@@ -1,11 +1,13 @@
 const {neon}=require('@neondatabase/serverless');
 const crypto=require('node:crypto');
 const COOKIE='yad_admin_session';
+const adminPassword=process.env.ADMIN_PASSWORD||process.env.Admin_password;
+const sessionSecret=process.env.ADMIN_SESSION_SECRET||process.env.admin_session_secret;
 const maxAge=60*60*8;
-function configured(){return Boolean(process.env.ADMIN_PASSWORD&&process.env.ADMIN_SESSION_SECRET&&process.env.ADMIN_PASSWORD.length>=12&&process.env.ADMIN_SESSION_SECRET.length>=32&&process.env.DATABASE_URL)}
+function configured(){return Boolean(adminPassword&&sessionSecret&&adminPassword.length>=12&&sessionSecret.length>=32&&process.env.DATABASE_URL)}
 function digest(v){return crypto.createHash('sha256').update(String(v)).digest()}
 function equal(a,b){return crypto.timingSafeEqual(digest(a),digest(b))}
-function sign(payload){return crypto.createHmac('sha256',process.env.ADMIN_SESSION_SECRET).update(payload).digest('hex')}
+function sign(payload){return crypto.createHmac('sha256',sessionSecret).update(payload).digest('hex')}
 function authorized(req){const cookies=(req.headers.cookie||'').split(';').map(s=>s.trim());const value=cookies.find(x=>x.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);if(!value)return false;const match=/^(\d+)\.([a-f0-9]{64})$/.exec(value);if(!match||Number(match[1])<Date.now()||Number(match[1])>Date.now()+maxAge*1000)return false;return equal(match[2],sign(match[1]))}
 function cookie(value,age){return COOKIE+'='+value+'; HttpOnly; Secure; SameSite=Strict; Path=/api/admin; Max-Age='+age}
 module.exports=async(req,res)=>{
@@ -13,7 +15,7 @@ module.exports=async(req,res)=>{
  if(!configured())return res.status(503).json({error:'Панель администратора ещё не активирована.'});
  if(req.method==='POST'&&req.query.action==='login'){
   const b=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
-  if(typeof b.password!=='string'||!equal(b.password,process.env.ADMIN_PASSWORD))return res.status(401).json({error:'Неверный пароль.'});
+  if(typeof b.password!=='string'||!equal(b.password,adminPassword))return res.status(401).json({error:'Неверный пароль.'});
   const exp=String(Date.now()+maxAge*1000);res.setHeader('Set-Cookie',cookie(exp+'.'+sign(exp),maxAge));return res.status(200).json({ok:true});
  }
  if(req.method==='POST'&&req.query.action==='logout'){res.setHeader('Set-Cookie',cookie('',0));return res.status(200).json({ok:true})}
