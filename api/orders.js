@@ -3,15 +3,46 @@ const prices={6:500,10:700,20:1300,30:1800,50:2700,100:5000};
 const allowed=new Set(['immensite','imagination','escentric02','tygar','aventus','kirke','blackpepper','amberwood','tilia','megamare']);
 const fee=250;
 const perfumeNames={immensite:"L’Immensité",imagination:"Imagination",escentric02:"Escentric 02",tygar:"Tygar",aventus:"Aventus",kirke:"Kirke",blackpepper:"Black Pepper",amberwood:"Amber Wood",tilia:"Tilia",megamare:"Megamare",discovery:"Discovery Set"};
+function telegramEscape(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function rub(n){return new Intl.NumberFormat('ru-RU').format(n)+' ₽'}
 async function notifyTelegram(order,b,items){
  const token=process.env.YAD_TELEGRAM_BOT_TOKEN,chat=process.env.YAD_TELEGRAM_CHAT_ID;
  if(!token||!chat)return;
- const lines=['🛍 Новый заказ YAD','№ '+String(order.public_id).slice(0,8).toUpperCase(),'Сумма: '+order.total_rub+' ₽','','🧴 Состав заказа:'];
- for(const item of items){lines.push('• '+(perfumeNames[item.id]||item.title)+(item.ml?' · '+item.ml+' мл':'')+' × '+item.qty+' — '+(item.unit_price*item.qty)+' ₽')}
- lines.push('','Покупатель: '+b.name.trim(),'Связь: '+(b.method==='whatsapp'?'WhatsApp':'Telegram')+' · '+b.contact.trim(),'Доставка: '+b.delivery,'Пункт выдачи: '+b.address.trim());
- if(b.comment.trim())lines.push('','💬 Комментарий: '+b.comment.trim());
+ const lines=[
+  '🛍 <b>НОВЫЙ ЗАКАЗ · YAD</b>',
+  '<code>№ '+telegramEscape(String(order.public_id).slice(0,8).toUpperCase())+'</code>',
+  '',
+  '🧴 <b>ТОВАРЫ</b>'
+ ];
+ for(const item of items){
+  const name=perfumeNames[item.id]||item.title;
+  lines.push('• '+telegramEscape(name)+(item.ml?' · '+item.ml+' мл':'')+' × '+item.qty);
+  lines.push('   '+rub(item.unit_price*item.qty));
+ }
+ lines.push(
+  '',
+  '💰 <b>ОПЛАТА</b>',
+  'Товары: '+rub(order.total_rub-fee),
+  'Доставка: '+rub(fee),
+  '<b>Итого: '+rub(order.total_rub)+'</b>',
+  '',
+  '👤 <b>ПОКУПАТЕЛЬ</b>',
+  telegramEscape(b.name.trim()),
+  'Связь: '+(b.method==='whatsapp'?'WhatsApp':'Telegram'),
+  '<code>'+telegramEscape(b.contact.trim())+'</code>',
+  '',
+  '📦 <b>ДОСТАВКА</b>',
+  telegramEscape(b.delivery),
+  telegramEscape(b.address.trim())
+ );
+ if(b.comment.trim())lines.push('','💬 <b>КОММЕНТАРИЙ</b>',telegramEscape(b.comment.trim()));
  try{
-  const response=await fetch('https://api.telegram.org/bot'+token+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chat,text:lines.join('\\n'),disable_web_page_preview:true}),signal:AbortSignal.timeout(3500)});
+  const response=await fetch('https://api.telegram.org/bot'+token+'/sendMessage',{
+   method:'POST',
+   headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({chat_id:chat,text:lines.join('\n'),parse_mode:'HTML',disable_web_page_preview:true}),
+   signal:AbortSignal.timeout(3500)
+  });
   if(!response.ok)console.error('YAD notification failed',response.status);
  }catch(e){console.error('YAD notification unavailable',e?.message)}
 }
