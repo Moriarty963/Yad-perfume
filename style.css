@@ -105,3 +105,8 @@
 .product-info button{border-color:#b6a081;color:#eae2d5;min-height:45px;transition:background .2s,color .2s}
 .product-info button:active{transform:scale(.99)}
 @media(max-width:700px){.product-meta{font-size:8px;letter-spacing:.07em}.product-price{font-size:17px}.product-info h3{min-height:0}}
+
+.real-bottle-photo{display:none;position:absolute;z-index:4;left:50%;top:50%;height:76%;max-width:76%;width:auto;object-fit:contain;transform:translate(-50%,-50%);filter:drop-shadow(12px 18px 13px #000b)}
+.product-art.photo-loaded.photo-volume-20 .real-bottle-photo{display:block}
+.product-art.photo-loaded.photo-volume-20 .yad-product-bottle{visibility:hidden}
+@media(max-width:700px){.real-bottle-photo{height:80%;max-width:80%}}
