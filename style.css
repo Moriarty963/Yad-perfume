@@ -397,3 +397,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .products{gap:10px}.product-info{padding:12px}
  .tools{gap:8px}
 }
+
+
+/* Unified bright product stages */
+.product-art,.detail-visual .product-art{background:linear-gradient(145deg,#f8f7f4,#e9e7e1)!important}
+.product-art .scene-backdrop{display:none}
+.product-art .yad-product-bottle{filter:drop-shadow(9px 14px 10px #29292535)}
+.product-art .real-bottle-photo{filter:drop-shadow(9px 14px 10px #29292535)}
+.market-card-photo{background:linear-gradient(145deg,#f8f7f4,#e9e7e1)!important}
+.market-mini-bottle{filter:drop-shadow(6px 9px 8px #29292524)}
+.product-info .product-image-link{display:block;font-size:11px;color:#756b5e;margin:4px 0 9px;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:760px){.product-art{height:210px}.product-art .yad-product-bottle{--bottle-scale:.83}.product-info .product-image-link{font-size:10px}}
