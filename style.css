@@ -96,3 +96,12 @@
 .volume-100 .yad-glass{width:148px;height:170px}
 .volume-50 .yad-cap,.volume-100 .yad-cap{width:83px}
 @media(max-width:700px){.product-art .volume-6{transform:scale(.65)}.product-art .volume-10{transform:scale(.73)}.product-art .volume-20,.product-art .volume-30,.product-art .volume-50,.product-art .volume-100{transform:scale(.78)}}
+
+/* Catalog merchandising refinements */
+.product-meta{display:flex;justify-content:space-between;gap:8px;color:#b8a88e;font-size:9px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px}
+.product-price{font:400 19px/1.2 Georgia,serif;color:#e9e4d9!important;min-height:0!important;margin:14px 0 6px}
+.product-info h3{min-height:35px;margin-bottom:6px}
+.product-info select{border-color:#77746c;background:#252623;min-height:46px}
+.product-info button{border-color:#b6a081;color:#eae2d5;min-height:45px;transition:background .2s,color .2s}
+.product-info button:active{transform:scale(.99)}
+@media(max-width:700px){.product-meta{font-size:8px;letter-spacing:.07em}.product-price{font-size:17px}.product-info h3{min-height:0}}
