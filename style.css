@@ -49,3 +49,30 @@
 .product:hover .yad-product-bottle{transform:scale(1.045) translateY(-5px)}
 @media(max-width:700px){.product-art{height:235px}.yad-product-bottle{--bottle-scale:.78}.product:hover .yad-product-bottle{transform:scale(.78)}}
 @media(prefers-reduced-motion:reduce){.yad-product-bottle{transition:none}}
+
+/* YAD editorial product sets: scenic backdrop, stone plinth and layered light */
+.product-art{height:330px;isolation:isolate;overflow:hidden;background:#11191a;position:relative}
+.product-art:before{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,#080c0f30 0%,transparent 42%,#090b0da8 100%),radial-gradient(ellipse at 65% 24%,#81918b 0%,#3b494a 27%,#111b1e 72%);opacity:1}
+.scene-backdrop{position:absolute;inset:0;overflow:hidden;z-index:1;pointer-events:none}
+.scene-backdrop i{position:absolute;display:block;pointer-events:none}
+.scene-light{inset:-20%;background:radial-gradient(ellipse at 75% 17%,#e6d3a05c,transparent 38%),radial-gradient(ellipse at 24% 50%,#a5aaa026,transparent 48%);mix-blend-mode:screen}
+.scene-ridge{width:130%;height:60%;left:-15%;bottom:17%;filter:blur(1.5px)}
+.ridge-one{background:linear-gradient(155deg,#72807a,#263539);clip-path:polygon(0 90%,13% 55%,27% 70%,43% 20%,58% 55%,74% 12%,89% 56%,100% 30%,100% 100%,0 100%);opacity:.48}
+.ridge-two{bottom:0;height:49%;background:linear-gradient(145deg,#3e4a45,#10191b);clip-path:polygon(0 45%,18% 75%,32% 28%,51% 67%,70% 20%,88% 54%,100% 30%,100% 100%,0 100%);opacity:.8}
+.scene-stone{width:110%;height:26%;left:-5%;bottom:-5%;background:linear-gradient(167deg,#666b64 0%,#292d2a 25%,#111615 70%);clip-path:polygon(0 16%,14% 4%,43% 11%,64% 1%,87% 10%,100% 4%,100% 100%,0 100%);box-shadow:inset 0 12px 20px #ffffff22}
+.scene-stone:after{content:"";position:absolute;inset:8px 0 0;background:repeating-linear-gradient(166deg,transparent 0 9px,#ffffff0a 10px 11px,transparent 12px 23px)}
+.scene-foreground{inset:0;background:linear-gradient(90deg,#060a0d75,transparent 27%,transparent 75%,#060a0d5a),linear-gradient(0deg,#090c0b8c,transparent 21%)}
+.scene-branch{width:150px;height:190px;left:-50px;bottom:4%;opacity:.7;transform:rotate(-25deg);background:radial-gradient(ellipse at 56% 40%,#56634b 0 4%,transparent 5%),radial-gradient(ellipse at 35% 25%,#697257 0 8%,transparent 9%),radial-gradient(ellipse at 74% 66%,#465a49 0 11%,transparent 12%),linear-gradient(100deg,transparent 47%,#5e5644 48% 50%,transparent 51%)}
+.product-art.scene-fresh:before{background:linear-gradient(180deg,#09151a40,transparent 45%,#091214ad),radial-gradient(ellipse at 66% 22%,#a7b5b0,#526a70 26%,#10242a 72%)}
+.product-art.scene-woody:before{background:linear-gradient(180deg,#0d101040,transparent 45%,#090c0cad),radial-gradient(ellipse at 70% 18%,#998b74,#4b4a3e 32%,#1a1e1b 78%)}
+.product-art.scene-intense:before{background:linear-gradient(180deg,#170d0e50,transparent 45%,#110d0fad),radial-gradient(ellipse at 66% 20%,#a1877c,#554043 28%,#211a1c 74%)}
+.product-art.scene-floral:before{background:linear-gradient(180deg,#13170e40,transparent 45%,#0c120dad),radial-gradient(ellipse at 66% 20%,#b4b69a,#666b58 30%,#1d2720 74%)}
+.product-art.scene-intense .scene-light{background:radial-gradient(ellipse at 75% 18%,#c18e695c,transparent 45%)}
+.product-art.scene-woody .scene-branch{opacity:1}
+.product-art.scene-floral .scene-branch{filter:hue-rotate(42deg) brightness(1.2)}
+.product-art .yad-product-bottle{z-index:3;filter:drop-shadow(10px 13px 8px #000e);transform:scale(1.03) translateY(-5px)}
+.product-art .yad-glass{background:linear-gradient(90deg,#e0e5dc28 0%,#ffffff70 7%,#dce3d72b 20%,#ffffff20 60%,#ffffff75 94%,#c8cfc32b 100%);backdrop-filter:blur(1px)}
+.product-art .yad-label{color:#151514}
+.product-art:after{z-index:2;bottom:34px;width:160px;height:23px;background:#000b;filter:blur(12px)}
+.product:hover .yad-product-bottle{transform:scale(1.065) translateY(-10px)}
+@media(max-width:700px){.product-art{height:235px}.product-art .yad-product-bottle{transform:scale(.79) translateY(-8px)}.product:hover .yad-product-bottle{transform:scale(.79) translateY(-8px)}.scene-branch{transform:scale(.7) rotate(-25deg);transform-origin:bottom left}}
