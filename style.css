@@ -139,3 +139,6 @@ body.cart-open{overflow:hidden}.drawer{overscroll-behavior:contain}.drawer-top{f
 
 /* Mobile conversion: persistent cart summary, never covers the checkout drawer */
 .mobile-cart-bar{display:none}.mobile-cart-bar[hidden]{display:none!important}@media(max-width:760px){body:not(.cart-open) .mobile-cart-bar:not([hidden]){display:flex;align-items:center;justify-content:space-between;gap:12px;position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;right:12px;z-index:45;background:#d3bea0;color:#171816;border:1px solid #e7d9c4;border-radius:5px;padding:13px 17px;box-shadow:0 12px 36px #0009;cursor:pointer;text-align:left}.mobile-cart-bar>span:first-child{display:flex;flex-direction:column;gap:3px}.mobile-cart-bar strong{font-size:14px}.mobile-cart-bar small{font-size:11px;color:#46413a}.mobile-cart-bar>span:nth-child(2){font-size:15px;font-weight:700;white-space:nowrap}.mobile-cart-bar>span:last-child{font-size:22px}body:has(.mobile-cart-bar:not([hidden])) footer{padding-bottom:100px}}.mobile-cart-bar:focus-visible{outline:3px solid #fff;outline-offset:3px}
+
+/* Checkout privacy and keyboard guidance */
+.privacy-note{font-size:11px;line-height:1.65;color:#a6a29a;margin:8px 0 14px}.drawer input:focus-visible{outline:2px solid #d5bc92;outline-offset:2px}
