@@ -2,6 +2,8 @@ const {neon}=require('@neondatabase/serverless');
 const prices={6:500,10:700,20:1300,30:1800,50:2700,100:5000};
 const allowed=new Set(['immensite','imagination','escentric02','tygar','aventus','kirke','blackpepper','amberwood','tilia','megamare']);
 const fee=250;
+const travelSurcharge={6:90,10:90};
+const travelColors=new Set(['Чёрный','Белый мрамор','Серый мрамор']);
 const perfumeNames={immensite:"L’Immensité",imagination:"Imagination",escentric02:"Escentric 02",tygar:"Tygar",aventus:"Aventus",kirke:"Kirke",blackpepper:"Black Pepper",amberwood:"Amber Wood",tilia:"Tilia",megamare:"Megamare",discovery:"Discovery Set"};
 function telegramEscape(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function rub(n){return new Intl.NumberFormat('ru-RU').format(n)+' ₽'}
@@ -16,7 +18,7 @@ async function notifyTelegram(order,b,items){
  ];
  for(const item of items){
   const name=perfumeNames[item.id]||item.title;
-  lines.push('• '+telegramEscape(name)+(item.ml?' · '+item.ml+' мл':'')+' × '+item.qty);
+  lines.push('• '+telegramEscape(name)+(item.ml?' · '+item.ml+' мл':'')+(item.variant==='travel'?' · Travel / '+telegramEscape(item.color):'')+' × '+item.qty);
   lines.push('   '+rub(item.unit_price*item.qty));
  }
  lines.push(
@@ -61,12 +63,12 @@ module.exports=async(req,res)=>{
   const items=[];
   for(const x of b.items){
    if(!x||!Number.isInteger(x.qty)||x.qty<1||x.qty>30)return res.status(400).json({error:'Неверное количество.'});
-   let price,title,ml;
+   let price,title,ml,variant='glass',color=null;
    if(x.id==='discovery'){price=990;title='Discovery Set';ml=0}
-   else if(allowed.has(x.id)&&Number.isInteger(x.ml)&&prices[x.ml]){price=prices[x.ml];title=x.id;ml=x.ml}
+   else if(allowed.has(x.id)&&Number.isInteger(x.ml)&&prices[x.ml]){ml=x.ml;variant=x.variant||'glass';if(!['glass','travel'].includes(variant))return res.status(400).json({error:'Неверное исполнение флакона.'});if(variant==='travel'){if(!travelSurcharge[ml]||!travelColors.has(x.color))return res.status(400).json({error:'Недоступный Travel флакон или цвет.'});color=x.color}price=prices[ml]+(variant==='travel'?travelSurcharge[ml]:0);title=x.id}
    else return res.status(400).json({error:'Некорректный товар.'});
    subtotal+=price*x.qty;
-   items.push({id:x.id,title,ml,qty:x.qty,unit_price:price});
+   items.push({id:x.id,title,ml,variant,color,qty:x.qty,unit_price:price});
   }
   if(subtotal>1000000)return res.status(400).json({error:'Слишком большая сумма заказа.'});
   const sql=neon(process.env.DATABASE_URL);
