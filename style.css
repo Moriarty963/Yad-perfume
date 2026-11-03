@@ -408,3 +408,5 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .market-mini-bottle{filter:drop-shadow(6px 9px 8px #29292524)}
 .product-info .product-image-link{display:block;font-size:11px;color:#756b5e;margin:4px 0 9px;text-decoration:underline;text-underline-offset:3px}
 @media(max-width:760px){.product-art{height:210px}.product-art .yad-product-bottle{--bottle-scale:.83}.product-info .product-image-link{font-size:10px}}
+
+.detail-packaging{background:#fff;border:1px solid #e7e4df;border-radius:12px;padding:16px 18px;margin:14px 0;color:#282722}.detail-packaging strong{display:block;font-size:14px;margin-bottom:6px}.detail-packaging p{font-size:13px;line-height:1.5;color:#64615c;margin:0 0 7px}.detail-packaging small{display:block;font-size:11px;line-height:1.5;color:#827d74;margin-top:5px}
