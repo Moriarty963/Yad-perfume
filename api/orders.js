@@ -2,7 +2,19 @@ const {neon}=require('@neondatabase/serverless');
 const prices={6:500,10:700,20:1300,30:1800,50:2700,100:5000};
 const allowed=new Set(['immensite','imagination','escentric02','tygar','aventus','kirke','blackpepper','amberwood','tilia','megamare']);
 const fee=250;
-async function notifyTelegram(order,b){const token=process.env.YAD_TELEGRAM_BOT_TOKEN,chat=process.env.YAD_TELEGRAM_CHAT_ID;if(!token||!chat)return;const lines=['🛍 Новый заказ YAD','№ '+String(order.public_id).slice(0,8).toUpperCase(),'Сумма: '+order.total_rub+' ₽','Покупатель: '+b.name.trim(),'Связь: '+b.method+' · '+b.contact.trim(),'Доставка: '+b.delivery,'Пункт выдачи: '+b.address.trim()];try{const response=await fetch('https://api.telegram.org/bot'+token+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chat,text:lines.join('\n'),disable_web_page_preview:true}),signal:AbortSignal.timeout(3500)});if(!response.ok)console.error('YAD notification failed',response.status)}catch(e){console.error('YAD notification unavailable',e?.message)}}
+const perfumeNames={immensite:"L’Immensité",imagination:"Imagination",escentric02:"Escentric 02",tygar:"Tygar",aventus:"Aventus",kirke:"Kirke",blackpepper:"Black Pepper",amberwood:"Amber Wood",tilia:"Tilia",megamare:"Megamare",discovery:"Discovery Set"};
+async function notifyTelegram(order,b,items){
+ const token=process.env.YAD_TELEGRAM_BOT_TOKEN,chat=process.env.YAD_TELEGRAM_CHAT_ID;
+ if(!token||!chat)return;
+ const lines=['🛍 Новый заказ YAD','№ '+String(order.public_id).slice(0,8).toUpperCase(),'Сумма: '+order.total_rub+' ₽','','🧴 Состав заказа:'];
+ for(const item of items){lines.push('• '+(perfumeNames[item.id]||item.title)+(item.ml?' · '+item.ml+' мл':'')+' × '+item.qty+' — '+(item.unit_price*item.qty)+' ₽')}
+ lines.push('','Покупатель: '+b.name.trim(),'Связь: '+(b.method==='whatsapp'?'WhatsApp':'Telegram')+' · '+b.contact.trim(),'Доставка: '+b.delivery,'Пункт выдачи: '+b.address.trim());
+ if(b.comment.trim())lines.push('','💬 Комментарий: '+b.comment.trim());
+ try{
+  const response=await fetch('https://api.telegram.org/bot'+token+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chat,text:lines.join('\\n'),disable_web_page_preview:true}),signal:AbortSignal.timeout(3500)});
+  if(!response.ok)console.error('YAD notification failed',response.status);
+ }catch(e){console.error('YAD notification unavailable',e?.message)}
+}
 function validText(v,max){return typeof v==='string'&&v.trim().length>0&&v.trim().length<=max}
 module.exports=async(req,res)=>{
  res.setHeader('Cache-Control','no-store');
@@ -28,6 +40,6 @@ module.exports=async(req,res)=>{
   if(subtotal>1000000)return res.status(400).json({error:'Слишком большая сумма заказа.'});
   const sql=neon(process.env.DATABASE_URL);
   const rows=await sql`INSERT INTO yad_orders (customer_name,customer_phone,contact_method,contact_value,delivery_service,pickup_address,comment,items,subtotal_rub,delivery_rub,total_rub) VALUES (${b.name.trim()},${b.method==='whatsapp'?b.contact.trim():null},${b.method},${b.contact.trim()},${b.delivery},${b.address.trim()},${b.comment.trim()},${JSON.stringify(items)}::jsonb,${subtotal},${fee},${subtotal+fee}) RETURNING public_id,created_at,total_rub`;
-  await notifyTelegram(rows[0],b);return res.status(201).json({order_id:rows[0].public_id,total:rows[0].total_rub});
+  await notifyTelegram(rows[0],b,items);return res.status(201).json({order_id:rows[0].public_id,total:rows[0].total_rub});
  }catch(e){console.error('YAD order submission failed',e?.message);return res.status(500).json({error:'Не удалось сохранить заказ. Попробуйте ещё раз.'})}
 };
