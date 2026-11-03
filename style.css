@@ -133,3 +133,6 @@ body.cart-open{overflow:hidden}.drawer{overscroll-behavior:contain}.drawer-top{f
 
 /* Individual fragrance share links */
 .product-info button.share-scent{display:block;width:100%;margin-top:9px;background:transparent;color:#c8b89d;border:1px solid #ffffff30;font-size:12px;padding:12px 10px;cursor:pointer}.product-info button.share-scent:hover{background:#ffffff12;border-color:#c8b89d}.product-info button.share-scent:focus-visible{outline:2px solid #d4b985;outline-offset:3px}.product.linked-product{outline:1px solid #b9a17b;outline-offset:4px;scroll-margin-top:95px}
+
+/* Favorites: local, private to this browser */
+.product{position:relative}.favorite-toggle{position:absolute;right:13px;top:13px;z-index:3;width:38px;height:38px;border:1px solid #ffffff48;border-radius:50%;background:#171817d9;color:#eee3d2;font-size:24px;line-height:1;cursor:pointer;display:grid;place-items:center}.favorite-toggle[aria-pressed=true]{color:#e6b7a7;border-color:#e6b7a7}.favorite-toggle:focus-visible,.favorites-filter:focus-visible{outline:2px solid #e0c49b;outline-offset:3px}.favorites-filter{border:1px solid #ffffff42;background:transparent;color:#e4ded5;padding:11px 14px;cursor:pointer}.favorites-filter.active,.favorites-filter[aria-pressed=true]{background:#c3ad8e;color:#181817;border-color:#c3ad8e}.favorites-filter span{font-variant-numeric:tabular-nums}
