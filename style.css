@@ -427,3 +427,36 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .product-art.has-volume-photo .yad-product-bottle,.product-art.has-volume-photo .scene-backdrop,.market-card-photo.has-volume-photo .market-mini-bottle{visibility:hidden}
 .product-art.has-volume-photo,.market-card-photo.has-volume-photo{background:#f7f2ef}
 .market-card-photo .yad-volume-photo{object-fit:cover}
+
+
+/* YAD premium fragrance product detail, responsive */
+body[data-page^="fragrance/"] .detail-layout{max-width:1440px;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(24px,3.5vw,64px);align-items:start}
+.detail-gallery{display:grid;grid-template-columns:72px minmax(0,1fr);gap:16px;min-width:0}
+.detail-thumbnails{display:flex;flex-direction:column;gap:12px}
+.detail-thumb{width:72px;aspect-ratio:1;border:1px solid #e3dfd8;border-radius:14px;background:linear-gradient(145deg,#e9e4dc,#faf9f6);font-family:Georgia,serif;font-size:18px;color:#7e7569;cursor:pointer}
+.detail-thumb.active{border:2px solid #22201d;color:#22201d}
+.detail-gallery .detail-visual{position:relative;min-width:0;border-radius:22px;overflow:hidden;background:#f3f0eb}
+.detail-gallery .detail-visual .product-art{min-height:560px;height:min(68vw,690px);border-radius:22px}
+.detail-gallery .detail-visual .yad-volume-photo{object-fit:contain}
+.detail-copy h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(40px,5vw,76px);font-weight:400;letter-spacing:-.035em;line-height:1.06}
+.detail-copy .eyebrow{letter-spacing:.13em;font-size:12px}
+.detail-copy .detail-story{font-size:clamp(15px,1.5vw,19px);line-height:1.65}
+.detail-note-section{margin:24px 0}
+.detail-note-section h2{font-family:Georgia,serif;font-size:25px;font-weight:400;margin:0 0 14px}
+.detail-note-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.detail-note-tile{min-height:100px;border-radius:14px;background:#f2f0ed;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;padding:10px;text-align:center}
+.detail-note-tile span{font-size:27px;color:#998b76}
+.detail-note-tile strong{font-size:13px;font-weight:500;color:#292622}
+.detail-sizes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.detail-sizes button{min-width:0;padding:12px 6px}
+.detail-sizes button[aria-pressed=true]{background:#242321;color:white;border-color:#242321}
+.detail-sizes button[aria-pressed=true] small{color:#e9e5e0}
+.detail-add{width:100%;min-height:60px;background:#1e1e1d;color:white;border-radius:12px;font-size:17px}
+.detail-gallery .detail-visual[data-gallery-current="cap"] .yad-volume-photo{transform:scale(2.5);transform-origin:50% 22%}
+.detail-gallery .detail-visual[data-gallery-current="label"] .yad-volume-photo{transform:scale(2.1);transform-origin:50% 58%}
+.detail-gallery .detail-visual[data-gallery-current="glass"] .yad-volume-photo{transform:scale(2.5);transform-origin:50% 83%}
+.detail-gallery .detail-visual[data-gallery-current="cap"] .yad-product-bottle{transform:scale(1.85) translateY(25%)}
+.detail-gallery .detail-visual[data-gallery-current="label"] .yad-product-bottle{transform:scale(1.8)}
+.detail-gallery .detail-visual[data-gallery-current="glass"] .yad-product-bottle{transform:scale(1.9) translateY(-22%)}
+@media(max-width:900px){body[data-page^="fragrance/"] .detail-layout{grid-template-columns:1fr}.detail-gallery .detail-visual .product-art{height:500px;min-height:380px}}
+@media(max-width:600px){.detail-gallery{grid-template-columns:1fr;gap:10px}.detail-thumbnails{order:2;flex-direction:row;justify-content:center;gap:10px}.detail-thumb{width:54px;border-radius:10px;font-size:13px}.detail-gallery .detail-visual .product-art{height:380px;min-height:320px}.detail-copy h1{font-size:43px}.detail-note-tile{min-height:85px}.detail-note-section h2{font-size:21px}.detail-sizes{grid-template-columns:repeat(3,minmax(0,1fr))}}
