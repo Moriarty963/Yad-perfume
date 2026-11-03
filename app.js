@@ -49,7 +49,7 @@ $('submitSiteOrder').addEventListener('click',async()=>{
  const method=document.querySelector('input[name="contactMethod"]:checked')?.value;
  const contact=$('preferredContact').value.trim();
  if(method==='telegram'&&!/^@[A-Za-z0-9_]{5,32}$/.test(contact)){status.textContent='Укажите Telegram в формате @username (не менее 5 символов).';$('preferredContact').focus();return}
- if(method==='whatsapp'&&!/^\\+?[\\d\\s()\\-]{10,25}$/.test(contact)){status.textContent='Укажите корректный номер WhatsApp.';$('preferredContact').focus();return}
+ if(method==='whatsapp'&&!/^\+?[\d\s()\-]{10,25}$/.test(contact)){status.textContent='Укажите корректный номер WhatsApp.';$('preferredContact').focus();return}
  const body={name:$('customerName').value.trim(),contact,method,address:$('customerAddress').value.trim(),delivery:document.querySelector('input[name="deliveryService"]:checked')?.value,comment:$('customerComment').value.trim(),items:cart.map(x=>({id:x.id,ml:x.ml,qty:x.qty}))};
  button.disabled=true;button.textContent='Сохраняем заявку…';status.textContent='Отправляем заказ на сайт YAD.';
  try{
