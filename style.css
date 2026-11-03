@@ -151,3 +151,23 @@ body.cart-open{overflow:hidden}.drawer{overscroll-behavior:contain}.drawer-top{f
 
 /* Resilient Telegram checkout draft, kept only in the open page */
 .order-preview[hidden]{display:none}.order-preview{margin-top:16px;padding:16px;border:1px solid #ffffff35;background:#ffffff08}.order-preview h3{font-size:15px;margin:0 0 8px;color:#e8dac6}.order-preview p{font-size:12px;line-height:1.55;color:#bbb3a8}.order-preview textarea{box-sizing:border-box;display:block;width:100%;min-height:150px;resize:vertical;padding:12px;margin:12px 0;background:#151515;border:1px solid #ffffff35;border-radius:2px;color:#eee;line-height:1.5;font-size:13px;user-select:text;-webkit-user-select:text}.order-telegram-link{display:block;text-align:center;padding:12px;margin-top:8px;border:1px solid #d1b994;color:#e5d2b6;text-decoration:none;font-size:13px}.order-telegram-link:focus-visible,.order-preview textarea:focus-visible{outline:2px solid #d1b994;outline-offset:2px}
+
+/* One-path checkout */
+.checkout-intro{font-size:13px;line-height:1.6;color:#b9b8b2;margin:16px 0 20px}
+.drawer-bottom{padding-bottom:max(28px,env(safe-area-inset-bottom))}
+.drawer-bottom label{margin:16px 0 0;color:#dedbd4;font-size:13px}
+.drawer-bottom label input:not([type=radio]){border:1px solid #414442;background:#121414;border-radius:6px;padding:14px 13px;min-height:48px}
+.drawer-bottom label input:focus{border-color:#c8b9a0;outline:1px solid #c8b9a0}
+.delivery-choice{border:0;padding:0;margin:20px 0 8px;display:flex;gap:10px;flex-wrap:wrap}
+.delivery-choice legend{font-size:13px;color:#dedbd4;padding:0;margin-bottom:10px}
+.delivery-choice label{margin:0;flex:1;min-width:115px;display:flex;align-items:center;justify-content:center;gap:9px;padding:12px;border:1px solid #444845;border-radius:6px;font-size:13px;cursor:pointer}
+.delivery-choice label:has(input:checked){background:#343531;border-color:#c1b19b;color:#fff}
+.delivery-choice input[type=radio]{width:15px;height:15px;margin:0;accent-color:#cbbba2}
+.drawer-bottom [hidden]{display:none!important}
+.privacy-note{color:#999;font-size:11px;line-height:1.5;margin:18px 0 8px}
+.checkout-submit{min-height:54px;border-radius:6px;font-size:15px;margin-top:12px}
+.checkout-submit:disabled{opacity:.65;cursor:wait}
+.checkout-status{margin:12px 0 0;font-size:13px;line-height:1.6;color:#c9bba5}
+.checkout-status.success{color:#d8e4d4;padding:15px;background:#26342c;border:1px solid #52745b;border-radius:6px}
+.checkout-status.error{color:#e9b5ae}
+#status:empty,.checkout-status:empty{display:none}
