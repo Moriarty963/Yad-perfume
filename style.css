@@ -179,3 +179,20 @@ body.cart-open{overflow:hidden}.drawer{overscroll-behavior:contain}.drawer-top{f
 .cart-items{overflow:visible;flex:none;min-height:0}
 .drawer-bottom{overflow:visible;max-height:none;flex:none;padding-bottom:calc(28px + env(safe-area-inset-bottom))}
 @media(max-width:700px){.drawer-bottom{overflow:visible;max-height:none}.drawer{padding-bottom:0}}
+
+
+/* YAD mobile app-like navigation — calm, compact, safe-area aware */
+.yad-bottom-nav{display:none}
+@media(max-width:760px){
+ .mobile-cart-bar{display:none!important}
+ .yad-bottom-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));position:fixed;bottom:0;left:0;right:0;z-index:45;padding:9px 9px calc(9px + env(safe-area-inset-bottom));background:rgba(18,19,19,.96);border-top:1px solid rgba(231,221,203,.16);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 -9px 25px #0005}
+ .yad-bottom-nav button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:52px;background:transparent;border:0;color:#8f918d;font-size:10px;letter-spacing:.015em;padding:3px 0}
+ .yad-bottom-nav button.active{color:#e2c8a4}
+ .yad-bottom-nav button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+ .yad-bottom-nav button:focus-visible{outline:2px solid #d7b98d;outline-offset:-2px;border-radius:8px}
+ .nav-cart-count{position:absolute;top:0;left:calc(50% + 7px);min-width:17px;height:17px;padding:0 4px;border-radius:12px;background:#d8c2a1;color:#1a1b19;display:grid;place-items:center;font-size:10px;font-weight:700;line-height:1}
+ .nav-cart-count[hidden]{display:none}
+ body:not(.cart-open){padding-bottom:calc(74px + env(safe-area-inset-bottom))}
+ body.cart-open .yad-bottom-nav{display:none}
+ #catalog{scroll-margin-top:70px}
+}
