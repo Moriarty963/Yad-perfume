@@ -76,3 +76,23 @@
 .product-art:after{z-index:2;bottom:34px;width:160px;height:23px;background:#000b;filter:blur(12px)}
 .product:hover .yad-product-bottle{transform:scale(1.065) translateY(-10px)}
 @media(max-width:700px){.product-art{height:235px}.product-art .yad-product-bottle{transform:scale(.79) translateY(-8px)}.product:hover .yad-product-bottle{transform:scale(.79) translateY(-8px)}.scene-branch{transform:scale(.7) rotate(-25deg);transform-origin:bottom left}}
+
+/* Real packaging proportions by volume: 6ml travel spray, 10ml silver atomizer, 20ml rectangular, larger glass variants are illustrative pending individual photos. */
+.yad-product-bottle.volume-6{transform:scale(.82) translateY(0)}
+.volume-6 .yad-cap{width:40px;height:69px;border-radius:7px 7px 3px 3px;box-shadow:inset 3px 0 5px #ffffff20,inset -4px 0 7px #000;background:linear-gradient(90deg,#08090a,#2c2d2e 45%,#08090a)}
+.volume-6 .yad-cap:after{display:none}
+.volume-6 .yad-collar{width:40px;height:13px;background:repeating-linear-gradient(90deg,#131516 0 2px,#292a2b 2px 3px)}
+.volume-6 .yad-glass{width:45px;height:153px;border-radius:6px 6px 7px 7px}
+.volume-6 .yad-label,.volume-10 .yad-label{display:none}
+.volume-6 .yad-tube,.volume-10 .yad-tube{left:50%;height:90%}
+.yad-product-bottle.volume-10{transform:scale(.94) translateY(0)}
+.volume-10 .yad-cap{width:55px;height:70px;border-radius:6px 6px 2px 2px;background:linear-gradient(90deg,#656a6d,#f5f5f3 27%,#a7acaf 55%,#e6e8e8 78%,#555b60);box-shadow:inset 4px 0 5px #fff6,inset -4px 0 6px #3335}
+.volume-10 .yad-cap:after{height:2px;top:60px;background:#565a5e}
+.volume-10 .yad-collar{width:55px;height:7px;background:linear-gradient(90deg,#555,#f1f1f1,#555)}
+.volume-10 .yad-glass{width:58px;height:165px;border-radius:12px 12px 10px 10px}
+.volume-30 .yad-glass,.volume-50 .yad-glass,.volume-100 .yad-glass{border-radius:15px 15px 12px 12px}
+.volume-30 .yad-glass{width:127px;height:162px}
+.volume-50 .yad-glass{width:140px;height:165px}
+.volume-100 .yad-glass{width:148px;height:170px}
+.volume-50 .yad-cap,.volume-100 .yad-cap{width:83px}
+@media(max-width:700px){.product-art .volume-6{transform:scale(.65)}.product-art .volume-10{transform:scale(.73)}.product-art .volume-20,.product-art .volume-30,.product-art .volume-50,.product-art .volume-100{transform:scale(.78)}}
