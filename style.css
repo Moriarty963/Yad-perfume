@@ -171,3 +171,11 @@ body.cart-open{overflow:hidden}.drawer{overscroll-behavior:contain}.drawer-top{f
 .checkout-status.success{color:#d8e4d4;padding:15px;background:#26342c;border:1px solid #52745b;border-radius:6px}
 .checkout-status.error{color:#e9b5ae}
 #status:empty,.checkout-status:empty{display:none}
+
+
+/* Unified cart scroll: one continuous pane for items and checkout */
+.drawer{overflow-y:auto;overflow-x:hidden;display:block;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.drawer-top{position:sticky;top:0;z-index:2;background:#1b1d1c}
+.cart-items{overflow:visible;flex:none;min-height:0}
+.drawer-bottom{overflow:visible;max-height:none;flex:none;padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+@media(max-width:700px){.drawer-bottom{overflow:visible;max-height:none}.drawer{padding-bottom:0}}
