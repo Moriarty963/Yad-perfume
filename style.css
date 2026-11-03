@@ -308,3 +308,92 @@ body[data-page="cart"] .cart-items{padding:16px 25px}
  .market-card-photo{height:190px}.market-card-copy{padding:11px}.market-card-copy>a{font-size:18px;margin:4px 0 12px}
  .market-promise{gap:8px;padding:18px 0}.market-promise strong{font-size:11px}.market-promise span{font-size:10px}
 }
+
+
+/* YAD LIGHT LUXURY — storefront-wide light design system */
+:root{color-scheme:light;--bg:#faf9f6;--panel:#fff;--line:#e7e4df;--fg:#20201e;--muted:#777771;--gold:#8b7863}
+html,body{background:#faf9f6;color:#20201e}
+body{color-scheme:light}
+.header{background:rgba(255,255,255,.94);border-bottom:1px solid #e9e7e2;box-shadow:0 1px 12px #1d1c1808}
+.header .logo{color:#171716}.header nav{color:#55534f}.header nav a:hover{color:#151515}
+.cart-button{color:#242424;border:1px solid #d8d5d0;background:#fff;border-radius:9px}
+.eyebrow,.market-overline,.market-section-title span{color:#8b7863}
+.market-home{background:#faf9f6}
+.market-head h1,.market-head p,.market-mark{color:#20201e}
+.market-head p{color:#797771}
+.market-search{background:#fff;border:1px solid #e3e1dc;color:#7b7a75;box-shadow:0 2px 8px #19191905}
+.market-search:hover{border-color:#b7aea1}
+.market-categories button{background:#fff;color:#484641;border-color:#e7e4df}
+.market-categories button:first-child{background:#242422;color:#fff;border-color:#242422}
+.market-hero{background:linear-gradient(115deg,#eae6df,#d8d5cd 55%,#b8b7ac);border:1px solid #e0ddd6}
+.market-hero-copy>span{color:#70685e}
+.market-hero-copy h2,.market-hero-copy h2 em{color:#292722}
+.market-hero-copy p{color:#585751}
+.market-hero-copy button{background:#222220;color:#fff;border-radius:6px}
+.market-hero-glow{background:#ffffff9c}
+.market-hero-cap{background:linear-gradient(90deg,#131413,#50504c,#101110)}
+.market-hero-glass{border-color:#b6b6ac;background:linear-gradient(110deg,#ffffff8c,#f3f1e999,#a8aca28c);color:#262626}
+.market-section-title h2{color:#20201e}.market-section-title button{color:#5c554c}
+.market-card{background:#fff;border:1px solid #e9e7e2;border-radius:12px;box-shadow:0 3px 12px #29261f08}
+.market-card-photo{background:radial-gradient(ellipse at center,#f5f3ef,#e9e7e2 80%)}
+.market-mini-bottle{border-color:#b1b2aa;border-top-color:#252624;background:linear-gradient(95deg,#e6e9e299,#ffffffbd,#d8ddd5a8);color:#242424;box-shadow:12px 15px 18px #2a2a241f}
+.market-card-copy>span{color:#85837d}.market-card-copy>a{color:#22211f}
+.market-card-bottom strong{color:#232320}.market-card-bottom button{background:#222220;color:#fff}
+.market-promise{border-top-color:#e5e2dc}.market-promise strong{color:#2d2c29}.market-promise span{color:#77756f}
+#catalog{background:#faf9f6}
+.section-head h2,.section-head p{color:#262521}
+.scent-finder{background:#fff;border:1px solid #e9e6e0;border-radius:12px}
+.scent-finder-title span{color:#86745d}.scent-finder-title strong{color:#272624}
+.scent-finder-options button{border:1px solid #e4e1dc;background:#faf9f6;color:#55514b;border-radius:20px}
+.scent-finder-options button:hover,.scent-finder-options button[aria-pressed=true]{background:#272724;color:#fff;border-color:#272724}
+.mood-hint,.catalog-count{color:#797771}
+.tools input,.tools select,.product select{background:#fff;color:#242422;border:1px solid #dfdcd6;border-radius:8px}
+.tools button,.favorites-filter,.reset-filters{background:#fff;color:#393833;border:1px solid #dfdcd6;border-radius:8px}
+.products{gap:14px}
+.product{background:#fff;border:1px solid #e9e7e2;border-radius:12px;overflow:hidden;box-shadow:0 3px 14px #29261f08}
+.product-art{background:radial-gradient(ellipse at 50% 50%,#f6f4f0,#e8e7e2 82%)}
+.product-info{padding:16px}
+.product-info h3,.product-info h3 a{color:#22211f}
+.product-info p,.product-meta{color:#77756e}
+.product-info .product-price{color:#22211f;font-size:18px;font-weight:600}
+.product-info button[data-add]{background:#232321;color:#fff;border:1px solid #232321;border-radius:8px;font-weight:600}
+.product-info button[data-add]:hover{background:#47443e;color:#fff}
+.product-info .share-scent{background:#fff;color:#595650;border:1px solid #e4e0da;border-radius:8px}
+.product-info .favorite-toggle{background:#fff;color:#262521;border:1px solid #e6e3dd}
+.scent-details,.scent-details summary,.scent-details p,.scent-details small{color:#6d6b65}
+.disclaimer,.hint{color:#77756f}
+.fragrance-detail{background:#faf9f6}
+.detail-breadcrumb,.detail-breadcrumb a{color:#716c63}
+.detail-copy h1{color:#22211f}.detail-notes{color:#716450}.detail-story{color:#696862}
+.detail-divider{border-top-color:#e5e1d9}.detail-label{color:#6c6962}
+.detail-visual{background:#efede8;border-radius:12px}
+.detail-visual .product-art{background:radial-gradient(ellipse at center,#f8f7f4,#e9e7e1 75%)}
+.detail-sizes button{background:#fff;border:1px solid #e2dfd9;color:#252421;border-radius:8px}
+.detail-sizes button small{color:#74716a}
+.detail-sizes button[aria-pressed=true]{background:#f1ede7;border-color:#4a4843;box-shadow:inset 0 0 0 1px #4a4843}
+.detail-total{color:#76736e}.detail-total strong{color:#242320}
+.detail-add{background:#222220;color:#fff;border-radius:8px}
+.detail-favorite{background:#fff;color:#282722;border:1px solid #dcd8d1;border-radius:8px}
+.detail-footnote{color:#77756e}
+body[data-page="cart"] .drawer{background:#faf9f6}
+body[data-page="cart"] .drawer-bottom{background:#fff;border:1px solid #e6e3dd;border-radius:12px}
+.drawer-top,.cart-row{border-bottom-color:#e8e4de}
+.drawer-top h2,.cart-row,.total{color:#242320}
+.drawer-top button,.cart-row button{color:#262521}
+.cart-row small{color:#77736c}
+.drawer-bottom{background:#fff;color:#252421;border-top-color:#e5e2dc}
+.drawer-bottom input,.drawer-bottom textarea,.drawer-bottom select{background:#fff;color:#242320;border:1px solid #dcd9d2;border-radius:7px}
+.drawer-bottom label,.drawer-bottom p,.drawer-bottom small{color:#55534e}
+.drawer-bottom button[type="button"],.drawer-bottom button[type="submit"]{border-radius:8px}
+footer{background:#fff;border-top:1px solid #e6e3de;color:#77746d}
+footer a{color:#55514b}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #71614f;outline-offset:3px}
+@media(max-width:760px){
+ .yad-bottom-nav,body[data-page="cart"].cart-open .yad-bottom-nav{background:rgba(255,255,255,.97);border-top:1px solid #e7e4df;box-shadow:0 -5px 18px #26231e0c}
+ .yad-bottom-nav button{color:#8a8984}
+ .yad-bottom-nav button.active{color:#20201e}
+ .yad-bottom-nav .nav-cart-badge{background:#242320;color:#fff}
+ .market-hero{background:linear-gradient(120deg,#eeece7,#d2d0c8)}
+ .products{gap:10px}.product-info{padding:12px}
+ .tools{gap:8px}
+}
