@@ -30,3 +30,22 @@
 :focus-visible{outline:2px solid #d4b985;outline-offset:4px}
 @media(max-width:700px){.hero{background:radial-gradient(ellipse at 65% 30%,#4c5551,#101516 70%)}.hero:before{background:linear-gradient(180deg,#0b1011a8 0%,#0b1011b5 55%,#101111 100%)}.hero-art{right:-15%;bottom:-8%;opacity:.42}.mountain-far{bottom:16%}.mountain-mid{bottom:-5%}.brand-manifesto{padding:85px 5%}.product:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){.mist{animation:none}.reveal{opacity:1;transform:none;transition:none}.product,.mini-bottle{transition:none}.hero-atmosphere,.hero-art{transform:none}}
+
+/* Native code-rendered YAD 20 ml bottle, based on the supplied real packaging */
+.product-art{height:315px;display:flex;align-items:center;justify-content:center;perspective:700px;background:radial-gradient(ellipse at 53% 35%,color-mix(in srgb,var(--glow),#a5a6a0 13%),#202323 73%,#131616)}
+.product-art:after{z-index:0;bottom:15px}
+.yad-product-bottle{--bottle-scale:1;position:relative;z-index:2;width:122px;height:242px;display:flex;align-items:center;flex-direction:column;filter:drop-shadow(15px 20px 13px #0009);transform:scale(var(--bottle-scale));transition:transform .4s ease}
+.yad-cap{width:73px;height:70px;flex:none;border-radius:10px 10px 3px 3px;background:linear-gradient(90deg,#070809 0%,#232425 12%,#0b0c0d 30%,#1d1f20 72%,#050607 100%);box-shadow:inset 3px 0 5px #ffffff25,inset -4px 0 7px #000,0 -5px 0 #bd9a49;position:relative}
+.yad-cap:after{content:"";position:absolute;left:0;right:0;top:-4px;height:7px;border-radius:50%;background:linear-gradient(90deg,#7e5924,#e6c777 37%,#ad792c 72%,#f4d583)}
+.yad-collar{width:70px;height:11px;flex:none;background:linear-gradient(90deg,#79551f,#f4d58b 33%,#ad7e32 70%,#533915);box-shadow:0 2px 4px #0007}
+.yad-glass{width:119px;height:157px;position:relative;border:2px solid #c6c9c2a8;border-radius:23px 23px 16px 16px;background:linear-gradient(90deg,#d5e3d51c 0%,#ffffff43 7%,#e0e4db0b 18%,#ffffff13 65%,#f3f7f147 93%,#bcc5bd18 100%);box-shadow:inset 6px 0 8px #ffffff5c,inset -7px 0 12px #0004,inset 0 -13px 4px #c4bca137,0 4px 2px #0007;overflow:hidden}
+.yad-glass:before{content:"";position:absolute;inset:7px 10px 11px;border:1px solid #ffffff3b;border-radius:16px 16px 11px 11px}
+.yad-glass:after{content:"";position:absolute;bottom:3px;left:8px;right:8px;height:9px;border-radius:50%;border-bottom:3px solid #f1f2eb7c;box-shadow:0 4px 5px #b8a98a66}
+.yad-tube{position:absolute;left:53%;top:0;width:2px;height:129px;background:linear-gradient(90deg,#ffffff95,#888b8855);transform:rotate(5deg);transform-origin:top;opacity:.65}
+.yad-label{position:absolute;inset:20px 15px 15px;display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:space-between;color:#191b1b;text-shadow:0 1px 2px #ffffff80;font-family:Georgia,serif}
+.yad-label span{font-size:8px;letter-spacing:.035em;white-space:nowrap}
+.yad-label strong{font-size:clamp(9px,1vw,12px);font-weight:400;line-height:1.2;overflow-wrap:anywhere;max-height:57px;overflow:hidden}
+.yad-label small{font:5.8px/1.3 Arial,sans-serif;letter-spacing:.02em}
+.product:hover .yad-product-bottle{transform:scale(1.045) translateY(-5px)}
+@media(max-width:700px){.product-art{height:235px}.yad-product-bottle{--bottle-scale:.78}.product:hover .yad-product-bottle{transform:scale(.78)}}
+@media(prefers-reduced-motion:reduce){.yad-product-bottle{transition:none}}
