@@ -145,3 +145,6 @@ body.cart-open{overflow:hidden}.drawer{overscroll-behavior:contain}.drawer-top{f
 
 /* Clear shopping-cart controls */
 .cart-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 20px;border-top:1px solid #ffffff1d}.cart-actions button{border:0;background:transparent;color:#c9b798;font-size:12px;cursor:pointer;padding:8px 0}.cart-actions button:last-child{color:#c9aaa2}.cart-actions button:hover{text-decoration:underline}.cart-actions button:focus-visible{outline:2px solid #d4b985;outline-offset:3px}.cart-actions button[hidden]{display:none}@media(max-width:380px){.cart-actions{padding:12px 14px}}
+
+/* Delivery checkout: clear fixed price and carrier selection */
+.checkout-breakdown{display:grid;gap:8px;margin:0 0 12px;color:#bbb4a9;font-size:13px}.checkout-breakdown>div{display:flex;justify-content:space-between;gap:12px}.checkout-breakdown strong{color:#e7dfd1;font-weight:500}.delivery-choice{display:flex;flex-wrap:wrap;gap:10px 20px;border:1px solid #ffffff32;padding:14px;margin:12px 0;color:#e8e0d5}.delivery-choice legend{padding:0 6px;font-size:13px;color:#d2bd9e}.delivery-choice label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px}.delivery-choice input{accent-color:#cdb08a;width:17px;height:17px}
