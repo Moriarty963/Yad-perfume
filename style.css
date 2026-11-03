@@ -110,3 +110,5 @@
 .product-art.photo-loaded.photo-volume-20 .real-bottle-photo{display:block}
 .product-art.photo-loaded.photo-volume-20 .yad-product-bottle{visibility:hidden}
 @media(max-width:700px){.real-bottle-photo{height:80%;max-width:80%}}
+
+.cart-qty{display:flex;align-items:center;gap:12px;flex-shrink:0}.cart-qty button{min-width:34px;min-height:34px;display:grid;place-items:center;border:1px solid #70695e;background:transparent;color:#eee;border-radius:4px;font-size:20px;cursor:pointer}.cart-qty span{min-width:18px;text-align:center;font-variant-numeric:tabular-nums}.cart-qty button:focus-visible{outline:2px solid #d7b98d;outline-offset:3px}
