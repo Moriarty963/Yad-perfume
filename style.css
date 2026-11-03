@@ -490,3 +490,11 @@ body[data-page^="fragrance/"] .detail-sizes button[aria-pressed="true"] small{co
 body[data-page^="fragrance/"] .detail-add{width:100%;min-height:65px;border-radius:13px;font-size:16px;background:linear-gradient(135deg,#2d2b29,#111);color:#fff}
 @media(min-width:1200px){body[data-page^="fragrance/"] .detail-sizes{grid-template-columns:repeat(6,minmax(0,1fr))}body[data-page^="fragrance/"] .detail-sizes button{padding:9px 3px;font-size:13px}}
 @media(max-width:760px){body[data-page^="fragrance/"] .detail-layout{grid-template-columns:minmax(0,1fr);gap:22px}.detail-gallery{grid-template-columns:minmax(0,1fr);gap:10px}.detail-thumbnails{order:2;flex-direction:row;gap:9px}.detail-thumb{height:47px;width:55px;font-size:13px;border-radius:9px}.detail-gallery .detail-visual,.detail-gallery .detail-visual .product-art{min-height:365px;height:365px}.detail-gallery .detail-visual{border-radius:16px}body[data-page^="fragrance/"] .detail-copy h1{font-size:43px}.detail-note-section{margin:20px 0}.detail-note-tile{min-height:90px}body[data-page^="fragrance/"] .detail-add{min-height:57px}}
+
+/* Detail gallery controls and editorial benefits */
+.detail-thumb{font-family:inherit;font-size:12px;font-weight:500;letter-spacing:.01em;line-height:1.2;overflow:hidden;word-break:normal}
+.detail-thumb:focus-visible{outline:2px solid #181715;outline-offset:3px}
+.detail-benefits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;padding:19px 0;border-top:1px solid #e6e0d9;border-bottom:1px solid #e6e0d9;margin:23px 0 14px}
+.detail-benefits span{font-size:12px;line-height:1.5;color:#60584e;text-align:center}
+.detail-benefits span+span{border-left:1px solid #e6e0d9}
+@media(max-width:760px){.detail-thumb{font-size:10px;width:66px}.detail-benefits{gap:5px}.detail-benefits span{font-size:10px;padding:0 4px}}
