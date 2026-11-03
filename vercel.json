@@ -11,6 +11,10 @@
     {
       "source": "/cart",
       "destination": "/"
+    },
+    {
+      "source": "/fragrance/:id",
+      "destination": "/"
     }
   ]
 }
