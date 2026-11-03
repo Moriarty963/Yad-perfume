@@ -57,10 +57,29 @@ $('fragranceDetail').addEventListener('click',e=>{
  if(e.target.closest('#detailFavorite')){toggleFavorite(id);renderFragranceDetail(id)}
 });
 
+
+function renderMarketHome(){
+ const featured=['imagination','tygar','kirke','aventus'].map(id=>fragrances.find(f=>f.id===id));
+ $('marketFeatured').innerHTML=featured.map(f=>`<article class="market-card"><a href="/fragrance/${f.id}" data-market-detail="${f.id}" class="market-card-photo scene-${f.family}" style="--glow:${f.glow}" aria-label="Открыть ${safe(f.name)}"><div class="market-mini-bottle"><span>YAD</span><small>${safe(f.name)}</small></div></a><div class="market-card-copy"><span>YAD · ${safe(f.notes)}</span><a href="/fragrance/${f.id}" data-market-detail="${f.id}">${safe(f.name)}</a><div class="market-card-bottom"><strong>от ${rub(prices[6])}</strong><button type="button" data-market-add="${f.id}" aria-label="Добавить ${safe(f.name)} 20 мл в корзину">+</button></div></div></article>`).join('');
+}
+function marketCatalog(family='all',focus=false){
+ navigate('catalog');$('family').value=family;$('search').value='';renderProducts();
+ if(focus)$('search').focus();
+}
+$('marketSearch').addEventListener('click',()=>marketCatalog('all',true));
+$('marketExplore').addEventListener('click',()=>marketCatalog());
+$('marketAll').addEventListener('click',()=>marketCatalog());
+document.querySelector('.market-categories').addEventListener('click',e=>{const b=e.target.closest('[data-market-family]');if(b)marketCatalog(b.dataset.marketFamily)});
+$('marketFeatured').addEventListener('click',e=>{
+ const addButton=e.target.closest('[data-market-add]');if(addButton){add(addButton.dataset.marketAdd,20);return}
+ const link=e.target.closest('[data-market-detail]');if(link){e.preventDefault();navigate('fragrance/'+link.dataset.marketDetail)}
+});
+renderMarketHome();
+
 function renderPage(){
  const page=currentPage();document.body.dataset.page=page;
  const isDetail=page.startsWith('fragrance/');const catalogPage=page==='catalog'||page==='favorites';
- document.querySelectorAll('main > *').forEach(el=>{el.hidden=isDetail?el.id!=='fragranceDetail':catalogPage?el.id!=='catalog':page==='home'?el.id==='catalog':true});
+ document.querySelectorAll('main > *').forEach(el=>{el.hidden=isDetail?el.id!=='fragranceDetail':catalogPage?el.id!=='catalog':page==='home'?el.id!=='marketHome':true});
  $('catalog').hidden=!catalogPage;if(isDetail)renderFragranceDetail(page.split('/')[1]);
  if(page==='favorites'){favoritesOnly=true;$('search').value='';$('family').value='all'}
  else if(page==='catalog'){favoritesOnly=false}
