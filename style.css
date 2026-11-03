@@ -142,3 +142,6 @@ body.cart-open{overflow:hidden}.drawer{overscroll-behavior:contain}.drawer-top{f
 
 /* Checkout privacy and keyboard guidance */
 .privacy-note{font-size:11px;line-height:1.65;color:#a6a29a;margin:8px 0 14px}.drawer input:focus-visible{outline:2px solid #d5bc92;outline-offset:2px}
+
+/* Clear shopping-cart controls */
+.cart-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 20px;border-top:1px solid #ffffff1d}.cart-actions button{border:0;background:transparent;color:#c9b798;font-size:12px;cursor:pointer;padding:8px 0}.cart-actions button:last-child{color:#c9aaa2}.cart-actions button:hover{text-decoration:underline}.cart-actions button:focus-visible{outline:2px solid #d4b985;outline-offset:3px}.cart-actions button[hidden]{display:none}@media(max-width:380px){.cart-actions{padding:12px 14px}}
