@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/catalog",
+      "destination": "/"
+    },
+    {
+      "source": "/favorites",
+      "destination": "/"
+    },
+    {
+      "source": "/cart",
+      "destination": "/"
+    }
+  ]
+}
