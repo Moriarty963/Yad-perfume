@@ -720,3 +720,11 @@ body[data-page^="fragrance/"] .atelier-mini-gallery .yad-mockup-label{z-index:2;
  .product-art .yad-mockup-label,.market-card-photo .yad-mockup-label{font-size:clamp(5px,1.8vw,9px)}
  body[data-page^="fragrance/"] .atelier-stage .yad-mockup-label{font-size:clamp(6px,2.25vw,12px)}
 }
+
+/* Compact image-aware order confirmation rows */
+.cart-row .cart-product{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+.cart-row .cart-bottle-photo{width:58px;height:74px;flex:0 0 58px;object-fit:contain;background:#f8f3ee;border-radius:10px;border:1px solid rgba(130,110,85,.12)}
+.cart-row .cart-product-copy{min-width:0;overflow-wrap:anywhere;line-height:1.4}
+.cart-row .cart-product-copy small{font-size:11px;line-height:1.45;padding-top:5px;color:inherit;opacity:.65}
+.cart-row .cart-qty{flex-shrink:0}
+@media(max-width:440px){.cart-row .cart-product{gap:9px}.cart-row .cart-bottle-photo{width:48px;height:64px;flex-basis:48px}}
