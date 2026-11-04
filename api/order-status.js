@@ -1,6 +1,6 @@
 'use strict';
 const {neon}=require('@neondatabase/serverless');
-const {configured,verifyToken}=require('./_order-status-token.js');
+const {configured,verifyToken}=require('../lib/order-status-token.js');
 const statuses=new Set(['new','confirmed','paid','shipped','completed','cancelled']);
 module.exports=async function orderStatus(req,res){
  res.setHeader('Cache-Control','no-store');
