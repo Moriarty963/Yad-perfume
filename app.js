@@ -227,8 +227,39 @@ function renderOrderReceipt(){
   :'<p class="order-receipt-note">Онлайн-проверка статуса доступна для новых заявок. Для этой заявки можно уточнить статус через WhatsApp.</p>';
  holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><h3>Заказ №${safe(lastOrder.number)}</h3><p>Мы свяжемся с вами в ${lastOrder.method==='telegram'?'Telegram':'WhatsApp'} для подтверждения.</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div>${trackingUI}<div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div><p class="order-receipt-retention">Сведения о последней заявке хранятся только в этом браузере, без имени, телефона и адреса. Токен статуса действует 180 дней.</p><button type="button" class="order-forget" data-order-forget>Удалить сведения о заявке с устройства</button>`;
 }
+async function checkLastOrderStatus(button){
+ if(!lastOrder?.statusToken)return;
+ const token=lastOrder.statusToken;
+ if(button){button.disabled=true;button.textContent='Проверяем…'}
+ const msg=$('orderStatusMessage');if(msg)msg.textContent='Запрашиваем актуальный статус…';
+ try{
+  const response=await fetch('/api/order-status',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})});
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(result.error||'Не удалось получить статус.');
+  if(!Object.prototype.hasOwnProperty.call(orderStatusDetails,result.status))throw new Error('Получен неизвестный статус заказа.');
+  if(lastOrder?.statusToken!==token)return;
+  lastOrder.status=result.status;
+  lastOrder.checkedAt=typeof result.checked_at==='string'?result.checked_at:new Date().toISOString();
+  saveLastOrder();
+  renderOrderReceipt();
+  const updated=$('orderStatusMessage');if(updated)updated.textContent='Статус обновлён по данным YAD.';
+ }catch(err){
+  if(lastOrder?.statusToken!==token)return;
+  const note=$('orderStatusMessage');if(note)note.textContent=String(err?.message||'Не удалось проверить статус. Попробуйте позже.');
+ }finally{
+  const active=$('orderReceipt')?.querySelector('[data-order-status]');
+  if(active){active.disabled=false;active.textContent='Проверить статус'}
+ }
+}
 $('orderReceipt').addEventListener('click',async event=>{
- if(!event.target.closest('[data-order-copy]')||!lastOrder)return;
+ if(!lastOrder)return;
+ const check=event.target.closest('[data-order-status]');
+ if(check){await checkLastOrderStatus(check);return}
+ if(event.target.closest('[data-order-forget]')){
+  if(window.confirm('Удалить сведения о последней заявке из этого браузера?'))forgetLastOrder();
+  return;
+ }
+ if(!event.target.closest('[data-order-copy]'))return;
  const message=receiptPlainText(lastOrder);
  let copied=false;
  try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(message);copied=true}}catch{}
@@ -342,9 +373,11 @@ $('submitSiteOrder').addEventListener('click',async()=>{
   lastOrder={
    number:publicNumber,method,delivery:body.delivery,
    total:Number.isFinite(Number(result.total))?Number(result.total):cart.reduce((sum,x)=>sum+x.qty*x.price,0)+deliveryFee,
-   items:cart.map(x=>({name:x.title,description:orderProductLine(x),qty:x.qty,price:x.qty*x.price}))
+   items:cart.map(x=>({name:x.title,description:orderProductLine(x),qty:x.qty,price:x.qty*x.price})),
+   statusToken:typeof result.status_token==='string'&&result.status_token.length<=160?result.status_token:null,
+   status:'new',checkedAt:null,savedAt:Date.now()
   };
-  try{sessionStorage.setItem(lastOrderSessionKey,JSON.stringify(lastOrder))}catch{}
+  saveLastOrder();
   status.classList.add('success');
   status.textContent='Заявка №'+publicNumber+' отправлена.';
   cart=[];persist();notify('Заказ оформлен');
