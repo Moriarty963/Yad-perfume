@@ -1117,3 +1117,26 @@ body[data-page="cart"] .drawer-bottom .delivery-choice label:has(input:checked){
  .editorial-footer div:first-child{min-width:0}
 }
 @media(prefers-reduced-motion:reduce){.yad-editorial-home *, .yad-editorial-home *:before,.yad-editorial-home *:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+
+/* Catalog favorite fix: a compact, touch-friendly heart pinned to the product image.
+   Avoid product-info button's 100%-width style and unintended oval background. */
+.product .product-art{position:relative}
+.product .product-art .favorite-toggle{
+  box-sizing:border-box;position:absolute;top:12px;right:12px;left:auto;bottom:auto;
+  z-index:11;display:flex;align-items:center;justify-content:center;
+  width:42px;min-width:42px;max-width:42px;height:42px;min-height:42px;max-height:42px;
+  flex:none;margin:0;padding:0;border:1px solid rgba(230,226,218,.88);
+  border-radius:50%;background:rgba(255,255,255,.93);color:#262623;
+  box-shadow:0 3px 13px rgba(32,29,24,.065);
+  font-size:25px;line-height:1;letter-spacing:0;white-space:nowrap;
+  cursor:pointer;-webkit-appearance:none;appearance:none;
+}
+.product .product-art .favorite-toggle[aria-pressed="true"]{
+  background:rgba(255,250,247,.96);color:#a45d57;border-color:#edcbc7;
+}
+.product .product-art .favorite-toggle:hover{background:#fff}
+.product .product-art .favorite-toggle:focus-visible{outline:2px solid #4b4a43;outline-offset:3px}
+@media(max-width:760px){
+ .product .product-art .favorite-toggle{top:10px;right:10px;width:40px;min-width:40px;max-width:40px;height:40px;min-height:40px;max-height:40px}
+}
