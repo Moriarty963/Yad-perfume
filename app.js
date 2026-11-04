@@ -274,7 +274,7 @@ function renderOrderHistory(){
   return '<article class="order-history-item">'+
    '<div class="order-history-head"><div><strong>№'+safe(o.number)+'</strong><small>'+safe(date)+'</small></div><div class="order-history-head-right"><span class="order-history-badge status-'+safe(o.status)+'">'+safe(label)+'</span><strong>'+rub(o.total)+'</strong></div></div>'+
    '<details data-history-detail="'+safe(o.number)+'"'+(detailOpen?' open':'')+'><summary>Состав заказа</summary><div class="order-history-products">'+lines+'</div></details>'+
-   '<div class="order-history-actions"><button type="button" data-history-open="'+safe(o.number)+'">Открыть заказ</button>'+
+   '<div class="order-history-actions">'+(!cart.length?'<button type="button" data-history-open="'+safe(o.number)+'">Открыть заказ</button>':'')+
    (o.statusToken?'<button type="button" data-history-check="'+safe(o.number)+'">Проверить статус</button>':'')+
    '<button type="button" class="order-history-remove" data-history-remove="'+safe(o.number)+'">Удалить</button></div></article>';
  }).join('');
@@ -298,7 +298,7 @@ $('orderHistory').addEventListener('click',async e=>{
  renderOrderReceipt();
  renderOrderHistory();
  if(!cart.length)$('orderReceipt')?.scrollIntoView({block:'start',behavior:'smooth'});
- else notify('Заказ выбран. Чтобы просмотреть подтверждение, завершите или очистите текущую корзину.');
+
 });
 function renderOrderReceipt(){
  const holder=$('orderReceipt');if(!holder)return;
