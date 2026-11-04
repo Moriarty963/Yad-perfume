@@ -561,3 +561,21 @@ body[data-page^="fragrance/"] .detail-gallery .detail-visual{position:relative}
 body[data-page^="fragrance/"] .detail-image-status{position:absolute;left:18px;bottom:17px;z-index:3;padding:8px 12px;border-radius:999px;background:rgba(252,250,247,.88);color:#655b51;font-size:11px;letter-spacing:.025em;line-height:1.2;backdrop-filter:blur(9px);pointer-events:none}
 body[data-page^="fragrance/"] .detail-sizes button[aria-pressed="true"]{background:#171615;border-color:#171615;color:white}
 @media(max-width:760px){body[data-page^="fragrance/"] .detail-image-status{left:11px;bottom:11px;font-size:10px;padding:7px 10px}}
+
+/* YAD reference layout — product photography left, product information right */
+@media(min-width:951px){
+body[data-page^="fragrance/"] .detail-layout{display:grid;grid-template-columns:minmax(0,1.07fr) minmax(0,1fr);gap:clamp(28px,3.5vw,62px);align-items:start;max-width:1480px;margin:0 auto}
+body[data-page^="fragrance/"] .detail-gallery{display:block;min-width:0}
+body[data-page^="fragrance/"] .detail-gallery .detail-visual{aspect-ratio:1/1.065;min-height:0;height:auto;max-height:none;border-radius:22px}
+body[data-page^="fragrance/"] .detail-copy{width:100%;max-width:none;min-width:0;padding:0}
+body[data-page^="fragrance/"] .detail-copy h1{font-size:clamp(48px,5vw,76px);margin:12px 0 20px}
+body[data-page^="fragrance/"] .detail-note-section{margin:24px 0}
+body[data-page^="fragrance/"] .detail-note-tile{min-height:108px}
+body[data-page^="fragrance/"] .detail-sizes{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+body[data-page^="fragrance/"] .detail-sizes button{min-height:77px}
+body[data-page^="fragrance/"] .detail-add{min-height:70px}
+}
+body[data-page^="fragrance/"] .detail-benefits-wide{max-width:1480px;margin:30px auto 0;padding:22px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #e5ded5;border-bottom:0}
+body[data-page^="fragrance/"] .detail-benefits-wide span{font-size:13px}
+@media(max-width:950px){body[data-page^="fragrance/"] .detail-benefits-wide{margin-top:24px}}
+@media(max-width:760px){body[data-page^="fragrance/"] .detail-benefits-wide{padding:15px 0;gap:5px}body[data-page^="fragrance/"] .detail-benefits-wide span{font-size:10px}}
