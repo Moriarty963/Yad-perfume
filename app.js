@@ -22,6 +22,14 @@ const favoritesKey='yad-favorites-v1';let favorites=[];try{const saved=JSON.pars
 const $=id=>document.getElementById(id);const key='yad-market-cart-v1';let cart=[];try{cart=JSON.parse(localStorage.getItem(key))||[]}catch{};
 // Rebuild saved cart from the current catalog and price list; never trust stale prices.
 cart=Array.isArray(cart)?cart.filter(x=>x&&typeof x.id==='string'&&Number.isInteger(Number(x.qty))&&Number(x.qty)>0).map(x=>{const isSet=x.id==='discovery';const item=fragrances.find(f=>f.id===x.id);const ml=Number(x.ml);if(!isSet&&!item)return null;if(!isSet&&!Object.prototype.hasOwnProperty.call(prices,ml))return null;const variant=!isSet&&[6,10].includes(ml)&&x.variant==='travel'?'travel':'glass';const color=variant==='travel'&&travelColors.includes(x.color)?x.color:'Чёрный';return {id:x.id,ml:isSet?0:ml,title:isSet?'Discovery Set · 3 × 6 мл':item.name,variant:isSet?'glass':variant,color,price:isSet?990:itemPrice(ml,variant),qty:Math.min(30,Number(x.qty))}}).filter(Boolean):[];
+// Only the public order number and purchased items are kept for this tab.
+// Personal details (name, phone, address) are deliberately not stored here.
+const lastOrderSessionKey='yad-last-order-session-v1';
+let lastOrder=null;
+try{
+ const saved=JSON.parse(sessionStorage.getItem(lastOrderSessionKey)||'null');
+ if(saved&&typeof saved.number==='string'&&Array.isArray(saved.items)&&saved.items.length<=30)lastOrder=saved;
+}catch{}
 const rub=n=>new Intl.NumberFormat('ru-RU').format(n)+' ₽';const safe=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const yadPhoto=ml=>'/assets/yad-'+ml+'ml.webp';
 // Approved Higgsfield concept visuals are registered here by fragrance and bottle size.
@@ -152,7 +160,29 @@ function syncBottle(select){
 $('products').addEventListener('change',e=>{if(e.target.matches('select[id^="size-"]'))syncBottle(e.target)});
 function notify(message){const el=$('toast');if(!el)return;el.textContent=message;el.hidden=false;clearTimeout(notify.timer);notify.timer=setTimeout(()=>{el.hidden=true},3500)}function add(id,ml,variant='glass',color='Чёрный'){let title=id==='discovery'?'Discovery Set · 3 × 6 мл':fragrances.find(f=>f.id===id)?.name;if(!title)return;if(![6,10].includes(ml))variant='glass';if(variant!=='travel')variant='glass';if(!travelColors.includes(color))color='Чёрный';let price=id==='discovery'?990:itemPrice(ml,variant);if(!Number.isFinite(price))return;let found=cart.find(x=>x.id===id&&x.ml===ml&&(x.variant||'glass')===variant&&(variant!=='travel'||x.color===color));if(found){if(found.qty>=30){notify('Для одного товара максимум 30 штук.');return}found.qty+=1}else{if(cart.length>=30){notify('В корзине максимум 30 разных позиций.');return}cart.push({id,ml,title,variant,color,price,qty:1})}persist();notify('Добавлено в корзину · '+cart.reduce((sum,x)=>sum+x.qty,0)+' шт.')}
 function persist(){try{localStorage.setItem(key,JSON.stringify(cart))}catch{}renderCart()}
-function renderCart(){const quantity=cart.reduce((s,x)=>s+x.qty,0);const sum=cart.reduce((s,x)=>s+x.qty*x.price,0);$('count').textContent=quantity;$('subtotal').textContent=rub(sum);$('deliveryPrice').textContent=rub(quantity?deliveryFee:0);$('total').textContent=rub(quantity?sum+deliveryFee:0);$('mobileCartCount').textContent=quantity;$('mobileCartTotal').textContent=rub(quantity?sum+deliveryFee:0);$('mobileCartBar').hidden=true;$('navCartCount').textContent=quantity>99?'99+':quantity;$('navCartCount').hidden=quantity===0;$('clearCart').hidden=quantity===0;$('cartItems').innerHTML=cart.length?cart.map((x,i)=>`<div class="cart-row"><div class="cart-product"><img class="cart-bottle-photo" alt="" loading="lazy" decoding="async" src="${x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div class="cart-product-copy">${safe(x.title)}<small>${x.id==='discovery'?'Набор':x.ml+' мл · '+packagingName(x)} · ${x.qty} шт. · ${rub(x.price*x.qty)}</small></div></div><div class="cart-qty"><button data-remove="${i}" aria-label="Уменьшить количество ${safe(x.title)}">−</button><span aria-label="Количество">${x.qty}</span><button data-increase="${i}" aria-label="Увеличить количество ${safe(x.title)}">+</button></div></div>`).join(''):'<p style="color:#aaa">Пока пусто. Выберите аромат из коллекции.</p>'}
+function renderCart(){const quantity=cart.reduce((s,x)=>s+x.qty,0);const sum=cart.reduce((s,x)=>s+x.qty*x.price,0);$('count').textContent=quantity;$('subtotal').textContent=rub(sum);$('deliveryPrice').textContent=rub(quantity?deliveryFee:0);$('total').textContent=rub(quantity?sum+deliveryFee:0);$('mobileCartCount').textContent=quantity;$('mobileCartTotal').textContent=rub(quantity?sum+deliveryFee:0);$('mobileCartBar').hidden=true;$('navCartCount').textContent=quantity>99?'99+':quantity;$('navCartCount').hidden=quantity===0;$('clearCart').hidden=quantity===0;$('cartItems').innerHTML=cart.length?cart.map((x,i)=>`<div class="cart-row"><div class="cart-product"><img class="cart-bottle-photo" alt="" loading="lazy" decoding="async" src="${x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div class="cart-product-copy">${safe(x.title)}<small>${x.id==='discovery'?'Набор':x.ml+' мл · '+packagingName(x)} · ${x.qty} шт. · ${rub(x.price*x.qty)}</small></div></div><div class="cart-qty"><button data-remove="${i}" aria-label="Уменьшить количество ${safe(x.title)}">−</button><span aria-label="Количество">${x.qty}</span><button data-increase="${i}" aria-label="Увеличить количество ${safe(x.title)}">+</button></div></div>`).join(''):'<p class="cart-empty-state">Пока пусто. Выберите аромат из коллекции.</p>';
+ $('checkoutPanel').hidden=cart.length===0;
+ renderCheckoutReview();
+ renderOrderReceipt();
+}
+function orderProductLine(x){
+ return x.id==='discovery'?'Набор 3 × 6 мл':x.ml+' мл · '+packagingName(x);
+}
+function renderCheckoutReview(){
+ const holder=$('checkoutReviewItems');if(!holder)return;
+ const qty=cart.reduce((sum,x)=>sum+x.qty,0);
+ $('checkoutReviewCount').textContent=qty+' шт.';
+ $('checkoutReviewTotal').textContent=rub(cart.reduce((sum,x)=>sum+x.qty*x.price,0)+(cart.length?deliveryFee:0));
+ holder.innerHTML=cart.map(x=>`<div class="checkout-review-row"><img src="${x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}" loading="lazy" alt="" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div><strong>${safe(x.title)}</strong><small>${safe(orderProductLine(x))} · ${x.qty} шт.</small></div><span>${rub(x.price*x.qty)}</span></div>`).join('');
+}
+function renderOrderReceipt(){
+ const holder=$('orderReceipt');if(!holder)return;
+ const show=!cart.length&&!!lastOrder;
+ holder.hidden=!show;
+ if(!show){holder.innerHTML='';return}
+ const rows=lastOrder.items.map(x=>`<div class="order-receipt-row"><div><strong>${safe(x.name)}</strong><small>${safe(x.description)} · ${Number(x.qty)||1} шт.</small></div><span>${rub(Number(x.price)||0)}</span></div>`).join('');
+ holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><h3>Заказ №${safe(lastOrder.number)}</h3><p>Мы свяжемся с вами в ${lastOrder.method==='telegram'?'Telegram':'WhatsApp'} для подтверждения.</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div><p class="order-receipt-note">Это подтверждение отправленной заявки, не отслеживание доставки. Для уточнения статуса свяжитесь с нами.</p>`;
+}
 let focusBeforeCart=null;function openCart(){navigate('cart')}
 function closeCart(){if(currentPage()==='cart'){navigate('catalog');return}$('overlay').hidden=true;$('drawer').classList.remove('open');$('drawer').setAttribute('aria-hidden','true');document.body.classList.remove('cart-open');const focusTarget=focusBeforeCart?.isConnected?focusBeforeCart:$('cartButton');focusTarget.focus()}
 $('search').addEventListener('input',renderProducts);$('family').addEventListener('change',renderProducts);$('sort').addEventListener('change',renderProducts);$('resetFilters').addEventListener('click',()=>{$('search').value='';$('family').value='all';$('sort').value='default';favoritesOnly=false;updateFavoritesUI();renderProducts()});$('products').addEventListener('click',e=>{const favorite=e.target.closest('[data-favorite]');if(favorite){toggleFavorite(favorite.dataset.favorite);return}let b=e.target.closest('[data-add]');if(b){add(b.dataset.add,Number($('size-'+b.dataset.add).value));return}const detail=e.target.closest('[data-detail]');if(detail){e.preventDefault();navigate('fragrance/'+detail.dataset.detail);return}const share=e.target.closest('[data-share]');if(share)shareFragrance(share.dataset.share)});$('favoritesFilter').addEventListener('click',()=>{favoritesOnly=!favoritesOnly;updateFavoritesUI();renderProducts()});updateFavoritesUI();$('addDiscovery').addEventListener('click',()=>add('discovery',0));$('cartButton').addEventListener('click',openCart);$('mobileCartBar').addEventListener('click',openCart);
@@ -250,9 +280,17 @@ $('submitSiteOrder').addEventListener('click',async()=>{
   const response=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const result=await response.json().catch(()=>({}));
   if(!response.ok)throw new Error(result.error||'Не удалось оформить заказ.');
+  const publicNumber=String(result.order_id||'').slice(0,8).toUpperCase();
+  lastOrder={
+   number:publicNumber,method,delivery:body.delivery,
+   total:Number.isFinite(Number(result.total))?Number(result.total):cart.reduce((sum,x)=>sum+x.qty*x.price,0)+deliveryFee,
+   items:cart.map(x=>({name:x.title,description:orderProductLine(x),qty:x.qty,price:x.qty*x.price}))
+  };
+  try{sessionStorage.setItem(lastOrderSessionKey,JSON.stringify(lastOrder))}catch{}
   status.classList.add('success');
-  status.textContent='Заказ №'+String(result.order_id).slice(0,8).toUpperCase()+' принят. Мы свяжемся с вами в '+(method==='telegram'?'Telegram':'WhatsApp')+'.';
+  status.textContent='Заявка №'+publicNumber+' отправлена.';
   cart=[];persist();notify('Заказ оформлен');
+  $('orderReceipt')?.scrollIntoView({block:'start',behavior:'smooth'});
  }catch(error){status.classList.add('error');status.textContent=(error.message||'Не удалось оформить заказ.')+' Попробуйте ещё раз чуть позже.'}
  finally{button.disabled=false;button.innerHTML='Оформить заказ <span aria-hidden="true">↗</span>'}
 });
