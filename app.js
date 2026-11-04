@@ -26,26 +26,68 @@ cart=Array.isArray(cart)?cart.filter(x=>x&&typeof x.id==='string'&&Number.isInte
 // Personal details (name, phone, address) are deliberately not stored here.
 const lastOrderSessionKey='yad-last-order-session-v1';
 const lastOrderDeviceKey='yad-last-order-status-v2';
+const orderHistoryKey='yad-order-history-v1';
 const lastOrderRetentionMs=180*24*60*60*1000;
+const maxLocalOrderHistory=15;
 let lastOrder=null;
+let orderHistory=[];
+function normalizeLocalOrder(value){
+ if(!value||typeof value!=='object'||!/^[A-F0-9]{8}$/.test(String(value.number||''))||!Array.isArray(value.items)||value.items.length>30)return null;
+ const savedAt=Number(value.savedAt)||Date.now();
+ if(savedAt>Date.now()+60000||Date.now()-savedAt>lastOrderRetentionMs)return null;
+ const items=value.items.map(x=>({
+  name:String(x.name||'Аромат').slice(0,120),
+  description:String(x.description||'').slice(0,180),
+  qty:Math.min(30,Math.max(1,Number(x.qty)||1)),
+  price:Math.max(0,Math.min(1000000,Number(x.price)||0))
+ }));
+ const token=typeof value.statusToken==='string'&&/^v1\.[0-9a-f-]{36}\.[0-9]{10}\.[a-f0-9]{64}$/.test(value.statusToken)?value.statusToken:null;
+ return {number:value.number,method:value.method==='whatsapp'?'whatsapp':'telegram',
+ delivery:value.delivery==='Wildberries'?'Wildberries':'Ozon',
+ total:Math.max(0,Math.min(1000000,Number(value.total)||0)),items,
+ statusToken:token,status:['new','confirmed','paid','shipped','completed','cancelled'].includes(value.status)?value.status:'new',
+ checkedAt:typeof value.checkedAt==='string'?value.checkedAt:null,savedAt};
+}
 try{
- const raw=localStorage.getItem(lastOrderDeviceKey)||sessionStorage.getItem(lastOrderSessionKey);
- const saved=raw?JSON.parse(raw):null;
- if(saved&&typeof saved.number==='string'&&Array.isArray(saved.items)&&saved.items.length<=30&&(!saved.savedAt||Date.now()-saved.savedAt<lastOrderRetentionMs))lastOrder=saved;
- else if(saved){localStorage.removeItem(lastOrderDeviceKey);sessionStorage.removeItem(lastOrderSessionKey)}
-}catch{}
+ const data=JSON.parse(localStorage.getItem(orderHistoryKey)||'[]');
+ if(Array.isArray(data))orderHistory=data.map(normalizeLocalOrder).filter(Boolean).sort((a,b)=>b.savedAt-a.savedAt).slice(0,maxLocalOrderHistory);
+ const oldData=localStorage.getItem(lastOrderDeviceKey)||sessionStorage.getItem(lastOrderSessionKey);
+ const previous=oldData?normalizeLocalOrder(JSON.parse(oldData)):null;
+ if(previous&&!orderHistory.some(x=>x.number===previous.number))orderHistory.push(previous);
+ orderHistory.sort((a,b)=>b.savedAt-a.savedAt);
+ orderHistory=orderHistory.slice(0,maxLocalOrderHistory);
+ lastOrder=orderHistory[0]||null;
+}catch{orderHistory=[];lastOrder=null}
+function persistLocalOrderHistory(){
+ try{localStorage.setItem(orderHistoryKey,JSON.stringify(orderHistory))}catch{}
+ if(lastOrder){
+  try{localStorage.setItem(lastOrderDeviceKey,JSON.stringify(lastOrder))}catch{}
+  try{sessionStorage.setItem(lastOrderSessionKey,JSON.stringify(lastOrder))}catch{}
+ }else{
+  try{localStorage.removeItem(lastOrderDeviceKey)}catch{}
+  try{sessionStorage.removeItem(lastOrderSessionKey)}catch{}
+ }
+}
 function saveLastOrder(){
  if(!lastOrder)return;
- // Only order summary and read-only status token; no customer's name, phone or pickup address.
- try{localStorage.setItem(lastOrderDeviceKey,JSON.stringify(lastOrder))}catch{}
- try{sessionStorage.setItem(lastOrderSessionKey,JSON.stringify(lastOrder))}catch{}
+ const clean=normalizeLocalOrder(lastOrder);if(!clean)return;
+ lastOrder=clean;
+ const previousIndex=orderHistory.findIndex(o=>o.number===clean.number);
+ if(previousIndex>=0)orderHistory[previousIndex]=clean;
+ else orderHistory.unshift(clean);
+ orderHistory.sort((a,b)=>b.savedAt-a.savedAt);
+ orderHistory=orderHistory.slice(0,maxLocalOrderHistory);
+ persistLocalOrderHistory();
 }
-function forgetLastOrder(){
- lastOrder=null;
- try{localStorage.removeItem(lastOrderDeviceKey);sessionStorage.removeItem(lastOrderSessionKey)}catch{}
+function deleteSavedOrder(number){
+ orderHistory=orderHistory.filter(x=>x.number!==number);
+ if(lastOrder?.number===number)lastOrder=orderHistory[0]||null;
+ persistLocalOrderHistory();
  renderOrderReceipt();
+ renderOrderHistory();
  notify('Сведения о заявке удалены с этого устройства.');
 }
+function forgetLastOrder(){if(lastOrder)deleteSavedOrder(lastOrder.number)}
 const rub=n=>new Intl.NumberFormat('ru-RU').format(n)+' ₽';const safe=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const yadPhoto=ml=>'/assets/yad-'+ml+'ml.webp';
 // Approved Higgsfield concept visuals are registered here by fragrance and bottle size.
