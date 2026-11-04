@@ -233,6 +233,11 @@ function syncBottle(select){
  art.setAttribute('aria-label',(yadProductImage(id,ml).isPhoto?'Фотография':'Иллюстрация')+' флакона YAD '+ml+' мл');
 }
 $('products').addEventListener('change',e=>{if(e.target.matches('select[id^="size-"]'))syncBottle(e.target)});
+function syncCheckoutAction(){
+ const button=$('submitSiteOrder');if(!button||button.disabled)return;
+ const sum=cart.reduce((total,item)=>total+item.qty*item.price,0);
+ button.innerHTML='Отправить заявку · '+rub(sum+(cart.length?deliveryFee:0))+' <span aria-hidden="true">↗</span>';
+}
 function notify(message){const el=$('toast');if(!el)return;el.textContent=message;el.hidden=false;clearTimeout(notify.timer);notify.timer=setTimeout(()=>{el.hidden=true},3500)}function add(id,ml,variant='glass',color='Чёрный'){let title=id==='discovery'?'Discovery Set · 3 × 6 мл':fragrances.find(f=>f.id===id)?.name;if(!title)return;if(![6,10].includes(ml))variant='glass';if(variant!=='travel')variant='glass';if(!travelColors.includes(color))color='Чёрный';let price=id==='discovery'?990:itemPrice(ml,variant);if(!Number.isFinite(price))return;let found=cart.find(x=>x.id===id&&x.ml===ml&&(x.variant||'glass')===variant&&(variant!=='travel'||x.color===color));if(found){if(found.qty>=30){notify('Для одного товара максимум 30 штук.');return}found.qty+=1}else{if(cart.length>=30){notify('В корзине максимум 30 разных позиций.');return}cart.push({id,ml,title,variant,color,price,qty:1})}persist();notify('Добавлено в корзину · '+cart.reduce((sum,x)=>sum+x.qty,0)+' шт.')}
 function persist(){try{localStorage.setItem(key,JSON.stringify(cart))}catch{}renderCart()}
 function renderCart(){const quantity=cart.reduce((s,x)=>s+x.qty,0);const sum=cart.reduce((s,x)=>s+x.qty*x.price,0);$('count').textContent=quantity;$('subtotal').textContent=rub(sum);$('deliveryPrice').textContent=rub(quantity?deliveryFee:0);$('total').textContent=rub(quantity?sum+deliveryFee:0);$('mobileCartCount').textContent=quantity;$('mobileCartTotal').textContent=rub(quantity?sum+deliveryFee:0);$('mobileCartBar').hidden=true;$('navCartCount').textContent=quantity>99?'99+':quantity;$('navCartCount').hidden=quantity===0;$('clearCart').hidden=quantity===0;$('cartItems').innerHTML=cart.length?cart.map((x,i)=>`<div class="cart-row"><div class="cart-product"><img class="cart-bottle-photo" alt="" loading="lazy" decoding="async" src="${x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div class="cart-product-copy">${safe(x.title)}<small>${x.id==='discovery'?'Набор':x.ml+' мл · '+packagingName(x)} · ${x.qty} шт. · ${rub(x.price*x.qty)}</small></div></div><div class="cart-qty"><button data-remove="${i}" aria-label="Уменьшить количество ${safe(x.title)}">−</button><span aria-label="Количество">${x.qty}</span><button data-increase="${i}" aria-label="Увеличить количество ${safe(x.title)}">+</button></div></div>`).join(''):'<p class="cart-empty-state">Пока пусто. Выберите аромат из коллекции.</p>';
@@ -240,6 +245,7 @@ function renderCart(){const quantity=cart.reduce((s,x)=>s+x.qty,0);const sum=car
  renderCheckoutReview();
  renderOrderReceipt();
  renderOrderHistory();
+ syncCheckoutAction();
 }
 function orderProductLine(x){
  return x.id==='discovery'?'Набор 3 × 6 мл':x.ml+' мл · '+packagingName(x);
@@ -523,6 +529,9 @@ function buildOrder(){if(!cart.length){$('status').textContent='Добавьте
 const contactMethods=[...document.querySelectorAll('input[name="contactMethod"]')];
 function updatePreferredContact(){const method=document.querySelector('input[name="contactMethod"]:checked')?.value;const label=$('telegramContactLabel');label.hidden=method!=='telegram';$('preferredContact').required=method==='telegram';}
 contactMethods.forEach(input=>input.addEventListener('change',updatePreferredContact));updatePreferredContact();
+// Keep the order overview available, but avoid pushing contact fields below the fold
+// on phones. Desktop retains the expanded review.
+if(window.matchMedia('(max-width:760px)').matches)$('checkoutReview').open=false;
 $('submitSiteOrder').addEventListener('click',async()=>{
  const button=$('submitSiteOrder'),status=$('siteOrderStatus');status.textContent='';status.className='checkout-status';
  if(!buildOrder())return;
@@ -549,7 +558,7 @@ $('submitSiteOrder').addEventListener('click',async()=>{
   cart=[];persist();notify('Заказ оформлен');
   $('orderReceipt')?.scrollIntoView({block:'start',behavior:'smooth'});
  }catch(error){status.classList.add('error');status.textContent=(error.message||'Не удалось оформить заказ.')+' Попробуйте ещё раз чуть позже.'}
- finally{button.disabled=false;button.innerHTML='Оформить заказ <span aria-hidden="true">↗</span>'}
+ finally{button.disabled=false;syncCheckoutAction()}
 });
 async function shareFragrance(id){const item=fragrances.find(f=>f.id===id);if(!item)return;const url=new URL('/catalog',window.location.origin);url.searchParams.set('aroma',id);const payload={title:'YAD — '+item.name,text:item.name+' · '+item.notes,url:url.toString()};try{if(navigator.share){await navigator.share(payload);return}}catch(error){if(error&&error.name==='AbortError')return}try{await navigator.clipboard.writeText(payload.url);notify('Ссылка на аромат скопирована')}catch{const field=document.createElement('textarea');field.value=payload.url;field.style.position='fixed';field.style.opacity='0';document.body.appendChild(field);field.select();const copied=document.execCommand('copy');field.remove();notify(copied?'Ссылка на аромат скопирована':'Не удалось скопировать ссылку')}}
 function openLinkedFragrance(){const id=new URLSearchParams(window.location.search).get('aroma');const item=fragrances.find(f=>f.id===id);if(!item)return;if(currentPage()!=='catalog')navigate('catalog');$('search').value='';$('family').value='all';$('sort').value='default';syncMood();renderProducts();const card=document.querySelector('[data-share="'+id+'"]')?.closest('.product');if(!card)return;card.classList.add('linked-product');card.querySelector('.scent-details')?.setAttribute('open','');requestAnimationFrame(()=>card.scrollIntoView({behavior:'auto',block:'center'}))}
