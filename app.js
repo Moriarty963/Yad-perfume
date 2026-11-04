@@ -35,12 +35,15 @@ function normalizeLocalOrder(value){
  if(!value||typeof value!=='object'||!/^[A-F0-9]{8}$/.test(String(value.number||''))||!Array.isArray(value.items)||value.items.length>30)return null;
  const savedAt=Number(value.savedAt)||Date.now();
  if(savedAt>Date.now()+60000||Date.now()-savedAt>lastOrderRetentionMs)return null;
- const items=value.items.map(x=>({
-  name:String(x.name||'Аромат').slice(0,120),
-  description:String(x.description||'').slice(0,180),
-  qty:Math.min(30,Math.max(1,Number(x.qty)||1)),
-  price:Math.max(0,Math.min(1000000,Number(x.price)||0))
- }));
+ const items=value.items.map(entry=>{
+  const x=entry&&typeof entry==='object'?entry:{};
+  return {
+   name:String(x.name||'Аромат').slice(0,120),
+   description:String(x.description||'').slice(0,180),
+   qty:Math.min(30,Math.max(1,Number(x.qty)||1)),
+   price:Math.max(0,Math.min(1000000,Number(x.price)||0))
+  };
+ });
  const token=typeof value.statusToken==='string'&&/^v1\.[0-9a-f-]{36}\.[0-9]{10}\.[a-f0-9]{64}$/.test(value.statusToken)?value.statusToken:null;
  return {number:value.number,method:value.method==='whatsapp'?'whatsapp':'telegram',
  delivery:value.delivery==='Wildberries'?'Wildberries':'Ozon',
@@ -328,11 +331,15 @@ async function checkLastOrderStatus(button){
   lastOrder.checkedAt=typeof result.checked_at==='string'?result.checked_at:new Date().toISOString();
   saveLastOrder();
   renderOrderReceipt();
+  renderOrderHistory();
   const updated=$('orderStatusMessage');if(updated)updated.textContent='Статус обновлён по данным YAD.';
+  if(!updated)notify('Статус заявки №'+lastOrder.number+' обновлён: '+orderStatusDetails[result.status][0]);
  }catch(err){
   if(lastOrder?.statusToken!==token)return;
   const note=$('orderStatusMessage');if(note)note.textContent=String(err?.message||'Не удалось проверить статус. Попробуйте позже.');
+  else notify('Не удалось проверить статус. Повторите попытку позже.');
  }finally{
+  if(button){button.disabled=false;button.textContent='Проверить статус'}
   const active=$('orderReceipt')?.querySelector('[data-order-status]');
   if(active){active.disabled=false;active.textContent='Проверить статус'}
  }
