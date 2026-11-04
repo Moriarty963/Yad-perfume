@@ -25,6 +25,8 @@ module.exports=async(req,res)=>{
   if(action==='info')return res.status(200).json({bot_username:bot.username,connected,webhook_ready:webhook.active,webhook_conflict:webhook.conflict});
   if(connected)return res.status(200).json({connected:true,bot_username:bot.username});
   if(!webhook.active)return res.status(409).json({error:'Подключение Telegram пока не активировано администратором YAD.'});
+  const counts=await sql`SELECT COUNT(*)::int AS recent FROM yad_telegram_links WHERE order_id=${orderId}::uuid AND created_at>now()-interval '1 hour'`;
+  if(Number(counts[0]?.recent||0)>=8)return res.status(429).json({error:'Слишком много ссылок за последний час. Повторите попытку позже.'});
   const code='yad_'+crypto.randomBytes(24).toString('base64url');
   const expiry=new Date(Date.now()+30*60*1000);
   const hash=hashCode(code);
