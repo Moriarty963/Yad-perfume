@@ -646,28 +646,18 @@ checkoutFieldIds.forEach(id=>$(id)?.addEventListener('input',event=>{
  const status=$('siteOrderStatus');
  if(status.classList.contains('error')){status.textContent='';status.className='checkout-status'}
 }));
-// Carrier-specific pickup guidance. These links open the official services;
-// YAD does not have a live pickup-point lookup integration.
-const pickupServiceLinks={
- Wildberries:'https://www.wildberries.ru/',
- Ozon:'https://www.ozon.ru/'
-};
+// Wildberries and Ozon designate pickup destinations only, never storefront links.
 function syncPickupService(changed=false){
  const service=document.querySelector('input[name="deliveryService"]:checked')?.value;
- const field=$('customerAddress'),link=$('pickupAssistLink'),help=$('pickupAssistText'),hint=$('pickupServiceHint');
- if(!service||!Object.prototype.hasOwnProperty.call(pickupServiceLinks,service)||!field||!link||!help||!hint)return;
- help.textContent='Откройте '+service+', найдите удобный пункт выдачи и скопируйте его адрес.';
- link.href=pickupServiceLinks[service];
- link.textContent='Открыть '+service+' ↗';
- link.setAttribute('aria-label','Открыть '+service+' в новой вкладке');
+ const field=$('customerAddress'),hint=$('pickupServiceHint');
+ if(!['Wildberries','Ozon'].includes(service)||!field||!hint)return;
  hint.textContent=changed&&field.value.trim()
-  ?'Вы выбрали '+service+'. Проверьте, что указанный адрес относится именно к этой службе.'
-  :'Укажите адрес ПВЗ '+service+', не домашний адрес. Детали доставки согласуем после оформления.';
+  ?'Вы выбрали ПВЗ '+service+'. Проверьте, что указанный адрес относится именно к этой службе.'
+  :'Укажите адрес ПВЗ '+service+', куда доставить ваш заказ YAD.';
 }
 document.querySelectorAll('input[name="deliveryService"]').forEach(input=>
  input.addEventListener('change',()=>syncPickupService(true))
 );
-$('customerAddress')?.addEventListener('input',()=>syncPickupService(false));
 syncPickupService();
 const contactMethods=[...document.querySelectorAll('input[name="contactMethod"]')];
 function updatePreferredContact(){const method=document.querySelector('input[name="contactMethod"]:checked')?.value;const label=$('telegramContactLabel');label.hidden=method!=='telegram';$('preferredContact').required=method==='telegram';}
