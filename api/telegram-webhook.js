@@ -1,6 +1,7 @@
 'use strict';
 const {neon}=require('@neondatabase/serverless');
 const {ready,validWebhookSecret,hashCode,sendText,statusLabels}=require('../lib/yad-telegram');
+const {ensureTelegramTables}=require('../lib/yad-telegram-schema');
 const {YAD_CATALOG_ROWS}=require('../catalog-data');
 const fragranceNames=new Map(YAD_CATALOG_ROWS.map(([id,name])=>[id,name]));
 fragranceNames.set('discovery','Discovery Set');
@@ -21,6 +22,7 @@ module.exports=async(req,res)=>{
   const text=String(message.text||'').trim();
   if(text.length>100)return res.status(200).json({ok:true});
   const sql=neon(process.env.DATABASE_URL);
+  await ensureTelegramTables(sql);
   if(/^\/start(?:@\w+)?(?:\s+.*)?$/i.test(text)){
    const m=/^\/start(?:@\w+)?\s+(yad_[A-Za-z0-9_-]{32})$/i.exec(text);
    if(!m){
