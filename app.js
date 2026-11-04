@@ -456,6 +456,22 @@ $('marketSearch').addEventListener('click',()=>marketCatalog('all',true));
 $('marketExplore').addEventListener('click',()=>marketCatalog());
 $('marketAll').addEventListener('click',()=>marketCatalog());
 document.querySelector('.market-categories').addEventListener('click',e=>{const b=e.target.closest('[data-market-family]');if(b)marketCatalog(b.dataset.marketFamily)});
+// Editorial homepage routes: keep the mobile catalogue, product detail and checkout unchanged.
+document.addEventListener('click',e=>{
+ const goCatalog=e.target.closest('[data-editorial-catalog]');
+ if(goCatalog){e.preventDefault();marketCatalog();return}
+ const jump=e.target.closest('[data-editorial-anchor]');
+ if(jump){
+  const id=jump.dataset.editorialAnchor;
+  if(!['home-formats','home-steps'].includes(id))return;
+  e.preventDefault();
+  if(currentPage()!=='home')navigate('home');
+  requestAnimationFrame(()=>document.getElementById(id)?.scrollIntoView({
+   behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',
+   block:'start'
+  }));
+ }
+});
 $('marketFeatured').addEventListener('click',e=>{
  const addButton=e.target.closest('[data-market-add]');if(addButton){navigate('fragrance/'+addButton.dataset.marketAdd);return}
  const link=e.target.closest('[data-market-detail]');if(link){e.preventDefault();navigate('fragrance/'+link.dataset.marketDetail)}
@@ -474,7 +490,7 @@ function renderPage(){
  $('overlay').hidden=true;$('drawer').classList.toggle('open',isCart);$('drawer').setAttribute('aria-hidden',String(!isCart));
  document.body.classList.toggle('cart-open',isCart);
  setBottomActive(isDetail?'catalog':page);
- document.title=(page==='home'?'YAD — Искусство оставлять впечатление':page==='catalog'?'Каталог ароматов — YAD':page==='favorites'?'Избранное — YAD':isDetail?fragrances.find(f=>f.id===page.split('/')[1]).name+' — YAD':'Корзина — YAD');
+ document.title=(page==='home'?'YAD — Ароматы с характером':page==='catalog'?'Каталог ароматов — YAD':page==='favorites'?'Избранное — YAD':isDetail?fragrances.find(f=>f.id===page.split('/')[1]).name+' — YAD':'Корзина — YAD');
  window.scrollTo({top:0,behavior:'instant'});
 }
 function navigate(page){const next=pages.includes(page)||(page.startsWith('fragrance/')&&fragrances.some(f=>f.id===page.slice(10)))?page:'home';const path=next==='home'?'/':'/'+next;if(location.pathname!==path)history.pushState({page:next},'',path);renderPage()}
