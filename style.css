@@ -2366,3 +2366,34 @@ body.compare-dialog-open .compare-tray{visibility:hidden}
 @media(prefers-reduced-motion:reduce){
  #products .product-info .product-compare{transition:none}
 }
+
+
+/* YAD mobile navigation: clear current tab without adding a floating control. */
+@media(max-width:760px){
+ .yad-bottom-nav button{
+  -webkit-tap-highlight-color:transparent;
+  transition:color .17s ease;
+ }
+ .yad-bottom-nav button::after{
+  content:"";position:absolute;left:50%;bottom:1px;
+  width:19px;height:2px;border-radius:2px;
+  background:#76644d;pointer-events:none;
+  opacity:0;transform:translateX(-50%) scaleX(.35);
+  transition:opacity .2s ease,transform .2s ease;
+ }
+ .yad-bottom-nav button[aria-current="page"]::after{
+  opacity:1;transform:translateX(-50%) scaleX(1);
+ }
+ .yad-bottom-nav button[aria-current="page"]>span{
+  font-weight:650;
+ }
+ .yad-bottom-nav button svg{
+  transition:transform .17s ease,stroke-width .17s ease;
+ }
+ .yad-bottom-nav button[aria-current="page"] svg{stroke-width:1.85}
+ .yad-bottom-nav button:active svg{transform:scale(.94)}
+}
+@media(prefers-reduced-motion:reduce){
+ .yad-bottom-nav button,.yad-bottom-nav button::after,
+ .yad-bottom-nav button svg{transition:none!important}
+}
