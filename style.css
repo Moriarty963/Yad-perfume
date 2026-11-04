@@ -615,3 +615,17 @@ body[data-page^="fragrance/"] .detail-benefits-wide span{font-size:13px}
  body[data-page^="fragrance/"] .detail-add{font-size:12px;min-height:44px;padding:8px 5px}
  body[data-page^="fragrance/"] .detail-image-status{max-width:calc(100% - 14px);white-space:normal}
 }
+
+@media(max-width:950px){
+body[data-page^="fragrance/"] .detail-layout{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:16px 12px;align-items:start}
+body[data-page^="fragrance/"] .detail-gallery{grid-column:1;grid-row:1}
+body[data-page^="fragrance/"] .detail-copy{display:contents}
+body[data-page^="fragrance/"] .detail-intro{grid-column:2;grid-row:1;min-width:0}
+body[data-page^="fragrance/"] .detail-purchase{grid-column:1/-1;grid-row:2;min-width:0}
+body[data-page^="fragrance/"] .detail-gallery .detail-visual{aspect-ratio:3/4;min-height:0;height:auto}
+body[data-page^="fragrance/"] .detail-purchase .detail-divider{display:none}
+body[data-page^="fragrance/"] .detail-purchase .detail-sizes{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+body[data-page^="fragrance/"] .detail-purchase .detail-sizes button{min-height:64px;padding:8px 3px;font-size:14px}
+body[data-page^="fragrance/"] .detail-purchase .detail-add{min-height:58px;font-size:16px}
+body[data-page^="fragrance/"] .detail-purchase .detail-label{font-size:23px;letter-spacing:0}
+}
