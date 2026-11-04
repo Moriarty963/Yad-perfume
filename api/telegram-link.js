@@ -3,6 +3,7 @@ const crypto=require('node:crypto');
 const {neon}=require('@neondatabase/serverless');
 const {verifyToken}=require('../lib/order-status-token');
 const {ready,botInfo,webhookInfo,hashCode}=require('../lib/yad-telegram');
+const {ensureTelegramTables}=require('../lib/yad-telegram-schema');
 module.exports=async(req,res)=>{
  res.setHeader('Cache-Control','no-store');
  res.setHeader('X-Content-Type-Options','nosniff');
@@ -18,6 +19,7 @@ module.exports=async(req,res)=>{
  try{
   const [bot,webhook]=await Promise.all([botInfo(),webhookInfo()]);
   const sql=neon(process.env.DATABASE_URL);
+  await ensureTelegramTables(sql);
   const exists=await sql`SELECT 1 FROM yad_orders WHERE public_id=${orderId}::uuid LIMIT 1`;
   if(!exists.length)return res.status(404).json({error:'Заявка не найдена.'});
   const subscriptions=await sql`SELECT active FROM yad_telegram_subscriptions WHERE order_id=${orderId}::uuid AND active=true LIMIT 1`;
