@@ -593,7 +593,59 @@ bottomNav.addEventListener('click',e=>{const button=e.target.closest('[data-nav]
 window.addEventListener('popstate',renderPage);
 document.addEventListener('click',e=>{const link=e.target.closest('a[href^="#"]');if(!link)return;const href=link.getAttribute('href');if(href==='#catalog'||href==='#discovery'||href==='#philosophy'||href==='#questions'||href==='#top'){e.preventDefault();const page=href==='#catalog'?'catalog':'home';navigate(page);if(page==='home'&&href!=='#top')requestAnimationFrame(()=>document.querySelector(href)?.scrollIntoView({behavior:'smooth'}))}});
 $('continueShopping').addEventListener('click',()=>navigate('catalog'));$('clearCart').addEventListener('click',()=>{if(!cart.length)return;if(!window.confirm('Удалить все товары из корзины?'))return;cart=[];persist();$('status').textContent='Корзина очищена.';notify('Корзина очищена')});$('closeCart').addEventListener('click',closeCart);$('overlay').addEventListener('click',closeCart);document.addEventListener('keydown',e=>{if(!$('drawer').classList.contains('open')||currentPage()==='cart')return;if(e.key==='Escape'){e.preventDefault();closeCart();return}if(e.key==='Tab'){const nodes=[...$('drawer').querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),a[href]')].filter(el=>el.getClientRects().length);if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});$('cartItems').addEventListener('click',e=>{let b=e.target.closest('[data-remove],[data-increase]');if(!b)return;let i=Number(b.dataset.remove??b.dataset.increase);if(!cart[i])return;if(b.hasAttribute('data-increase')){if(cart[i].qty>=30){notify('Для одного товара максимум 30 штук.');return}cart[i].qty+=1}else{cart[i].qty--;if(!cart[i].qty)cart.splice(i,1)}persist()});
-function buildOrder(){if(!cart.length){$('status').textContent='Добавьте товары в корзину.';return null}const name=$('customerName').value.trim(),phone=$('customerPhone').value.trim(),address=$('customerAddress').value.trim(),comment=$('customerComment').value.trim(),delivery=document.querySelector('input[name="deliveryService"]:checked')?.value;if(!['Wildberries','Ozon'].includes(delivery)){$('status').textContent='Выберите службу доставки.';return null}if(!name||!phone||!address){const missing=!name?'customerName':!phone?'customerPhone':'customerAddress';$('status').textContent='Укажите имя, телефон и адрес доставки.';$(missing).focus();return null}if(name.length>100||address.length>350||comment.length>500){$('status').textContent='Сократите имя, адрес или комментарий.';return null}const digits=phone.replace(/\D/g,'');if(digits.length<10||digits.length>15){$('status').textContent='Проверьте номер телефона: нужно от 10 до 15 цифр.';$('customerPhone').focus();return null}$('status').textContent='';return ['Здравствуйте! Хочу оформить заказ YAD.','','Покупатель: '+name,'Телефон: '+phone,'Способ доставки: '+delivery,'Пункт выдачи: '+address,...(comment?['Комментарий: '+comment]:[]),'','Состав заказа:',...cart.map((x,i)=>`${i+1}. ${x.title} — ${x.id==='discovery'?'набор 3 × 6 мл (ароматы согласовать)':x.ml+' мл · '+packagingName(x)} × ${x.qty} = ${rub(x.price*x.qty)}`),'','Товары: '+rub(cart.reduce((s,x)=>s+x.qty*x.price,0)),'Доставка ('+delivery+'): '+rub(deliveryFee),'Итого с доставкой: '+rub(cart.reduce((s,x)=>s+x.qty*x.price,0)+deliveryFee),'','Пожалуйста, подтвердите наличие и способ оплаты.'].join('\n')}
+// Checkout feedback appears next to the field requiring attention.
+const checkoutFieldIds=['customerName','customerPhone','customerAddress','preferredContact','customerComment'];
+function clearCheckoutFieldIssue(){
+ const note=$('checkoutFieldError');if(note)note.remove();
+ checkoutFieldIds.forEach(id=>{$(id)?.removeAttribute('aria-invalid');$(id)?.removeAttribute('aria-describedby')});
+}
+function checkoutProblem(message,id){
+ clearCheckoutFieldIssue();
+ const status=$('siteOrderStatus');
+ status.textContent=message;
+ status.className='checkout-status error';
+ const field=id?$(id):null;
+ if(field){
+  field.setAttribute('aria-invalid','true');
+  field.setAttribute('aria-describedby','checkoutFieldError');
+  const note=document.createElement('span');
+  note.id='checkoutFieldError';
+  note.className='checkout-field-error';
+  note.textContent=message;
+  field.insertAdjacentElement('afterend',note);
+  field.focus();
+ }else status.scrollIntoView({behavior:'smooth',block:'nearest'});
+ return false;
+}
+function buildOrder(){
+ if(!cart.length)return checkoutProblem('Корзина пуста. Добавьте аромат перед оформлением.');
+ const name=$('customerName').value.trim(),phone=$('customerPhone').value.trim();
+ const address=$('customerAddress').value.trim(),comment=$('customerComment').value.trim();
+ const delivery=document.querySelector('input[name="deliveryService"]:checked')?.value;
+ const method=document.querySelector('input[name="contactMethod"]:checked')?.value;
+ if(!name)return checkoutProblem('Укажите ваше имя.','customerName');
+ if(name.length>100)return checkoutProblem('Имя слишком длинное — не более 100 символов.','customerName');
+ if(!phone)return checkoutProblem('Укажите номер телефона для связи.','customerPhone');
+ const digits=phone.replace(/\D/g,'');
+ if(digits.length<10||digits.length>15||!/^\+?[\d\s()\-]{10,25}$/.test(phone))
+  return checkoutProblem('Проверьте номер: от 10 до 15 цифр, можно использовать +, пробелы и скобки.','customerPhone');
+ if(!['Wildberries','Ozon'].includes(delivery))
+  return checkoutProblem('Выберите службу доставки: Wildberries или Ozon.');
+ if(!address)return checkoutProblem('Укажите город и адрес пункта выдачи.','customerAddress');
+ if(address.length>350)return checkoutProblem('Адрес слишком длинный — не более 350 символов.','customerAddress');
+ if(comment.length>500)return checkoutProblem('Сократите комментарий до 500 символов.','customerComment');
+ if(method==='telegram'&&!/^@[A-Za-z0-9_]{5,32}$/.test($('preferredContact').value.trim()))
+  return checkoutProblem('Укажите Telegram в формате @username (не менее 5 символов после @).','preferredContact');
+ if(!['whatsapp','telegram'].includes(method))
+  return checkoutProblem('Выберите, где удобнее подтвердить заказ.');
+ return true;
+}
+checkoutFieldIds.forEach(id=>$(id)?.addEventListener('input',event=>{
+ if(event.target.getAttribute('aria-invalid')!=='true')return;
+ clearCheckoutFieldIssue();
+ const status=$('siteOrderStatus');
+ if(status.classList.contains('error')){status.textContent='';status.className='checkout-status'}
+}));
 const contactMethods=[...document.querySelectorAll('input[name="contactMethod"]')];
 function updatePreferredContact(){const method=document.querySelector('input[name="contactMethod"]:checked')?.value;const label=$('telegramContactLabel');label.hidden=method!=='telegram';$('preferredContact').required=method==='telegram';}
 contactMethods.forEach(input=>input.addEventListener('change',updatePreferredContact));updatePreferredContact();
@@ -602,10 +654,11 @@ contactMethods.forEach(input=>input.addEventListener('change',updatePreferredCon
 if(window.matchMedia('(max-width:760px)').matches)$('checkoutReview').open=false;
 $('submitSiteOrder').addEventListener('click',async()=>{
  const button=$('submitSiteOrder'),status=$('siteOrderStatus');status.textContent='';status.className='checkout-status';
+ clearCheckoutFieldIssue();
  if(!buildOrder())return;
  const method=document.querySelector('input[name="contactMethod"]:checked')?.value;
  const contact=method==='whatsapp'?$('customerPhone').value.trim():$('preferredContact').value.trim();
- if(method==='telegram'&&!/^@[A-Za-z0-9_]{5,32}$/.test(contact)){status.textContent='Укажите Telegram в формате @username.';$('preferredContact').focus();return}
+
  const body={name:$('customerName').value.trim(),contact,method,address:$('customerAddress').value.trim(),delivery:document.querySelector('input[name="deliveryService"]:checked')?.value,comment:$('customerComment').value.trim(),items:cart.map(x=>({id:x.id,ml:x.ml,qty:x.qty,variant:x.variant||'glass',color:x.variant==='travel'?x.color:undefined}))};
  button.disabled=true;button.textContent='Оформляем заказ…';status.textContent='Сохраняем заявку…';
  try{

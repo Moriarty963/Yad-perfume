@@ -2021,3 +2021,18 @@ body[data-page^="fragrance/"] .atelier-related-price span{
  body[data-page^="fragrance/"] .atelier-related-media img{transition:none!important}
  body[data-page^="fragrance/"] .atelier-related-grid{scroll-behavior:auto}
 }
+
+
+/* Checkout: restrained, high-contrast inline validation on light surfaces. */
+#checkoutPanel input[aria-invalid="true"]:not([type="radio"]),
+body[data-page="cart"] #checkoutPanel input[aria-invalid="true"]:not([type="radio"]){
+ border-color:#b25b50!important;
+ box-shadow:0 0 0 2px rgba(178,91,80,.16)!important;
+}
+#checkoutPanel .checkout-field-error{
+ display:block;
+ color:#a34539!important;
+ font-size:12px;
+ line-height:1.5;
+ margin:7px 0 0;
+}
