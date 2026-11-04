@@ -14,15 +14,16 @@ ROOT=Path(__file__).resolve().parent.parent
 OUT=ROOT/'assets'/'studio'
 DATA=json.loads((ROOT/'docs'/'catalog-69.json').read_text('utf-8'))
 REFS={
- 6:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/8275abcb-2a55-4854-a0d1-894da87fee07.jpg',
- 10:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/33d4d1a6-36dc-42f3-8eb8-5e46a7212063.jpg',
- 20:str(ROOT/'assets'/'real'/'imagination-20ml-main.webp'),
- 30:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/8ed5016f-b1c1-402c-8210-1d5f9bb767d6.jpg',
- 50:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/c992b3b0-982c-4f82-8723-bf6d42cc21e6.jpg',
- 100:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/f61658bc-dbbf-4b70-b3cc-069d4c019287.jpg',
+ 6:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/1762bcf2-871f-448c-9015-7a576a2df8dc.jpg',
+ 10:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/92fc07e8-d38b-48fb-9d73-67a4c127a811.jpg',
+ 20:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/02da08fd-56bb-468f-bd61-0fcce8c55267.jpg',
+ 30:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/ad364887-04df-4804-bb6b-17bdbed75da4.jpg',
+ 50:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/27500f9e-6613-4b2c-8037-1251b54f1bad.jpg',
+ 100:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/9623cf65-2e2d-40f9-8041-780b5abc9514.jpg',
 }
-# On 1103x1536 reference images, only the center line containing
-# IMAGINATION is modified. Keep all other typography unmodified.
+# The real six supplied photos are 1122x1402 (6-50 ml) or 1199x1312 (100 ml).
+# Pixel coordinates below are calibrated to these exact dimensions, NOT a
+# guessed common canvas size. Only the original IMAGINATION line is erased.
 LAYOUT={
  6: ((480,886,643,934),561,912,158,30,27,'italic'),
  10:((478,766,643,816),562,791,164,31,27,'italic'),
@@ -63,7 +64,10 @@ def source(key):
 
 def dimensions(ml,im):
  (xa,ya,xb,yb),cx,cy,maxw,sz,leading,face=LAYOUT[ml]
- sx,sy=im.width/1103,im.height/1536
+ base=(1199,1312) if ml==100 else (1122,1402)
+ if (im.width,im.height)!=base:
+  raise ValueError(f'Unexpected YAD {ml} ml photo size {im.size}, expected {base}')
+ sx,sy=im.width/base[0],im.height/base[1]
  box=(round(xa*sx),round(ya*sy),round(xb*sx),round(yb*sy))
  return box,round(cx*sx),round(cy*sy),round(maxw*sx),round(sz*sy),round(leading*sy),face
 
