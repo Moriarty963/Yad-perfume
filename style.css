@@ -846,3 +846,18 @@ body[data-page="cart"] .drawer-bottom .delivery-choice label:has(input:checked){
  .order-receipt{margin:12px;padding:17px}
  .drawer-bottom label input:not([type="radio"]){font-size:16px}
 }
+
+/* YAD receipt follow-up actions: lightweight, accessible and mobile-friendly. */
+.order-receipt-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-top:15px;margin-top:15px;border-top:1px solid #e8e3dc}
+.order-receipt-actions button,.order-receipt-actions a{
+ box-sizing:border-box;min-height:46px;padding:11px 13px;
+ display:flex;align-items:center;justify-content:center;text-align:center;
+ border-radius:9px;border:1px solid #cfc8be;background:#fff;
+ color:#302c26;font-size:12px;font-weight:600;line-height:1.35;text-decoration:none;
+ cursor:pointer;transition:background .15s,border-color .15s;
+}
+.order-receipt-actions a{background:#292824;border-color:#292824;color:#fff}
+.order-receipt-actions button:hover{background:#f4f0ea;border-color:#837565}
+.order-receipt-actions a:hover{background:#48453e;border-color:#48453e}
+.order-receipt-actions button:focus-visible,.order-receipt-actions a:focus-visible{outline:2px solid #8c785e;outline-offset:3px}
+@media(max-width:420px){.order-receipt-actions{grid-template-columns:1fr}}
