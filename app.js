@@ -175,14 +175,38 @@ function renderCheckoutReview(){
  $('checkoutReviewTotal').textContent=rub(cart.reduce((sum,x)=>sum+x.qty*x.price,0)+(cart.length?deliveryFee:0));
  holder.innerHTML=cart.map(x=>`<div class="checkout-review-row"><img src="${x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}" loading="lazy" alt="" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div><strong>${safe(x.title)}</strong><small>${safe(orderProductLine(x))} · ${x.qty} шт.</small></div><span>${rub(x.price*x.qty)}</span></div>`).join('');
 }
+function receiptPlainText(order){
+ return ['YAD / PERFUME ATELIER','Заявка №'+order.number,'','Состав заказа:',...order.items.map((x,i)=>(i+1)+'. '+x.name+' — '+x.description+' × '+x.qty+' = '+rub(Number(x.price)||0)),'','Доставка: '+order.delivery,'Итого с доставкой: '+rub(Number(order.total)||0),'','Заявка отправлена. Дождитесь подтверждения от YAD в '+(order.method==='telegram'?'Telegram':'WhatsApp')+'.'].join('\n');
+}
+function orderInquiryUrl(order){
+ const number=String(window.YAD_WHATSAPP_NUMBER||'').replace(/\D/g,'');
+ if(!/^\d{10,15}$/.test(number))return '';
+ return 'https://wa.me/'+number+'?text='+encodeURIComponent('Здравствуйте! Хочу уточнить статус заявки YAD №'+order.number+'.');
+}
 function renderOrderReceipt(){
  const holder=$('orderReceipt');if(!holder)return;
  const show=!cart.length&&!!lastOrder;
  holder.hidden=!show;
  if(!show){holder.innerHTML='';return}
  const rows=lastOrder.items.map(x=>`<div class="order-receipt-row"><div><strong>${safe(x.name)}</strong><small>${safe(x.description)} · ${Number(x.qty)||1} шт.</small></div><span>${rub(Number(x.price)||0)}</span></div>`).join('');
- holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><h3>Заказ №${safe(lastOrder.number)}</h3><p>Мы свяжемся с вами в ${lastOrder.method==='telegram'?'Telegram':'WhatsApp'} для подтверждения.</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div><p class="order-receipt-note">Это подтверждение отправленной заявки, не отслеживание доставки. Для уточнения статуса свяжитесь с нами.</p>`;
+ const inquiry=orderInquiryUrl(lastOrder);
+ const receiptActions=inquiry?'<a href="'+safe(inquiry)+'" target="_blank" rel="noopener noreferrer">Уточнить статус в WhatsApp ↗</a>':'';
+ holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><h3>Заказ №${safe(lastOrder.number)}</h3><p>Мы свяжемся с вами в ${lastOrder.method==='telegram'?'Telegram':'WhatsApp'} для подтверждения.</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div><p class="order-receipt-note">Это подтверждение отправленной заявки, не отслеживание доставки. Для уточнения статуса свяжитесь с нами.</p><div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div>`;
 }
+$('orderReceipt').addEventListener('click',async event=>{
+ if(!event.target.closest('[data-order-copy]')||!lastOrder)return;
+ const message=receiptPlainText(lastOrder);
+ let copied=false;
+ try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(message);copied=true}}catch{}
+ if(!copied){
+  const field=document.createElement('textarea');
+  field.value=message;field.setAttribute('readonly','');field.style.position='fixed';field.style.opacity='0';
+  document.body.appendChild(field);field.select();
+  try{copied=document.execCommand('copy')}catch{}
+  field.remove();
+ }
+ notify(copied?'Состав заказа скопирован':'Не получилось скопировать. Сохраните заказ скриншотом.');
+});
 let focusBeforeCart=null;function openCart(){navigate('cart')}
 function closeCart(){if(currentPage()==='cart'){navigate('catalog');return}$('overlay').hidden=true;$('drawer').classList.remove('open');$('drawer').setAttribute('aria-hidden','true');document.body.classList.remove('cart-open');const focusTarget=focusBeforeCart?.isConnected?focusBeforeCart:$('cartButton');focusTarget.focus()}
 $('search').addEventListener('input',renderProducts);$('family').addEventListener('change',renderProducts);$('sort').addEventListener('change',renderProducts);$('resetFilters').addEventListener('click',()=>{$('search').value='';$('family').value='all';$('sort').value='default';favoritesOnly=false;updateFavoritesUI();renderProducts()});$('products').addEventListener('click',e=>{const favorite=e.target.closest('[data-favorite]');if(favorite){toggleFavorite(favorite.dataset.favorite);return}let b=e.target.closest('[data-add]');if(b){add(b.dataset.add,Number($('size-'+b.dataset.add).value));return}const detail=e.target.closest('[data-detail]');if(detail){e.preventDefault();navigate('fragrance/'+detail.dataset.detail);return}const share=e.target.closest('[data-share]');if(share)shareFragrance(share.dataset.share)});$('favoritesFilter').addEventListener('click',()=>{favoritesOnly=!favoritesOnly;updateFavoritesUI();renderProducts()});updateFavoritesUI();$('addDiscovery').addEventListener('click',()=>add('discovery',0));$('cartButton').addEventListener('click',openCart);$('mobileCartBar').addEventListener('click',openCart);
