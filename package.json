@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "type": "commonjs",
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
-    "sharp": "^0.33.5"
+    "@neondatabase/serverless": "^1.0.2"
   }
 }
