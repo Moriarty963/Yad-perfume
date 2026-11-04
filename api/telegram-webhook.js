@@ -69,11 +69,15 @@ module.exports=async(req,res)=>{
    await sendText(chatId,'Ваши заказы YAD:\n\n'+list.join('\n\n')+'\n\n/stop — отключить уведомления');
    return res.status(200).json({ok:true});
   }
-  if(/^\/help(?:@\w+)?$/i.test(text)){
-   await sendText(chatId,'YAD · Помощь\n/orders — ваши заказы\n/stop — отключить уведомления\n\nДля подключения нового заказа откройте его на сайте YAD.');
+  if(/^\/ping(?:@\w+)?$/i.test(text)){
+   await sendText(chatId,'✅ YAD Telegram работает. Связь с ботом установлена.\n\nДля уведомлений о заказе подключите заявку на сайте YAD.\n/orders — связанные заказы\n/stop — отключить уведомления');
    return res.status(200).json({ok:true});
   }
-  if(text.startsWith('/'))await sendText(chatId,'Доступные команды: /orders, /stop, /help.');
+  if(/^\/help(?:@\w+)?$/i.test(text)){
+   await sendText(chatId,'YAD · Помощь\n/ping — проверить работу бота\n/orders — ваши заказы\n/stop — отключить уведомления\n\nДля подключения нового заказа откройте его на сайте YAD.');
+   return res.status(200).json({ok:true});
+  }
+  if(text.startsWith('/'))await sendText(chatId,'Доступные команды: /ping, /orders, /stop, /help.');
   return res.status(200).json({ok:true});
  }catch(e){
   console.error('YAD bot webhook failed',e?.message);
