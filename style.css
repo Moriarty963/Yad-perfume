@@ -728,3 +728,19 @@ body[data-page^="fragrance/"] .atelier-mini-gallery .yad-mockup-label{z-index:2;
 .cart-row .cart-product-copy small{font-size:11px;line-height:1.45;padding-top:5px;color:inherit;opacity:.65}
 .cart-row .cart-qty{flex-shrink:0}
 @media(max-width:440px){.cart-row .cart-product{gap:9px}.cart-row .cart-bottle-photo{width:48px;height:64px;flex-basis:48px}}
+
+/* YAD mobile product clarity — one cart entry point and calm, readable cards.
+   The bottom nav already includes Cart, so the sticky header does not duplicate it. */
+@media(max-width:760px){
+ .header{height:63px;padding:0 22px}
+ .header .cart-button{display:none}
+ .header .logo{font-size:1.85rem;letter-spacing:.26em}
+ .market-featured{gap:12px}
+ .market-card{border-radius:15px;overflow:hidden}
+ .market-card-photo{height:clamp(170px,53vw,225px)}
+ .market-card-copy{padding:13px}
+ .market-card-copy>span{display:none}
+ .market-card-copy>a{font-size:clamp(17px,5vw,21px);line-height:1.15;margin:0 0 16px;letter-spacing:-.015em}
+ .market-card-bottom strong{font-size:14px}
+ .market-card-bottom button{width:39px;height:39px;border-radius:10px}
+}
