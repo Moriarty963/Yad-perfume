@@ -258,7 +258,7 @@ function syncBottle(select){
     photo.classList.remove('yad-photo-entering');
     if(previous){
      previous.classList.add('yad-photo-fading');
-     setTimeout(()=>{if(previous.isConnected)previous.remove()},320);
+     setTimeout(()=>{if(previous.isConnected&&previous.classList.contains('yad-photo-fading'))previous.remove()},320);
     }
    });
   };
