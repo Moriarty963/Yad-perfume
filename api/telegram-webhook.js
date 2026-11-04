@@ -2,6 +2,7 @@
 const {neon}=require('@neondatabase/serverless');
 const {ready,validWebhookSecret,hashCode,sendText,statusLabels}=require('../lib/yad-telegram');
 const {ensureTelegramTables}=require('../lib/yad-telegram-schema');
+const {handleMessage:handleAdminMessage,handleCallback:handleAdminCallback}=require('../lib/yad-telegram-admin');
 const {YAD_CATALOG_ROWS}=require('../catalog-data');
 const fragranceNames=new Map(YAD_CATALOG_ROWS.map(([id,name])=>[id,name]));
 fragranceNames.set('discovery','Discovery Set');
@@ -13,6 +14,12 @@ module.exports=async(req,res)=>{
  if(!validWebhookSecret(req.headers?.['x-telegram-bot-api-secret-token']))return res.status(401).json({error:'Unauthorized'});
  try{
   const update=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
+  if(update.callback_query){
+   // Telegram only delivers callbacks from the existing authenticated webhook.
+   // Private-chat and exact Telegram user-ID verification happen inside handler.
+   await handleAdminCallback(update.callback_query);
+   return res.status(200).json({ok:true});
+  }
   const message=update.message;
   if(!message||message.chat?.type!=='private'||!Number.isSafeInteger(message.chat.id)||
    !Number.isSafeInteger(message.from?.id)||message.chat.id!==message.from.id||message.from?.is_bot){
@@ -21,6 +28,7 @@ module.exports=async(req,res)=>{
   const chatId=message.chat.id;
   const text=String(message.text||'').trim();
   if(text.length>100)return res.status(200).json({ok:true});
+  if(await handleAdminMessage(message))return res.status(200).json({ok:true});
   const sql=neon(process.env.DATABASE_URL);
   await ensureTelegramTables(sql);
   if(/^\/start(?:@\w+)?(?:\s+.*)?$/i.test(text)){
