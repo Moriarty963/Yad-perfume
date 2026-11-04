@@ -597,7 +597,7 @@ $('continueShopping').addEventListener('click',()=>navigate('catalog'));$('clear
 const checkoutFieldIds=['customerName','customerPhone','customerAddress','preferredContact','customerComment'];
 function clearCheckoutFieldIssue(){
  const note=$('checkoutFieldError');if(note)note.remove();
- checkoutFieldIds.forEach(id=>{$(id)?.removeAttribute('aria-invalid');$(id)?.removeAttribute('aria-describedby')});
+ checkoutFieldIds.forEach(id=>{const field=$(id);field?.removeAttribute('aria-invalid');if(id==='customerAddress')field?.setAttribute('aria-describedby','pickupServiceHint');else field?.removeAttribute('aria-describedby')});
 }
 function checkoutProblem(message,id){
  clearCheckoutFieldIssue();
@@ -607,7 +607,7 @@ function checkoutProblem(message,id){
  const field=id?$(id):null;
  if(field){
   field.setAttribute('aria-invalid','true');
-  field.setAttribute('aria-describedby','checkoutFieldError');
+  field.setAttribute('aria-describedby',id==='customerAddress'?'pickupServiceHint checkoutFieldError':'checkoutFieldError');
   const note=document.createElement('span');
   note.id='checkoutFieldError';
   note.className='checkout-field-error';
@@ -646,6 +646,29 @@ checkoutFieldIds.forEach(id=>$(id)?.addEventListener('input',event=>{
  const status=$('siteOrderStatus');
  if(status.classList.contains('error')){status.textContent='';status.className='checkout-status'}
 }));
+// Carrier-specific pickup guidance. These links open the official services;
+// YAD does not have a live pickup-point lookup integration.
+const pickupServiceLinks={
+ Wildberries:'https://www.wildberries.ru/',
+ Ozon:'https://www.ozon.ru/'
+};
+function syncPickupService(changed=false){
+ const service=document.querySelector('input[name="deliveryService"]:checked')?.value;
+ const field=$('customerAddress'),link=$('pickupAssistLink'),help=$('pickupAssistText'),hint=$('pickupServiceHint');
+ if(!service||!Object.prototype.hasOwnProperty.call(pickupServiceLinks,service)||!field||!link||!help||!hint)return;
+ help.textContent='Откройте '+service+', найдите удобный пункт выдачи и скопируйте его адрес.';
+ link.href=pickupServiceLinks[service];
+ link.textContent='Открыть '+service+' ↗';
+ link.setAttribute('aria-label','Открыть '+service+' в новой вкладке');
+ hint.textContent=changed&&field.value.trim()
+  ?'Вы выбрали '+service+'. Проверьте, что указанный адрес относится именно к этой службе.'
+  :'Укажите адрес ПВЗ '+service+', не домашний адрес. Детали доставки согласуем после оформления.';
+}
+document.querySelectorAll('input[name="deliveryService"]').forEach(input=>
+ input.addEventListener('change',()=>syncPickupService(true))
+);
+$('customerAddress')?.addEventListener('input',()=>syncPickupService(false));
+syncPickupService();
 const contactMethods=[...document.querySelectorAll('input[name="contactMethod"]')];
 function updatePreferredContact(){const method=document.querySelector('input[name="contactMethod"]:checked')?.value;const label=$('telegramContactLabel');label.hidden=method!=='telegram';$('preferredContact').required=method==='telegram';}
 contactMethods.forEach(input=>input.addEventListener('change',updatePreferredContact));updatePreferredContact();
