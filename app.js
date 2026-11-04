@@ -213,35 +213,67 @@ const more=$('catalogMore');if(more){more.hidden=shown.length>=items.length;$('c
 }
 function syncBottle(select){
  const card=select.closest('.product');if(!card)return;
- const ml=Number(select.value),id=card.querySelector('[data-detail]')?.dataset.detail||'';
- card.querySelector('[data-yad-label]')?.remove();
- card.querySelector('.product-art')?.insertAdjacentHTML('beforeend',yadMockupLabel(id,ml));
- const bottle=card.querySelector('.yad-product-bottle'),art=card.querySelector('.product-art'),photo=card.querySelector('.yad-volume-photo');
- if(bottle)bottle.className='yad-product-bottle volume-'+ml;
- if(!art)return;
- art.classList.remove('has-volume-photo');
- art.classList.toggle('photo-volume-20',ml===20&&!!card.querySelector('.real-bottle-photo'));
- if(photo){
-  const asset=yadProductImage(id,ml),sequence=String((Number(photo.dataset.requestSequence)||0)+1);
-  photo.dataset.requestSequence=sequence;photo.dataset.volume=String(ml);
-  photo.alt=yadMediaLabel(asset)+' YAD '+(fragrances.find(f=>f.id===id)?.name||id)+', '+ml+' мл';
-  const apply=(src,isPhoto)=>{
-   if(photo.dataset.requestSequence!==sequence||!photo.isConnected)return;
-   const badge=card.querySelector('.atelier-card-media-label');if(badge)badge.textContent=yadMediaLabel(yadProductImage(id,ml));
-   photo.onload=()=>{if(photo.dataset.requestSequence!==sequence)return;photo.hidden=false;art.classList.add('has-volume-photo')};
-   photo.onerror=()=>{if(!src.startsWith('data:')){apply(yadDigitalBottle(id,ml),false)}else{photo.hidden=true;art.classList.remove('has-volume-photo')}};
-   photo.src=src;
-   if(photo.complete&&photo.naturalWidth){photo.hidden=false;art.classList.add('has-volume-photo')}
-  };
-  const preload=new Image();
-  preload.onload=()=>apply(asset.src,asset.isPhoto);
-  preload.onerror=()=>apply(yadDigitalBottle(id,ml),false);
-  preload.src=asset.src;
- }
- const mediaLabel=card.querySelector('.atelier-card-media-label');if(mediaLabel)mediaLabel.textContent=yadMediaLabel(yadProductImage(id,ml));
- const volume=card.querySelector('.bottle-volume');if(volume)volume.textContent=ml+' мл';
+ const ml=Number(select.value),id=card.dataset.cardDetail||card.querySelector('[data-detail]')?.dataset.detail||'';
+ const art=card.querySelector('.product-art'),photo=art?.querySelector('.yad-volume-photo');
+ if(!art||!photo||!Object.prototype.hasOwnProperty.call(prices,ml))return;
+ const asset=yadProductImage(id,ml);
+ const request=String((Number(photo.dataset.requestSequence)||0)+1);
+ photo.dataset.requestSequence=request;
+ // Prices respond immediately; keep the previous photograph visible while the next loads.
  const price=card.querySelector('.product-price');if(price)price.textContent=rub(prices[ml]);
- art.setAttribute('aria-label',(yadProductImage(id,ml).isPhoto?'Фотография':'Иллюстрация')+' флакона YAD '+ml+' мл');
+ const volume=card.querySelector('.bottle-volume');if(volume)volume.textContent=ml+' мл';
+ const bottle=card.querySelector('.yad-product-bottle');
+ if(bottle)bottle.className='yad-product-bottle volume-'+ml;
+ art.classList.toggle('photo-volume-20',ml===20&&!!card.querySelector('.real-bottle-photo'));
+ const completeImage=(src,fallback)=>{
+  if(photo.dataset.requestSequence!==request||!photo.isConnected)return;
+  let previous=art.querySelector('.yad-previous-volume-photo');
+  if(previous)previous.classList.remove('yad-photo-fading');
+  else if(art.classList.contains('has-volume-photo')&&!photo.hidden&&photo.complete&&photo.naturalWidth){
+   previous=photo.cloneNode(false);
+   previous.className='yad-previous-volume-photo';
+   previous.removeAttribute('onload');previous.removeAttribute('onerror');
+   previous.alt='';previous.setAttribute('aria-hidden','true');
+   art.appendChild(previous);
+  }
+  photo.classList.add('yad-photo-entering');
+  let finished=false;
+  const done=()=>{
+   if(finished||photo.dataset.requestSequence!==request)return;finished=true;
+   photo.hidden=false;photo.dataset.volume=String(ml);
+   photo.alt=(fallback?'Визуализация':yadMediaLabel(asset))+' YAD '+(fragrances.find(f=>f.id===id)?.name||id)+', '+ml+' мл';
+   art.classList.add('has-volume-photo');
+   art.setAttribute('aria-label',photo.alt);
+   const badge=card.querySelector('.atelier-card-media-label');
+   if(badge)badge.textContent=fallback?'Визуализация':yadMediaLabel(asset);
+   card.querySelector('[data-yad-label]')?.remove();
+   art.insertAdjacentHTML('beforeend',yadMockupLabel(id,ml));
+   requestAnimationFrame(()=>{
+    if(photo.dataset.requestSequence!==request)return;
+    photo.classList.remove('yad-photo-entering');
+    if(previous){
+     previous.classList.add('yad-photo-fading');
+     setTimeout(()=>{if(previous.isConnected)previous.remove()},320);
+    }
+   });
+  };
+  photo.onload=done;
+  photo.onerror=()=>{
+   if(photo.dataset.requestSequence!==request)return;
+   if(!fallback){completeImage(yadDigitalBottle(id,ml),true)}
+   else{
+    photo.classList.remove('yad-photo-entering');
+    if(previous){previous.classList.remove('yad-photo-fading');art.classList.add('has-volume-photo')}
+    else{photo.hidden=true;art.classList.remove('has-volume-photo')}
+   }
+  };
+  photo.src=src;
+  if(photo.complete&&photo.naturalWidth)done();
+ };
+ const preload=new Image();
+ preload.onload=()=>completeImage(asset.src,false);
+ preload.onerror=()=>completeImage(yadDigitalBottle(id,ml),true);
+ preload.src=asset.src;
 }
 $('products').addEventListener('change',e=>{if(e.target.matches('select[id^="size-"]'))syncBottle(e.target)});$('loadMoreProducts').addEventListener('click',()=>{catalogVisibleLimit+=catalogPageSize;renderProducts()});
 function syncCheckoutAction(){
