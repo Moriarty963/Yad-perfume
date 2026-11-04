@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - ".github/workflows/yad-images.yml"
+      - "scripts/build_catalog_images.py"
   workflow_dispatch:
 
 permissions:
