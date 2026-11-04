@@ -921,3 +921,19 @@ body[data-page="cart"] .drawer-bottom .delivery-choice label:has(input:checked){
 .order-history-actions button:disabled{opacity:.65;cursor:wait}
 .order-history-actions button:focus-visible{outline:2px solid #8c7762;outline-offset:2px}
 @media(max-width:760px){.order-history{margin:12px}.order-history-item{padding:13px;margin:10px}.order-history-actions{display:grid;grid-template-columns:1fr 1fr}.order-history-actions button.order-history-remove{margin-left:0;grid-column:1/-1}.order-history-list>summary{padding:14px}}
+
+/* Consent-first Telegram order status subscription */
+.yad-tg-connect{margin-top:15px;border:1px solid #d6dfda;border-radius:12px;background:#f3f7f3;padding:15px;color:#28332c}
+.yad-tg-top{display:flex;justify-content:space-between;align-items:center;gap:9px;flex-wrap:wrap}
+.yad-tg-top strong{font-size:15px;font-weight:650}
+.yad-tg-top small{font-size:11px;color:#55705c}
+.yad-tg-connect p{margin:8px 0 12px;color:#657268;font-size:12px;line-height:1.5}
+.yad-tg-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.yad-tg-actions button{background:#243d30;color:#fff;border:1px solid #243d30;border-radius:9px;min-height:43px;padding:10px 13px;font-size:12px;font-weight:600;cursor:pointer}
+.yad-tg-actions button+button{background:#fff;color:#345541;border-color:#adbfaf}
+.yad-tg-actions button:disabled{opacity:.6;cursor:wait}
+.yad-tg-connect .yad-tg-message{margin:12px 0 0;font-size:12px;color:#34553d;line-height:1.55}
+.yad-tg-message:empty{display:none}
+.yad-tg-message a{font-weight:700;color:#285a36;text-decoration:underline;text-underline-offset:3px}
+.yad-tg-actions button:focus-visible,.yad-tg-message a:focus-visible{outline:2px solid #65806f;outline-offset:3px}
+@media(max-width:480px){.yad-tg-actions{display:grid;grid-template-columns:1fr;width:100%}.yad-tg-actions button{width:100%}}
