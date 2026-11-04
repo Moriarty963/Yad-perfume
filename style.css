@@ -555,3 +555,9 @@ body[data-page^="fragrance/"] .detail-sizes button:focus-visible,body[data-page^
 body[data-page^="fragrance/"] .detail-breadcrumb{max-width:1510px;margin-inline:auto}
 @media(min-width:951px){body[data-page^="fragrance/"] .detail-gallery .detail-visual{aspect-ratio:1/1.12}body[data-page^="fragrance/"] .detail-copy h1{margin-bottom:17px}}
 @media(max-width:760px){body[data-page^="fragrance/"] .detail-gallery .detail-visual{aspect-ratio:1/1.03!important}body[data-page^="fragrance/"] .detail-copy .detail-label{font-size:21px}body[data-page^="fragrance/"] .detail-copy h1{font-size:clamp(39px,10vw,48px)}body[data-page^="fragrance/"] .detail-note-grid{gap:7px}body[data-page^="fragrance/"] .detail-note-tile{padding:9px 4px;min-height:88px}body[data-page^="fragrance/"] .detail-add{min-height:60px;font-size:17px}}
+
+/* Volume-specific image indicator */
+body[data-page^="fragrance/"] .detail-gallery .detail-visual{position:relative}
+body[data-page^="fragrance/"] .detail-image-status{position:absolute;left:18px;bottom:17px;z-index:3;padding:8px 12px;border-radius:999px;background:rgba(252,250,247,.88);color:#655b51;font-size:11px;letter-spacing:.025em;line-height:1.2;backdrop-filter:blur(9px);pointer-events:none}
+body[data-page^="fragrance/"] .detail-sizes button[aria-pressed="true"]{background:#171615;border-color:#171615;color:white}
+@media(max-width:760px){body[data-page^="fragrance/"] .detail-image-status{left:11px;bottom:11px;font-size:10px;padding:7px 10px}}
