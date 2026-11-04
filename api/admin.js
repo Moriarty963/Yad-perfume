@@ -44,16 +44,38 @@ module.exports=async(req,res)=>{
  }
  const sql=neon(process.env.DATABASE_URL);
  try{
+  if(req.method==='POST'&&req.query.action==='telegram-retry'){
+   const b=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
+   const id=typeof b.id==='string'?b.id:'';
+   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))
+    return res.status(400).json({error:'Некорректный номер заявки.'});
+   const rows=await sql`SELECT o.public_id,o.status,(s.chat_id IS NOT NULL) AS telegram_connected,s.last_notified_status
+    FROM yad_orders o LEFT JOIN yad_telegram_subscriptions s ON s.order_id=o.public_id AND s.active=true
+    WHERE o.public_id=${id}::uuid LIMIT 1`;
+   if(!rows.length)return res.status(404).json({error:'Заказ не найден.'});
+   const order=rows[0];
+   if(!order.telegram_connected)return res.status(409).json({error:'Покупатель ещё не подключил заказ к Telegram.'});
+   if(order.last_notified_status===order.status)return res.status(200).json({notification_status:'already_sent',status:order.status});
+   const outcome=await notifyBuyerStatus(order.public_id,order.status);
+   if(outcome==='failed'||outcome==='not_configured')
+    return res.status(503).json({error:'Telegram не принял сообщение. Повторите попытку позже.',notification_status:outcome});
+   return res.status(200).json({notification_status:outcome,status:order.status});
+  }
   if(req.method==='GET'){
    const page=Number(req.query.page??0);
    const filter=String(req.query.status??'all');
    const query=String(req.query.q??'').trim();
    if(!Number.isInteger(page)||page<0||page>10000||!(filter==='all'||statuses.has(filter))||query.length>120)return res.status(400).json({error:'Неверные параметры фильтра.'});
    const offset=page*pageSize,term='%'+query+'%';
-   const rows=await sql`SELECT public_id,created_at,customer_name,contact_method,contact_value,delivery_service,pickup_address,comment,items,subtotal_rub,delivery_rub,total_rub,status
-    FROM yad_orders WHERE (${filter}='all' OR status=${filter})
-    AND (${query}='' OR customer_name ILIKE ${term} OR contact_value ILIKE ${term} OR pickup_address ILIKE ${term} OR public_id::text ILIKE ${term})
-    ORDER BY created_at DESC,id DESC LIMIT ${pageSize+1} OFFSET ${offset}`;
+   const rows=await sql`SELECT o.public_id,o.created_at,o.customer_name,o.contact_method,o.contact_value,
+    o.delivery_service,o.pickup_address,o.comment,o.items,o.subtotal_rub,o.delivery_rub,o.total_rub,o.status,
+    (sub.chat_id IS NOT NULL) AS telegram_connected,
+    sub.last_notified_status AS telegram_last_status,
+    sub.last_notified_at AS telegram_last_sent_at
+    FROM yad_orders o LEFT JOIN yad_telegram_subscriptions sub ON sub.order_id=o.public_id AND sub.active=true
+    WHERE (${filter}='all' OR o.status=${filter})
+    AND (${query}='' OR o.customer_name ILIKE ${term} OR o.contact_value ILIKE ${term} OR o.pickup_address ILIKE ${term} OR o.public_id::text ILIKE ${term})
+    ORDER BY o.created_at DESC,o.id DESC LIMIT ${pageSize+1} OFFSET ${offset}`;
    const metrics=await sql`SELECT
     COUNT(*)::int AS all_count,
     COUNT(*) FILTER(WHERE status='new')::int AS new_count,
