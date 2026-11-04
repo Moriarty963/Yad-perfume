@@ -387,7 +387,7 @@ function renderOrderReceipt(){
  const trackingUI=lastOrder.statusToken
   ?`<section class="order-tracking" aria-label="Статус заявки"><div class="order-tracking-heading"><span>Актуальный статус заказа</span><span class="order-tracking-checked">${safe(checkedLabel)}</span></div><strong class="order-tracking-state status-${statusKey}">${safe(statusTitle)}</strong><p>${safe(statusDescription)}</p><button type="button" data-order-status>Проверить статус</button><p id="orderStatusMessage" class="order-tracking-message" role="status" aria-live="polite"></p></section>`
   :'<p class="order-receipt-note">Онлайн-проверка статуса доступна для новых заявок. Для этой заявки можно уточнить статус через WhatsApp.</p>';
- holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><h3>Заказ №${safe(lastOrder.number)}</h3><p>Мы свяжемся с вами в ${lastOrder.method==='telegram'?'Telegram':'WhatsApp'} для подтверждения.</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div>${trackingUI}${telegramUI}<div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div><p class="order-receipt-retention">История до 15 заявок хранится только в этом браузере, без имён, телефонов и адресов. Данные хранятся не дольше 180 дней, их можно удалить.</p><button type="button" class="order-forget" data-order-forget>Удалить сведения о заявке с устройства</button>`;
+ holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><div class="order-receipt-number"><h3>Заказ №${safe(lastOrder.number)}</h3><button type="button" class="order-copy-number" data-order-copy-number aria-label="Скопировать номер заказа ${safe(lastOrder.number)}">Скопировать №</button></div><p>Мы свяжемся с вами в ${lastOrder.method==='telegram'?'Telegram':'WhatsApp'} для подтверждения.</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div>${trackingUI}${telegramUI}<div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div><p class="order-receipt-retention">История до 15 заявок хранится только в этом браузере, без имён, телефонов и адресов. Данные хранятся не дольше 180 дней, их можно удалить.</p><button type="button" class="order-forget" data-order-forget>Удалить сведения о заявке с устройства</button>`;
 }
 async function customerTelegramConnect(button,action){
  const order=lastOrder;if(!order?.statusToken)return;
@@ -458,8 +458,9 @@ $('orderReceipt').addEventListener('click',async event=>{
   if(window.confirm('Удалить сведения о последней заявке из этого браузера?'))forgetLastOrder();
   return;
  }
- if(!event.target.closest('[data-order-copy]'))return;
- const message=receiptPlainText(lastOrder);
+ const copyNumber=event.target.closest('[data-order-copy-number]');
+ if(!copyNumber&&!event.target.closest('[data-order-copy]'))return;
+ const message=copyNumber?lastOrder.number:receiptPlainText(lastOrder);
  let copied=false;
  try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(message);copied=true}}catch{}
  if(!copied){
@@ -469,7 +470,7 @@ $('orderReceipt').addEventListener('click',async event=>{
   try{copied=document.execCommand('copy')}catch{}
   field.remove();
  }
- notify(copied?'Состав заказа скопирован':'Не получилось скопировать. Сохраните заказ скриншотом.');
+ notify(copied?(copyNumber?'Номер заказа скопирован':'Состав заказа скопирован'):'Не получилось скопировать. Попробуйте ещё раз.');
 });
 let focusBeforeCart=null;function openCart(){navigate('cart')}
 function closeCart(){if(currentPage()==='cart'){navigate('catalog');return}$('overlay').hidden=true;$('drawer').classList.remove('open');$('drawer').setAttribute('aria-hidden','true');document.body.classList.remove('cart-open');const focusTarget=focusBeforeCart?.isConnected?focusBeforeCart:$('cartButton');focusTarget.focus()}
@@ -606,6 +607,7 @@ function checkoutProblem(message,id){
  status.className='checkout-status error';
  const field=id?$(id):null;
  if(field){
+  if(id==='customerComment')$('checkoutOptional').open=true;
   field.setAttribute('aria-invalid','true');
   field.setAttribute('aria-describedby',id==='customerAddress'?'pickupServiceHint checkoutFieldError':'checkoutFieldError');
   const note=document.createElement('span');
