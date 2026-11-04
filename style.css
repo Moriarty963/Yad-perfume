@@ -692,3 +692,31 @@ body[data-page^="fragrance/"] .atelier-mini-gallery img{display:block;width:100%
 body[data-page^="fragrance/"] .atelier-mini-gallery span{font-size:10px;white-space:nowrap}
 @media(max-width:600px){body[data-page^="fragrance/"] .atelier-mini-gallery{gap:4px;margin-top:7px}body[data-page^="fragrance/"] .atelier-mini-gallery button{border-radius:7px;padding:3px 2px 5px}body[data-page^="fragrance/"] .atelier-mini-gallery img{height:46px}body[data-page^="fragrance/"] .atelier-mini-gallery span{font-size:9px}}
 @media(prefers-reduced-motion:reduce){body[data-page^="fragrance/"] .atelier-mini-gallery button{transition:none}}
+
+/* YAD source-photo mockups — the original six physical bottle shapes stay unchanged.
+   Temporarily obscures only the original scent-name lettering until individual WebP
+   files are hosted; this is explicitly labeled a mockup, not a real product photo. */
+.yad-mockup-label{
+ position:absolute;z-index:8;left:var(--mx);top:var(--my);width:var(--mw);height:var(--mh);
+ display:flex;align-items:center;justify-content:center;text-align:center;
+ box-sizing:border-box;overflow:hidden;padding:1px 2px;
+ background:rgba(246,232,216,.98);color:#1f1b18;
+ font:500 clamp(5px,.72vw,11px)/1.06 Georgia,'Times New Roman',serif;
+ letter-spacing:.01em;overflow-wrap:anywhere;word-break:normal;
+ backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+ pointer-events:none;
+}
+.yad-mockup-label-6{background:rgba(243,229,214,.98);font-style:italic}
+.yad-mockup-label-10{background:rgba(248,233,221,.98);font-style:italic}
+.yad-mockup-label-20{background:rgba(249,229,208,.98);font-style:italic}
+.yad-mockup-label-30{background:rgba(241,225,207,.98)}
+.yad-mockup-label-50{background:rgba(243,229,214,.98)}
+.yad-mockup-label-100{background:rgba(234,211,179,.98)}
+body[data-page^="fragrance/"] .atelier-stage .yad-mockup-label{z-index:3;font-size:clamp(8px,1.35vw,17px);letter-spacing:.012em}
+.market-card-photo .yad-mockup-label{font-size:clamp(5px,.73vw,10px)}
+body[data-page^="fragrance/"] .atelier-mini-gallery button{position:relative;overflow:hidden}
+body[data-page^="fragrance/"] .atelier-mini-gallery .yad-mockup-label{z-index:2;font-size:5px;padding:0 1px;line-height:1}
+@media(max-width:760px){
+ .product-art .yad-mockup-label,.market-card-photo .yad-mockup-label{font-size:clamp(5px,1.8vw,9px)}
+ body[data-page^="fragrance/"] .atelier-stage .yad-mockup-label{font-size:clamp(6px,2.25vw,12px)}
+}
