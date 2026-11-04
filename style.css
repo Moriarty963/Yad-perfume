@@ -535,3 +535,13 @@ body[data-page^="fragrance/"] .detail-thumbnails .detail-thumb.active{border:2px
 body[data-page^="fragrance/"] .detail-benefits{margin-top:30px}
 @media(max-width:950px){body[data-page^="fragrance/"] .detail-layout{grid-template-columns:1fr}body[data-page^="fragrance/"] .detail-gallery .detail-visual,body[data-page^="fragrance/"] .detail-gallery .detail-visual .product-art{min-height:480px}}
 @media(max-width:760px){body[data-page^="fragrance/"] .detail-gallery{grid-template-columns:1fr}body[data-page^="fragrance/"] .detail-gallery .detail-visual,body[data-page^="fragrance/"] .detail-gallery .detail-visual .product-art{min-height:390px;height:390px}body[data-page^="fragrance/"] .detail-copy h1{font-size:48px}body[data-page^="fragrance/"] .detail-sizes{grid-template-columns:repeat(3,minmax(0,1fr))}body[data-page^="fragrance/"] .detail-note-tile{min-height:102px}body[data-page^="fragrance/"] .detail-note-icon{font-size:30px}body[data-page^="fragrance/"] .detail-thumbnails{grid-template-columns:repeat(6,minmax(0,1fr))}}
+
+/* YAD 3.0 — single-photo luxury product page */
+body[data-page^="fragrance/"] .detail-gallery{display:block;min-width:0}
+body[data-page^="fragrance/"] .detail-gallery .detail-visual{height:auto;min-height:0;aspect-ratio:4/4.55;display:block;overflow:hidden;background:#f6eee6;border-radius:24px}
+body[data-page^="fragrance/"] .detail-gallery .yad-detail-hero-photo{width:100%;height:100%;display:block;object-fit:cover;object-position:center;background:#f5eee7}
+body[data-page^="fragrance/"] .detail-copy{padding-top:0}
+body[data-page^="fragrance/"] .detail-layout{align-items:start}
+body[data-page^="fragrance/"] .detail-note-section{margin-top:22px}
+@media(max-width:950px){body[data-page^="fragrance/"] .detail-gallery .detail-visual{min-height:0;aspect-ratio:5/4}}
+@media(max-width:760px){body[data-page^="fragrance/"] .detail-gallery .detail-visual{height:auto;min-height:0;aspect-ratio:1/1.08;border-radius:17px}body[data-page^="fragrance/"] .detail-gallery .yad-detail-hero-photo{object-fit:cover}body[data-page^="fragrance/"] .detail-layout{gap:18px}body[data-page^="fragrance/"] .detail-copy h1{margin-top:7px;margin-bottom:13px;font-size:43px}body[data-page^="fragrance/"] .detail-note-section{margin:18px 0}}
