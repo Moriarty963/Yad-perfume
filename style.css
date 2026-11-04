@@ -1501,3 +1501,382 @@ body[data-page^="fragrance/"] .atelier-mini-gallery button[aria-pressed="true"]{
 @media(prefers-reduced-motion:reduce){
  .catalog-audiences button,.market-audiences button{transition:none!important}
 }
+
+
+/* YAD ATELIER 3.0 — boutique fragrance detail refinement.
+   Preserve the approved left-image/right-copy composition on phones. */
+body[data-page^="fragrance/"] .fragrance-detail{
+ background:#faf9f6;
+}
+body[data-page^="fragrance/"] .detail-breadcrumb{
+ align-items:center;margin-bottom:clamp(20px,2.5vw,32px);
+ color:#908779;font-size:11px;letter-spacing:.05em;
+}
+body[data-page^="fragrance/"] .detail-breadcrumb a{
+ display:inline-flex;align-items:center;min-height:40px;
+ color:#5b534a;text-decoration:none;font-weight:550;
+}
+body[data-page^="fragrance/"] .detail-breadcrumb a:hover{
+ text-decoration:underline;text-underline-offset:5px;
+}
+body[data-page^="fragrance/"] .detail-breadcrumb a:focus-visible{
+ outline:2px solid #706354;outline-offset:3px;border-radius:4px;
+}
+body[data-page^="fragrance/"] .atelier-layout{
+ gap:clamp(22px,4.2vw,66px);align-items:start;
+}
+body[data-page^="fragrance/"] .atelier-photo-topline{
+ font-size:10px;font-weight:550;letter-spacing:.11em;
+ line-height:1.5;color:#81776b;
+}
+body[data-page^="fragrance/"] .atelier-photo-topline #atelierGalleryCounter{
+ font-variant-numeric:tabular-nums;white-space:nowrap;
+ color:#a1988d;
+}
+body[data-page^="fragrance/"] .atelier-gallery .atelier-stage{
+ border:1px solid #e8e2d9;border-radius:18px;
+ background:#f5f0eb!important;
+ box-shadow:none;
+}
+body[data-page^="fragrance/"] .atelier-stage .detail-image-status{
+ border-radius:100px;
+ border:1px solid rgba(183,170,152,.25);
+ box-shadow:none;
+ backdrop-filter:blur(6px);
+ background:rgba(255,253,250,.83);
+ color:#62594e;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-intro .eyebrow{
+ font-size:10px;letter-spacing:.14em;
+ line-height:1.5;color:#897d6e;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-intro h1{
+ font-family:Georgia,"Times New Roman",serif;
+ font-size:clamp(44px,4.7vw,74px);
+ font-weight:400;line-height:1.08;
+ letter-spacing:-.05em;color:#26231f;
+ overflow-wrap:anywhere;
+ margin:13px 0 11px;
+}
+body[data-page^="fragrance/"] .detail-profile{
+ display:flex;align-items:center;flex-wrap:wrap;
+ gap:9px 14px;margin-bottom:clamp(19px,2.25vw,29px);
+}
+body[data-page^="fragrance/"] .detail-profile .detail-audience{
+ margin:0;min-height:30px;
+ border-radius:100px;background:#f3efe9;
+ border:1px solid #e4ddd3;color:#6b5d4e;
+ font-size:11px;letter-spacing:.02em;
+}
+body[data-page^="fragrance/"] .detail-family{
+ color:#8b8276;font-size:11px;line-height:1.4;
+ letter-spacing:.01em;
+}
+body[data-page^="fragrance/"] .detail-aroma-description{
+ margin:0 0 clamp(23px,3vw,37px);
+ max-width:58ch;
+}
+body[data-page^="fragrance/"] .detail-aroma-description>span{
+ display:block;margin:0 0 11px;
+ color:#8d8072;font-size:10px;
+ font-weight:650;letter-spacing:.16em;
+}
+body[data-page^="fragrance/"] .detail-aroma-description>p{
+ font-size:clamp(14px,1.35vw,16px);
+ line-height:1.8;color:#5e584f;
+ text-wrap:pretty;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-note-section{
+ margin:0 0 clamp(24px,3vw,36px);
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-note-section h2{
+ font:600 10px/1.5 inherit;
+ letter-spacing:.14em;text-transform:uppercase;
+ color:#887d70;margin:0 0 13px;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-note-grid{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:9px;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-note-tile{
+ display:flex;align-items:flex-start;justify-content:flex-start;
+ flex-direction:column;gap:7px;
+ min-width:0;min-height:87px;
+ padding:14px 13px;
+ background:#f6f2ec;
+ border:1px solid #e8e2d9;border-radius:11px;
+ text-align:left;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-note-index{
+ font:600 10px/1.3 inherit;color:#9f9384;
+ letter-spacing:.07em;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-note-tile strong{
+ font-family:inherit;font-size:13px;line-height:1.38;
+ font-weight:500;color:#39352f;
+ overflow-wrap:anywhere;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-purchase{
+ box-sizing:border-box;
+ width:100%;padding:clamp(17px,2.55vw,31px);
+ background:#fff;border:1px solid #e9e4dc;
+ border-radius:16px;
+ box-shadow:0 9px 27px rgba(64,53,39,.035);
+}
+body[data-page^="fragrance/"] .atelier-copy .atelier-selection-head{
+ align-items:end;margin:0 0 16px;
+}
+body[data-page^="fragrance/"] .atelier-copy .atelier-kicker{
+ color:#968c7d;font-size:9px;letter-spacing:.13em;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-label{
+ margin-top:5px;margin-bottom:0;
+ font:400 clamp(22px,2.25vw,28px)/1.2 Georgia,"Times New Roman",serif;
+ letter-spacing:-.025em;color:#302a25;
+}
+body[data-page^="fragrance/"] .atelier-copy .atelier-current-volume{
+ font:400 22px/1.2 Georgia,"Times New Roman",serif;
+ color:#847463;
+}
+body[data-page^="fragrance/"] .atelier-copy .atelier-volume-rail{
+ gap:9px;grid-template-columns:repeat(3,minmax(0,1fr));
+}
+body[data-page^="fragrance/"] .atelier-copy .atelier-volume-rail button{
+ box-sizing:border-box;
+ border:1px solid #e5dfd6;
+ border-radius:10px;background:#fbfaf8;
+ color:#39332d;
+ min-height:68px;padding:10px 8px;
+ transition:border-color .18s ease,background .18s ease,box-shadow .18s ease;
+}
+body[data-page^="fragrance/"] .atelier-copy .atelier-volume-rail button strong{
+ font-size:14px;line-height:1.3;
+}
+body[data-page^="fragrance/"] .atelier-copy .atelier-volume-rail button small{
+ font-size:11px;color:#8a8076;
+}
+body[data-page^="fragrance/"] .atelier-copy .atelier-volume-rail button[aria-pressed="true"]{
+ background:#f2eee8;border-color:#8b7a68;
+ box-shadow:inset 0 0 0 1px #8b7a68;
+}
+body[data-page^="fragrance/"] .atelier-copy .atelier-volume-rail button:focus-visible{
+ outline:2px solid #706354;outline-offset:3px;
+}
+body[data-page^="fragrance/"] .atelier-copy .atelier-format-caption{
+ margin:13px 0 17px;
+ font-size:11px;line-height:1.5;
+ letter-spacing:0;color:#857d71;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-total{
+ display:flex;justify-content:space-between;align-items:center;
+ padding:17px 0 13px;margin-top:15px;
+ border-top:1px solid #ebe5dd;
+ gap:12px;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-total>span{
+ color:#72695e;font-size:12px;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-total strong{
+ color:#292520;font-size:21px;font-weight:600;
+ font-variant-numeric:tabular-nums;
+}
+body[data-page^="fragrance/"] .atelier-copy #detailAdd{
+ display:flex;align-items:center;justify-content:center;gap:5px;
+ min-height:57px;width:100%;padding:14px 12px;
+ margin-top:10px;border:1px solid #282923;
+ border-radius:10px;background:#282923;color:#fff;
+ font-size:14px;font-weight:600;letter-spacing:.01em;
+ box-shadow:none;
+ transition:background .2s ease,transform .16s ease;
+}
+body[data-page^="fragrance/"] .atelier-copy #detailAdd:hover{background:#43433b}
+body[data-page^="fragrance/"] .atelier-copy #detailAdd:active{transform:scale(.992)}
+body[data-page^="fragrance/"] .atelier-copy .detail-secondary-actions{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:9px;margin-top:10px;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-secondary-actions>button{
+ display:flex;align-items:center;justify-content:center;
+ min-width:0;width:100%;min-height:46px;
+ padding:10px 7px;margin:0;border:1px solid #e4ded5;
+ border-radius:9px;background:#fff;
+ color:#665d51;font-size:12px;line-height:1.3;font-weight:500;
+ cursor:pointer;transition:background .18s ease,border-color .18s ease;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-secondary-actions>button:hover{
+ background:#f7f4ef;border-color:#c7bdb0;text-decoration:none;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-secondary-actions>button:focus-visible{
+ outline:2px solid #706354;outline-offset:2px;
+}
+body[data-page^="fragrance/"] .atelier-copy .detail-footnote{
+ margin:15px 0 0;font-size:11px;line-height:1.6;color:#9a9186;
+}
+body[data-page^="fragrance/"] .detail-benefits-wide{
+ max-width:1420px;margin-top:32px;
+ display:flex;justify-content:center;flex-wrap:wrap;
+ gap:10px 28px;padding:22px 0 2px;
+ border-top:1px solid #eae5dc;
+}
+body[data-page^="fragrance/"] .detail-benefits-wide span{
+ font-size:11px;letter-spacing:.02em;
+ color:#81796e;
+}
+@media(min-width:951px){
+ body[data-page^="fragrance/"] .atelier-copy .detail-purchase{
+  margin-top:6px;
+ }
+}
+@media(max-width:950px){
+ body[data-page^="fragrance/"] .atelier-layout{
+  grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);
+  gap:17px 14px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-intro h1{
+  font-size:clamp(29px,4.5vw,48px);line-height:1.08;
+  margin:7px 0 10px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-intro .eyebrow{
+  font-size:9px;letter-spacing:.07em;
+ }
+ body[data-page^="fragrance/"] .detail-profile{
+  gap:7px 10px;margin-bottom:16px;
+ }
+ body[data-page^="fragrance/"] .detail-aroma-description{margin-bottom:17px}
+ body[data-page^="fragrance/"] .detail-aroma-description>p{
+  font-size:13px;line-height:1.6;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-note-section{
+  margin-bottom:0;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-note-grid{
+  grid-template-columns:1fr;gap:0;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-note-tile{
+  flex-direction:row;align-items:center;gap:10px;
+  min-height:0;padding:8px 0;
+  border:0;border-bottom:1px solid #ebe6de;
+  border-radius:0;background:transparent;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-note-index{
+  min-width:19px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-note-tile strong{
+  font-size:12px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-purchase{
+  grid-column:1/-1;grid-row:2;margin-top:6px;
+  padding:21px 23px;border-radius:14px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .atelier-volume-rail{
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:7px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .atelier-volume-rail button{
+  min-height:63px;padding:8px 3px;
+ }
+ body[data-page^="fragrance/"] .detail-benefits-wide{margin-top:20px}
+}
+@media(max-width:760px){
+ body[data-page^="fragrance/"] .fragrance-detail{
+  padding-top:12px;
+ }
+ body[data-page^="fragrance/"] .detail-breadcrumb{
+  margin-bottom:12px;gap:7px;font-size:9px;
+ }
+ body[data-page^="fragrance/"] .detail-breadcrumb a{
+  min-height:39px;
+ }
+ body[data-page^="fragrance/"] .atelier-layout{
+  grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+  gap:15px 12px;
+ }
+ body[data-page^="fragrance/"] .atelier-gallery .atelier-mini-gallery{
+  display:none;
+ }
+ body[data-page^="fragrance/"] .atelier-gallery .atelier-stage{
+  border-radius:12px;
+ }
+ body[data-page^="fragrance/"] .atelier-photo-topline{
+  font-size:8px;letter-spacing:.025em;margin-bottom:7px;
+ }
+ body[data-page^="fragrance/"] .atelier-stage .detail-image-status{
+  left:6px;bottom:6px;max-width:calc(100% - 12px);
+  padding:5px 7px;font-size:8px;line-height:1.25;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-intro h1{
+  font-size:clamp(25px,5.2vw,37px);line-height:1.06;
+  margin:6px 0 9px;
+ }
+ body[data-page^="fragrance/"] .detail-profile{
+  gap:6px 9px;margin-bottom:12px;
+ }
+ body[data-page^="fragrance/"] .detail-profile .detail-audience{
+  min-height:26px;padding:5px 9px;font-size:10px;
+ }
+ body[data-page^="fragrance/"] .detail-family{
+  font-size:10px;
+ }
+ body[data-page^="fragrance/"] .detail-aroma-description{
+  margin:0 0 13px;
+ }
+ body[data-page^="fragrance/"] .detail-aroma-description>span{
+  font-size:9px;letter-spacing:.08em;margin-bottom:5px;
+ }
+ body[data-page^="fragrance/"] .detail-aroma-description>p{
+  font-size:12px;line-height:1.55;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-note-section h2{
+  font-size:9px;letter-spacing:.08em;margin-bottom:3px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-note-tile{
+  padding:6px 0;gap:7px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-note-tile strong{
+  font-size:11px;line-height:1.35;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-note-index{
+  font-size:9px;min-width:16px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-purchase{
+  margin-top:6px;padding:18px 16px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .atelier-selection-head{
+  margin-bottom:14px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .atelier-volume-rail{
+  grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .atelier-volume-rail button{
+  min-height:61px;padding:9px 6px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-total strong{font-size:20px}
+ body[data-page^="fragrance/"] .detail-benefits-wide{
+  justify-content:space-around;gap:10px 14px;
+ }
+}
+@media(max-width:390px){
+ body[data-page^="fragrance/"] .atelier-layout{
+  grid-template-columns:minmax(0,.90fr) minmax(0,1.10fr);
+  gap:14px 10px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-intro h1{
+  font-size:clamp(23px,6vw,30px);
+ }
+ body[data-page^="fragrance/"] .detail-profile .detail-audience{
+  padding:5px 8px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-purchase{
+  padding:15px 13px;
+ }
+ body[data-page^="fragrance/"] .atelier-copy .detail-secondary-actions>button{
+  font-size:11px;padding:10px 5px;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body[data-page^="fragrance/"] .atelier-copy #detailAdd,
+ body[data-page^="fragrance/"] .atelier-copy .detail-secondary-actions>button,
+ body[data-page^="fragrance/"] .atelier-copy .atelier-volume-rail button{
+  transition:none!important;
+ }
+}
