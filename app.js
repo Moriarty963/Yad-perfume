@@ -199,6 +199,18 @@ function orderInquiryUrl(order){
  if(!/^\d{10,15}$/.test(number))return '';
  return 'https://wa.me/'+number+'?text='+encodeURIComponent('Здравствуйте! Хочу уточнить статус заявки YAD №'+order.number+'.');
 }
+const orderStatusDetails={
+ new:['Новый','Заявка получена и ожидает подтверждения.'],
+ confirmed:['Подтверждён','Мы подтвердили заказ и готовим его к выполнению.'],
+ paid:['Оплачен','Поступление оплаты отмечено администратором YAD.'],
+ shipped:['Отправлен','Заказ передан на доставку. Уточните номер отправления у YAD.'],
+ completed:['Завершён','Заказ отмечен как завершённый.'],
+ cancelled:['Отменён','Заявка отменена. При необходимости свяжитесь с YAD.']
+};
+function orderStatusTimestamp(iso){
+ if(!iso||!Number.isFinite(new Date(iso).getTime()))return 'Пока не проверяли';
+ return 'Проверено '+new Date(iso).toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'});
+}
 function renderOrderReceipt(){
  const holder=$('orderReceipt');if(!holder)return;
  const show=!cart.length&&!!lastOrder;
@@ -207,7 +219,13 @@ function renderOrderReceipt(){
  const rows=lastOrder.items.map(x=>`<div class="order-receipt-row"><div><strong>${safe(x.name)}</strong><small>${safe(x.description)} · ${Number(x.qty)||1} шт.</small></div><span>${rub(Number(x.price)||0)}</span></div>`).join('');
  const inquiry=orderInquiryUrl(lastOrder);
  const receiptActions=inquiry?'<a href="'+safe(inquiry)+'" target="_blank" rel="noopener noreferrer">Уточнить статус в WhatsApp ↗</a>':'';
- holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><h3>Заказ №${safe(lastOrder.number)}</h3><p>Мы свяжемся с вами в ${lastOrder.method==='telegram'?'Telegram':'WhatsApp'} для подтверждения.</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div><p class="order-receipt-note">Это подтверждение отправленной заявки, не отслеживание доставки. Для уточнения статуса свяжитесь с нами.</p><div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div>`;
+ const statusKey=Object.prototype.hasOwnProperty.call(orderStatusDetails,lastOrder.status)?lastOrder.status:'new';
+ const [statusTitle,statusDescription]=orderStatusDetails[statusKey];
+ const checkedLabel=orderStatusTimestamp(lastOrder.checkedAt);
+ const trackingUI=lastOrder.statusToken
+  ?`<section class="order-tracking" aria-label="Статус заявки"><div class="order-tracking-heading"><span>Актуальный статус заказа</span><span class="order-tracking-checked">${safe(checkedLabel)}</span></div><strong class="order-tracking-state status-${statusKey}">${safe(statusTitle)}</strong><p>${safe(statusDescription)}</p><button type="button" data-order-status>Проверить статус</button><p id="orderStatusMessage" class="order-tracking-message" role="status" aria-live="polite"></p></section>`
+  :'<p class="order-receipt-note">Онлайн-проверка статуса доступна для новых заявок. Для этой заявки можно уточнить статус через WhatsApp.</p>';
+ holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><h3>Заказ №${safe(lastOrder.number)}</h3><p>Мы свяжемся с вами в ${lastOrder.method==='telegram'?'Telegram':'WhatsApp'} для подтверждения.</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div>${trackingUI}<div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div><p class="order-receipt-retention">Сведения о последней заявке хранятся только в этом браузере, без имени, телефона и адреса. Токен статуса действует 180 дней.</p><button type="button" class="order-forget" data-order-forget>Удалить сведения о заявке с устройства</button>`;
 }
 $('orderReceipt').addEventListener('click',async event=>{
  if(!event.target.closest('[data-order-copy]')||!lastOrder)return;
