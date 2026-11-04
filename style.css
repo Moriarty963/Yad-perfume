@@ -2038,36 +2038,13 @@ body[data-page="cart"] #checkoutPanel input[aria-invalid="true"]:not([type="radi
 }
 
 
-/* YAD delivery: compact official-service pickup help, optimized for mobile. */
-#checkoutPanel .pickup-assist{
- display:flex;align-items:center;justify-content:space-between;gap:15px;
- padding:14px 15px;margin:17px 0 8px;
- border:1px solid #e5ded3;border-radius:11px;background:#f9f7f3;
+/* Clear YAD delivery guidance: PVZ operators are not the sellers. */
+#checkoutPanel .pickup-explainer{
+ margin:14px 0 8px;padding:13px 14px;
+ border:1px solid #e5ded3;border-radius:9px;
+ background:#f9f7f3;color:#686159;
+ font-size:12px;line-height:1.6;
 }
-#checkoutPanel .pickup-assist-copy{min-width:0;flex:1}
-#checkoutPanel .pickup-assist-kicker{
- display:block;margin-bottom:4px;letter-spacing:.10em;
- font-size:10px;line-height:1.4;font-weight:650;color:#8c7960;
-}
-#checkoutPanel .pickup-assist p{
- color:#686159;font-size:12px;line-height:1.5;margin:0;
-}
-#checkoutPanel .pickup-assist a{
- display:inline-flex;align-items:center;justify-content:center;
- min-height:42px;padding:10px 12px;border:1px solid #d4c9b8;
- border-radius:7px;background:#fff;color:#484033;
- font-size:12px;line-height:1.35;font-weight:600;text-align:center;
- white-space:nowrap;transition:border-color .18s,background-color .18s;
-}
-#checkoutPanel .pickup-assist a:hover{border-color:#a5957e;background:#f4f0e9}
-#checkoutPanel .pickup-assist a:focus-visible{outline:2px solid #8a7658;outline-offset:3px}
 #checkoutPanel .pickup-service-hint{
  font-size:11px;line-height:1.5;color:#777168;margin:8px 0 5px;
-}
-@media(max-width:440px){
- #checkoutPanel .pickup-assist{align-items:stretch;flex-direction:column;gap:11px}
- #checkoutPanel .pickup-assist a{width:100%;white-space:normal}
-}
-@media(prefers-reduced-motion:reduce){
- #checkoutPanel .pickup-assist a{transition:none}
 }
