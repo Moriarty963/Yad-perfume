@@ -498,3 +498,8 @@ body[data-page^="fragrance/"] .detail-add{width:100%;min-height:65px;border-radi
 .detail-benefits span{font-size:12px;line-height:1.5;color:#60584e;text-align:center}
 .detail-benefits span+span{border-left:1px solid #e6e0d9}
 @media(max-width:760px){.detail-thumb{font-size:10px;width:66px}.detail-benefits{gap:5px}.detail-benefits span{font-size:10px;padding:0 4px}}
+
+/* Crisp per-fragrance vector bottle assets, with correct labels */
+.product-art .yad-volume-photo,.detail-gallery .yad-volume-photo{object-fit:contain;background:linear-gradient(145deg,#f9f6f0,#eee7dd);padding:0}
+.market-card-photo .yad-volume-photo{object-fit:contain;background:linear-gradient(145deg,#f9f6f0,#eee7dd)}
+.yad-volume-photo[hidden]{display:none!important}
