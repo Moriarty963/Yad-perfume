@@ -1,4 +1,5 @@
 const {neon}=require('@neondatabase/serverless');
+const {issueToken}=require('../lib/order-status-token.js');
 const prices={6:500,10:700,20:1300,30:1800,50:2700,100:5000};
 const {YAD_CATALOG_ROWS}=require('../catalog-data.js');
 const allowed=new Set(YAD_CATALOG_ROWS.map(([id])=>id));
@@ -75,6 +76,6 @@ module.exports=async(req,res)=>{
   if(subtotal>1000000)return res.status(400).json({error:'Слишком большая сумма заказа.'});
   const sql=neon(process.env.DATABASE_URL);
   const rows=await sql`INSERT INTO yad_orders (customer_name,customer_phone,contact_method,contact_value,delivery_service,pickup_address,comment,items,subtotal_rub,delivery_rub,total_rub) VALUES (${b.name.trim()},${b.method==='whatsapp'?b.contact.trim():null},${b.method},${b.contact.trim()},${b.delivery},${b.address.trim()},${b.comment.trim()},${JSON.stringify(items)}::jsonb,${subtotal},${fee},${subtotal+fee}) RETURNING public_id,created_at,total_rub`;
-  await notifyTelegram(rows[0],b,items);return res.status(201).json({order_id:rows[0].public_id,total:rows[0].total_rub});
+  await notifyTelegram(rows[0],b,items);return res.status(201).json({order_id:rows[0].public_id,total:rows[0].total_rub,status_token:issueToken(rows[0].public_id)});
  }catch(e){console.error('YAD order submission failed',e?.message);return res.status(500).json({error:'Не удалось сохранить заказ. Попробуйте ещё раз.'})}
 };
