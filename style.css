@@ -1427,3 +1427,77 @@ body[data-page^="fragrance/"] .atelier-mini-gallery button[aria-pressed="true"]{
   transition:none!important;
  }
 }
+
+
+/* YAD ATELIER · Taste-led audience categories (men / women / unisex)
+   Neutral editorial styling: categories guide shopping, not personal identity. */
+.market-audiences{
+ display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;
+ grid-column:1 / -1;margin:7px 0 3px;
+}
+.market-audiences>span{
+ margin-right:10px;color:#847b70;
+ font-size:10px;letter-spacing:.13em;font-weight:600;
+}
+.market-audiences button{
+ display:inline-flex;align-items:center;justify-content:center;
+ min-height:43px;padding:9px 17px;
+ border:1px solid #d9d3ca;border-radius:100px;
+ background:#faf9f6;color:#302d29;
+ font-size:12px;font-weight:550;letter-spacing:.01em;
+ cursor:pointer;transition:background .18s,border-color .18s,transform .18s;
+}
+.market-audiences button:hover{background:#efebe5;border-color:#aaa092}
+.market-audiences button:active{transform:scale(.98)}
+.market-audiences button:focus-visible{outline:2px solid #6d6051;outline-offset:3px}
+.catalog-audiences{
+ display:flex;flex-wrap:wrap;gap:8px;
+ margin:22px 0 9px;
+}
+.catalog-audiences button{
+ display:inline-flex;align-items:center;justify-content:center;
+ min-height:44px;padding:10px 20px;
+ border:1px solid #d9d4cc;border-radius:100px;
+ background:#fff;color:#413c34;font-size:13px;font-weight:550;
+ cursor:pointer;transition:background .18s,border-color .18s,color .18s;
+}
+.catalog-audiences button[aria-pressed="true"]{
+ color:#fff;background:#272722;border-color:#272722;
+}
+.catalog-audiences button:not([aria-pressed="true"]):hover{
+ background:#f5f1eb;border-color:#afa394;
+}
+.catalog-audiences button:focus-visible{outline:2px solid #6d6051;outline-offset:3px}
+.catalog-audience-note{
+ margin:0 0 23px;color:#847e74;font-size:12px;line-height:1.6;
+}
+#products .product-meta .product-audience{
+ display:inline-flex;align-items:center;
+ font-size:10px;font-weight:650;letter-spacing:.06em;
+ color:#716253;
+}
+.detail-audience{
+ display:inline-flex;align-items:center;
+ min-height:31px;padding:6px 12px;margin:4px 0 17px;
+ background:#f4f0ea;border:1px solid #e8e2d8;
+ border-radius:100px;
+ color:#62584e;font-size:11px;font-weight:600;
+ letter-spacing:.025em;
+}
+@media(max-width:760px){
+ .market-audiences{margin:3px 0 7px;gap:7px}
+ .market-audiences>span{width:100%;margin-right:0;font-size:9px}
+ .market-audiences button{flex:1;min-width:0;padding:9px 7px;min-height:43px;font-size:11px}
+ .catalog-audiences{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:12px 0 8px}
+ .catalog-audiences button{min-width:0;min-height:43px;padding:8px 5px;font-size:clamp(10px,2.55vw,12px);line-height:1.2}
+ .catalog-audience-note{font-size:11px;line-height:1.45;margin-bottom:17px}
+ .detail-audience{margin:3px 0 12px}
+ #products .product-meta .product-audience{font-size:9px;letter-spacing:.02em}
+}
+@media(max-width:390px){
+ .catalog-audiences{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .catalog-audiences button{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){
+ .catalog-audiences button,.market-audiences button{transition:none!important}
+}
