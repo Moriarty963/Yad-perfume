@@ -37,9 +37,19 @@ button.primary{background:#2b2925;color:#fff;border-color:#2b2925}
 .customer-update-actions .contact-link{margin:0}
 .status-draft{background:#f8f5ef;color:#453c32;border:1px solid #d9cec1;min-height:39px;padding:8px 12px;font-size:12px}
 .status-draft-note{display:block;color:#827c72;font-size:11px;margin-top:6px}
+
+/* Protected administrator control for consent-based Telegram webhook activation */
+.admin-telegram{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:17px 19px;margin:20px 0 24px;border:1px solid #d9e2d7;background:#f2f6f1;border-radius:12px;color:#25392b}
+.admin-telegram strong{font-size:15px}
+.admin-telegram p{margin:7px 0 0;font-size:12px;color:#607361;line-height:1.5}
+.admin-telegram-actions{display:flex;gap:9px;align-items:center}
+.admin-telegram-actions button{background:#fff;border-color:#bacdbb;color:#335440;min-height:42px;font-size:12px}
+.admin-telegram-actions #telegramAdminEnable{background:#2a4d39;color:#fff;border-color:#2a4d39;font-weight:600}
+.admin-telegram-actions button[hidden]{display:none}
+@media(max-width:600px){.admin-telegram{padding:14px}.admin-telegram-actions{width:100%}.admin-telegram-actions button{flex:1}}
 </style></head>
 <body><main><header><div class="logo">YAD</div><button id="logout" hidden>Выйти</button></header><section id="login" class="login"><h1>Управление заказами</h1><p class="muted">Закрытая панель YAD</p><form id="loginForm"><input type="password" id="password" autocomplete="current-password" placeholder="Пароль администратора" required minlength="12"><button class="primary" type="submit">Войти</button></form><p id="loginStatus" class="error" role="status"></p></section>
-<section id="dashboard" hidden><h1>Заказы</h1><p class="muted">Заказы YAD · Москва (UTC+3) · доступ только администратору</p><div class="metrics"><div class="metric"><span class="muted">Сегодня · заказы</span><strong id="todayCount">0</strong></div><div class="metric"><span class="muted">Сегодня · сумма</span><strong id="todaySum">0 ₽</strong></div><div class="metric"><span class="muted">За 7 дней · сумма заявок</span><strong id="weekSum">0 ₽</strong></div><div class="metric"><span class="muted">Новые · требуют внимания</span><strong id="newCount">0</strong></div></div><div class="toolbar"><span id="summary" class="muted"></span><button id="refresh">Обновить</button></div><div class="controls"><input id="searchOrders" type="search" placeholder="Номер, имя, контакт, адрес" aria-label="Поиск заказов"><select id="filterStatus" aria-label="Фильтр по статусу"><option value="all">Все статусы</option><option value="new">Новые</option><option value="confirmed">Подтверждённые</option><option value="paid">Оплачен</option><option value="shipped">Отправленные</option><option value="completed">Завершённые</option><option value="cancelled">Отменённые</option></select></div><p id="message" role="status" aria-live="polite"></p><div id="orders" class="orders"></div><div class="pager"><button id="prevPage" type="button">← Назад</button><span id="pageLabel" class="muted"></span><button id="nextPage" type="button">Дальше →</button></div><p class="admin-footnote">Суммы показывают стоимость заявок, а не фактически полученную оплату. Статус «Оплачен» ставьте только после подтверждения поступления денег.</p></section></main>
+<section id="dashboard" hidden><h1>Заказы</h1><p class="muted">Заказы YAD · Москва (UTC+3) · доступ только администратору</p><div class="metrics"><div class="metric"><span class="muted">Сегодня · заказы</span><strong id="todayCount">0</strong></div><div class="metric"><span class="muted">Сегодня · сумма</span><strong id="todaySum">0 ₽</strong></div><div class="metric"><span class="muted">За 7 дней · сумма заявок</span><strong id="weekSum">0 ₽</strong></div><div class="metric"><span class="muted">Новые · требуют внимания</span><strong id="newCount">0</strong></div></div><section class="admin-telegram"><div><strong>Telegram · уведомления клиентам</strong><p id="telegramAdminStatus" role="status" aria-live="polite">Проверяем подключение...</p></div><div class="admin-telegram-actions"><button id="telegramAdminRefresh" type="button">Проверить</button><button id="telegramAdminEnable" type="button" hidden>Активировать бота</button></div></section><div class="toolbar"><span id="summary" class="muted"></span><button id="refresh">Обновить</button></div><div class="controls"><input id="searchOrders" type="search" placeholder="Номер, имя, контакт, адрес" aria-label="Поиск заказов"><select id="filterStatus" aria-label="Фильтр по статусу"><option value="all">Все статусы</option><option value="new">Новые</option><option value="confirmed">Подтверждённые</option><option value="paid">Оплачен</option><option value="shipped">Отправленные</option><option value="completed">Завершённые</option><option value="cancelled">Отменённые</option></select></div><p id="message" role="status" aria-live="polite"></p><div id="orders" class="orders"></div><div class="pager"><button id="prevPage" type="button">← Назад</button><span id="pageLabel" class="muted"></span><button id="nextPage" type="button">Дальше →</button></div><p class="admin-footnote">Суммы показывают стоимость заявок, а не фактически полученную оплату. Статус «Оплачен» ставьте только после подтверждения поступления денег.</p></section></main>
 <script src="/catalog-data.js"></script><script>
 
 const $=id=>document.getElementById(id);
@@ -110,6 +120,33 @@ function renderOrders(){
    '<div class="order-status"><label for="status-'+safe(o.public_id)+'">Статус заказа</label><select id="status-'+safe(o.public_id)+'" data-id="'+safe(o.public_id)+'" data-old="'+safe(status)+'" aria-label="Статус заказа '+safe(number)+'">'+statusChoices+'</select></div></article>';
  }).join(''):'<p class="muted">Заказы по выбранным условиям не найдены.</p>';
 }
+async function loadTelegramSettings(){
+ if($('dashboard').hidden)return;
+ const message=$('telegramAdminStatus'),enable=$('telegramAdminEnable');
+ enable.hidden=true;
+ try{
+  const data=await request('/api/admin?action=telegram-config');
+  if(!data.configured){message.textContent='Telegram ещё не настроен на сервере.';return}
+  if(data.webhook_conflict){
+   message.textContent='Этот бот уже используется другим приложением. YAD не будет заменять его подключение.';
+   return;
+  }
+  if(data.webhook_ready){message.textContent='Готово: @'+data.bot_username+' принимает подписки и отправляет уведомления.';return}
+  message.textContent='Бот @'+data.bot_username+' найден, но подписки пока не активированы. Можно включить после проверки его использования.';
+  enable.hidden=false;
+ }catch(e){message.textContent=e.message}
+}
+$('telegramAdminRefresh').addEventListener('click',loadTelegramSettings);
+$('telegramAdminEnable').addEventListener('click',async()=>{
+ if(!confirm('Активировать получение команд для YAD у существующего Telegram-бота? Другие webhook YAD не заменяет.'))return;
+ const button=$('telegramAdminEnable');button.disabled=true;
+ $('telegramAdminStatus').textContent='Активируем подписки...';
+ try{
+  await request('/api/admin?action=telegram-enable',{method:'POST',body:'{}'});
+  await loadTelegramSettings();
+ }catch(e){$('telegramAdminStatus').textContent=e.message}
+ finally{button.disabled=false}
+});
 async function load(){
  const seq=++requestSeq;
  $('refresh').disabled=true;
@@ -124,6 +161,7 @@ async function load(){
   hasMore=!!data.has_more;
   overview=data.metrics||{};
   renderOrders();
+  loadTelegramSettings();
  }catch(e){
   if(seq!==requestSeq)return;
   if(e.status===401||e.status===503){
@@ -173,9 +211,14 @@ $('orders').addEventListener('change',async e=>{
  el.disabled=true;
  $('message').textContent='';
  try{
-  await request('/api/admin',{method:'PATCH',body:JSON.stringify({id:el.dataset.id,status:after})});
+  const result=await request('/api/admin',{method:'PATCH',body:JSON.stringify({id:el.dataset.id,status:after})});
   await load();
-  $('message').textContent='Статус заказа сохранён.';
+  const status=result.notification_status;
+  const label=status==='sent'?' Telegram-уведомление покупателю доставлено.':
+   status==='not_subscribed'?' Подписки на Telegram нет.':
+   status==='failed'?' Telegram-уведомление не доставлено.':
+   status==='already_sent'?' Уведомление уже отправлялось.':'';
+  $('message').textContent=result.unchanged?'Статус не изменился.':'Статус заказа сохранён.'+label;
   $('message').className='success';
  }catch(e){
   $('message').textContent=e.message;
