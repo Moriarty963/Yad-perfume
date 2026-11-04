@@ -48,12 +48,14 @@ function yadDigitalBottle(id,ml){
  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
 }
 function yadProductImage(id,ml){
+ const f=fragrances.find(x=>x.id===id);
+ const slug=YAD_PHOTO_SLUGS[id]||id;
+ const studio=f&&Object.prototype.hasOwnProperty.call(prices,ml)?'/assets/studio/'+slug+'-'+ml+'ml.webp':null;
  const photo=yadPhotoManifest(id,ml)?.main;
- const studio=YAD_STUDIO_VISUALS[id]?.[ml]?.main;
- const template=YAD_PHOTO_MANIFEST.imagination?.[ml]?.main;
- return {src:photo||studio||template||yadDigitalBottle(id,ml),isPhoto:!!photo,isMockup:!photo&&!studio&&!!template};
+ const original=id==='imagination'&&!!photo;
+ return {src:studio||photo||yadDigitalBottle(id,ml),isPhoto:original,isComposite:!!studio&&!original,isMockup:false};
 }
-function yadMediaLabel(asset){return asset.isPhoto?'Фото флакона':asset.isMockup?'Фотомакет':'Визуализация'}
+function yadMediaLabel(asset){return asset.isPhoto?'Фото флакона':asset.isComposite?'Фотомакет':'Визуализация'}
 const YAD_MOCKUP_LABEL_LAYOUT={
  6:[42.8,63.2,14.5,3.5],10:[42.6,54.6,14.7,3.6],
  20:[40.7,56.6,18.9,4.6],30:[39.4,61.6,21.1,3.1],
@@ -77,10 +79,10 @@ function updateDetailImage(id,ml){
  const old=stage.querySelector('.atelier-previous-photo');if(old)old.remove();
  const previous=img.cloneNode(false);previous.removeAttribute('id');previous.removeAttribute('onerror');previous.className='atelier-previous-photo';previous.alt='';previous.setAttribute('aria-hidden','true');stage.insertBefore(previous,img);
  img.classList.add('atelier-photo-changing');
- img.alt=(asset.isPhoto?'Фотография':asset.isMockup?'Фотомакет':'Иллюстрация')+' флакона YAD '+(f?.name||id)+', '+ml+' мл';
+ img.alt=yadMediaLabel(asset)+' YAD '+(f?.name||id)+', '+ml+' мл';
  const preload=new Image();let resolved=false;
  const commit=(src,isPhoto)=>{if(resolved||stage.dataset.imageSequence!==sequence)return;resolved=true;img.src=src;
-  if(label)label.textContent=yadMediaLabel(yadProductImage(id,ml))+' · '+ml+' мл';
+  if(label)label.textContent=(src===asset.src?yadMediaLabel(asset):'Визуализация')+' · '+ml+' мл';
   requestAnimationFrame(()=>{img.classList.remove('atelier-photo-changing');previous.classList.add('atelier-photo-leaving')});
   setTimeout(()=>{if(previous.isConnected)previous.remove()},460);
  };
@@ -109,12 +111,12 @@ function syncBottle(select){
  if(photo){
   const asset=yadProductImage(id,ml),sequence=String((Number(photo.dataset.requestSequence)||0)+1);
   photo.dataset.requestSequence=sequence;photo.dataset.volume=String(ml);
-  photo.alt=(asset.isPhoto?'Фотография':asset.isMockup?'Фотомакет':'Иллюстрация')+' флакона YAD '+(fragrances.find(f=>f.id===id)?.name||id)+', '+ml+' мл';
+  photo.alt=yadMediaLabel(asset)+' YAD '+(fragrances.find(f=>f.id===id)?.name||id)+', '+ml+' мл';
   const apply=(src,isPhoto)=>{
    if(photo.dataset.requestSequence!==sequence||!photo.isConnected)return;
    const badge=card.querySelector('.atelier-card-media-label');if(badge)badge.textContent=yadMediaLabel(yadProductImage(id,ml));
    photo.onload=()=>{if(photo.dataset.requestSequence!==sequence)return;photo.hidden=false;art.classList.add('has-volume-photo')};
-   photo.onerror=()=>{if(isPhoto){apply(yadDigitalBottle(id,ml),false)}else{photo.hidden=true;art.classList.remove('has-volume-photo')}};
+   photo.onerror=()=>{if(!src.startsWith('data:')){apply(yadDigitalBottle(id,ml),false)}else{photo.hidden=true;art.classList.remove('has-volume-photo')}};
    photo.src=src;
    if(photo.complete&&photo.naturalWidth){photo.hidden=false;art.classList.add('has-volume-photo')}
   };
@@ -161,8 +163,8 @@ function renderFragranceDetail(id){
  const f=fragrances.find(x=>x.id===id);if(!f)return;
  const index=fragrances.indexOf(f)+1;
  const isFav=favorites.includes(id);
- const scene=`<img class="yad-detail-hero-photo" src="${yadProductImage(id,20).src}" alt="${yadMediaLabel(yadProductImage(id,20))} YAD ${safe(f.name)}, 20 мл" loading="eager" decoding="async" onerror="this.onerror=null;this.src='${fragranceAsset(id,20)}'">${yadMockupLabel(id,20)}`;
- $('fragranceDetail').innerHTML=`<div class="detail-breadcrumb"><a href="/catalog" data-detail-back>← Коллекция ароматов</a><span>YAD / № ${String(index).padStart(2,'0')}</span></div><div class="detail-layout atelier-layout"><div class="detail-gallery atelier-gallery"><div class="atelier-photo-topline"><span>THE ATELIER EDITION</span><span>01 / 01</span></div><div class="detail-visual atelier-stage" data-gallery-current="full">${scene}<span class="detail-image-status" id="detailImageStatus">${yadMediaLabel(yadProductImage(id,20))} · 20 мл</span></div><div class="atelier-mini-gallery" role="group" aria-label="Просмотр флаконов по объёму">${Object.keys(prices).map(ml=>`<button type="button" data-gallery-size="${ml}" aria-label="Посмотреть флакон ${ml} мл" aria-pressed="${ml==='20'}" class="${ml==='20'?'active':''}"><img src="${yadProductImage(id,Number(ml)).src}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${fragranceAsset(id,Number(ml))}'">${yadMockupLabel(id,Number(ml))}<span>${ml} мл</span></button>`).join('')}</div></div><div class="detail-copy atelier-copy"><div class="detail-intro"><div class="eyebrow">YAD / PERFUME ATELIER · № ${String(index).padStart(3,'0')}</div><h1>${safe(f.name)}</h1><p class="detail-story">${safe(fragranceStories[id]||f.notes)}</p><div class="detail-note-section"><h2>Ноты аромата</h2><div class="detail-note-grid">${f.notes.split(' · ').map((note,i)=>`<div class="detail-note-tile"><span class="detail-note-icon" aria-hidden="true">${noteVisual(note)}</span><strong>${safe(note)}</strong></div>`).join('')}</div></div></div><div class="detail-purchase atelier-purchase"><div class="detail-divider"></div><div class="atelier-selection-head"><div><span class="atelier-kicker">YAD ATELIER / YOUR FORMAT</span><div class="detail-label">Выберите объём</div></div><span class="atelier-current-volume" id="atelierCurrentVolume">20 мл</span></div><div class="detail-sizes atelier-volume-rail" role="group" aria-label="Выбор объёма">${Object.entries(prices).map(([ml,p])=>`<button type="button" data-detail-size="${ml}" aria-pressed="${ml==='20'}"><strong>${ml} мл</strong><small>${rub(p)}</small></button>`).join('')}</div><div class="atelier-format-caption">При выборе объёма изображение плавно сменяется · реальные фото добавляем по мере подтверждения упаковки</div><div class="detail-packaging" id="detailPackaging" aria-live="polite"></div><div class="detail-total"><span>Стоимость аромата</span><strong id="detailPrice">${rub(prices[20])}</strong></div><button type="button" id="detailAdd" class="detail-add">Добавить в корзину · <span id="detailButtonPrice">${rub(prices[20])}</span></button><button type="button" id="detailFavorite" class="detail-favorite" aria-pressed="${isFav}">${isFav?'♥ В избранном':'♡ Добавить в избранное'}</button><p class="detail-footnote">Парфюмерная интерпретация. Описание нот носит ознакомительный характер.</p></div></div></div><div class="detail-benefits detail-benefits-wide"><span>✧ 30% эссенции</span><span>◈ Подарочная упаковка</span><span>◇ Доставка по России</span></div>`;
+ const scene=`<img class="yad-detail-hero-photo" src="${yadProductImage(id,20).src}" alt="${yadMediaLabel(yadProductImage(id,20))} YAD ${safe(f.name)}, 20 мл" loading="eager" decoding="async" onerror="this.onerror=null;this.src=yadDigitalBottle('${id}',20)">${yadMockupLabel(id,20)}`;
+ $('fragranceDetail').innerHTML=`<div class="detail-breadcrumb"><a href="/catalog" data-detail-back>← Коллекция ароматов</a><span>YAD / № ${String(index).padStart(2,'0')}</span></div><div class="detail-layout atelier-layout"><div class="detail-gallery atelier-gallery"><div class="atelier-photo-topline"><span>THE ATELIER EDITION</span><span>01 / 01</span></div><div class="detail-visual atelier-stage" data-gallery-current="full">${scene}<span class="detail-image-status" id="detailImageStatus">${yadMediaLabel(yadProductImage(id,20))} · 20 мл</span></div><div class="atelier-mini-gallery" role="group" aria-label="Просмотр флаконов по объёму">${Object.keys(prices).map(ml=>`<button type="button" data-gallery-size="${ml}" aria-label="Посмотреть флакон ${ml} мл" aria-pressed="${ml==='20'}" class="${ml==='20'?'active':''}"><img src="${yadProductImage(id,Number(ml)).src}" alt="" loading="lazy" onerror="this.onerror=null;this.src=yadDigitalBottle('${id}',${Number(ml)})">${yadMockupLabel(id,Number(ml))}<span>${ml} мл</span></button>`).join('')}</div></div><div class="detail-copy atelier-copy"><div class="detail-intro"><div class="eyebrow">YAD / PERFUME ATELIER · № ${String(index).padStart(3,'0')}</div><h1>${safe(f.name)}</h1><p class="detail-story">${safe(fragranceStories[id]||f.notes)}</p><div class="detail-note-section"><h2>Ноты аромата</h2><div class="detail-note-grid">${f.notes.split(' · ').map((note,i)=>`<div class="detail-note-tile"><span class="detail-note-icon" aria-hidden="true">${noteVisual(note)}</span><strong>${safe(note)}</strong></div>`).join('')}</div></div></div><div class="detail-purchase atelier-purchase"><div class="detail-divider"></div><div class="atelier-selection-head"><div><span class="atelier-kicker">YAD ATELIER / YOUR FORMAT</span><div class="detail-label">Выберите объём</div></div><span class="atelier-current-volume" id="atelierCurrentVolume">20 мл</span></div><div class="detail-sizes atelier-volume-rail" role="group" aria-label="Выбор объёма">${Object.entries(prices).map(([ml,p])=>`<button type="button" data-detail-size="${ml}" aria-pressed="${ml==='20'}"><strong>${ml} мл</strong><small>${rub(p)}</small></button>`).join('')}</div><div class="atelier-format-caption">При выборе объёма изображение плавно сменяется · реальные фото добавляем по мере подтверждения упаковки</div><div class="detail-packaging" id="detailPackaging" aria-live="polite"></div><div class="detail-total"><span>Стоимость аромата</span><strong id="detailPrice">${rub(prices[20])}</strong></div><button type="button" id="detailAdd" class="detail-add">Добавить в корзину · <span id="detailButtonPrice">${rub(prices[20])}</span></button><button type="button" id="detailFavorite" class="detail-favorite" aria-pressed="${isFav}">${isFav?'♥ В избранном':'♡ Добавить в избранное'}</button><p class="detail-footnote">Парфюмерная интерпретация. Описание нот носит ознакомительный характер.</p></div></div></div><div class="detail-benefits detail-benefits-wide"><span>✧ 30% эссенции</span><span>◈ Подарочная упаковка</span><span>◇ Доставка по России</span></div>`;
  $('fragranceDetail').dataset.fragrance=id;updateDetailPackaging();
 }
 $('fragranceDetail').addEventListener('change',e=>{if(e.target.name==='detailVariant'||e.target.id==='detailTravelColor'){const variant=$('fragranceDetail').querySelector('[name="detailVariant"]:checked')?.value||'glass';const ml=Number($('fragranceDetail').querySelector('[data-detail-size][aria-pressed="true"]').dataset.detailSize);const color=$('fragranceDetail').querySelector('.travel-color');if(color)color.hidden=variant!=='travel';$('detailPrice').textContent=rub(itemPrice(ml,variant));const bp=$('detailButtonPrice');if(bp)bp.textContent=rub(itemPrice(ml,variant));}});
