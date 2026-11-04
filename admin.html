@@ -35,16 +35,141 @@ button.primary{background:#2b2925;color:#fff;border-color:#2b2925}
 <body><main><header><div class="logo">YAD</div><button id="logout" hidden>Выйти</button></header><section id="login" class="login"><h1>Управление заказами</h1><p class="muted">Закрытая панель YAD</p><form id="loginForm"><input type="password" id="password" autocomplete="current-password" placeholder="Пароль администратора" required minlength="12"><button class="primary" type="submit">Войти</button></form><p id="loginStatus" class="error" role="status"></p></section>
 <section id="dashboard" hidden><h1>Заказы</h1><p class="muted">Заказы YAD · Москва (UTC+3) · доступ только администратору</p><div class="metrics"><div class="metric"><span class="muted">Сегодня · заказы</span><strong id="todayCount">0</strong></div><div class="metric"><span class="muted">Сегодня · сумма</span><strong id="todaySum">0 ₽</strong></div><div class="metric"><span class="muted">За 7 дней · сумма заявок</span><strong id="weekSum">0 ₽</strong></div><div class="metric"><span class="muted">Новые · требуют внимания</span><strong id="newCount">0</strong></div></div><div class="toolbar"><span id="summary" class="muted"></span><button id="refresh">Обновить</button></div><div class="controls"><input id="searchOrders" type="search" placeholder="Номер, имя, контакт, адрес" aria-label="Поиск заказов"><select id="filterStatus" aria-label="Фильтр по статусу"><option value="all">Все статусы</option><option value="new">Новые</option><option value="confirmed">Подтверждённые</option><option value="paid">Оплачен</option><option value="shipped">Отправленные</option><option value="completed">Завершённые</option><option value="cancelled">Отменённые</option></select></div><p id="message" role="status" aria-live="polite"></p><div id="orders" class="orders"></div><div class="pager"><button id="prevPage" type="button">← Назад</button><span id="pageLabel" class="muted"></span><button id="nextPage" type="button">Дальше →</button></div><p class="admin-footnote">Суммы показывают стоимость заявок, а не фактически полученную оплату. Статус «Оплачен» ставьте только после подтверждения поступления денег.</p></section></main>
 <script src="/catalog-data.js"></script><script>
-const $=id=>document.getElementById(id);const statusLabels={new:'Новый',confirmed:'Подтверждён',processing:'В работе',shipped:'Отправлен',completed:'Завершён',cancelled:'Отменён'};const money=n=>new Intl.NumberFormat('ru-RU').format(n)+' ₽';const date=s=>new Date(s).toLocaleString('ru-RU',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Moscow'});const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-async function request(url,options={}){const r=await fetch(url,{credentials:'same-origin',headers:{'Content-Type':'application/json'},...options});const data=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(data.error||'Ошибка сервера'),{status:r.status});return data}
-function showDashboard(on){$('login').hidden=on;$('dashboard').hidden=!on;$('logout').hidden=!on}
-let cachedOrders=[];
-function contactLink(o){const c=String(o.contact_value||'').trim();if(o.contact_method==='telegram'&&/^@[A-Za-z0-9_]{5,32}$/.test(c))return 'https://t.me/'+c.slice(1);if(o.contact_method==='whatsapp'){const digits=c.replace(/\D/g,'');if(digits.length>=10&&digits.length<=15)return 'https://wa.me/'+digits}return ''}
-function renderOrders(){const q=$('searchOrders').value.trim().toLowerCase(),filter=$('filterStatus').value;const orders=cachedOrders.filter(o=>(filter==='all'||o.status===filter)&&(!q||[o.public_id,o.customer_name,o.contact_value,o.pickup_address].some(x=>String(x||'').toLowerCase().includes(q))));$('summary').textContent=orders.length+' из '+cachedOrders.length+' заказов · новых: '+cachedOrders.filter(o=>o.status==='new').length;
-const now=Date.now(),today=new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Moscow'});const active=cachedOrders.filter(o=>o.status!=='cancelled');const day=active.filter(o=>new Date(o.created_at).toLocaleDateString('en-CA',{timeZone:'Europe/Moscow'})===today),week=active.filter(o=>now-new Date(o.created_at).getTime()<=7*86400000);$('todayCount').textContent=day.length;$('todaySum').textContent=money(day.reduce((a,o)=>a+o.total_rub,0));$('weekSum').textContent=money(week.reduce((a,o)=>a+o.total_rub,0));
-$('orders').innerHTML=orders.length?orders.map(o=>`<article class="order"><div class="order-top"><div><div class="order-id">№${safe(o.public_id.slice(0,8).toUpperCase())}</div><div class="muted">${safe(date(o.created_at))}</div></div><div class="total">${money(o.total_rub)}</div></div><div class="details"><div><small>Покупатель</small>${safe(o.customer_name)}</div><div><small>Связь · ${safe(o.contact_method)}</small>${safe(o.contact_value)}${contactLink(o)?`<div><a class="contact-link" target="_blank" rel="noopener noreferrer" href="${safe(contactLink(o))}">Связаться ↗</a></div>`:''}</div><div><small>Доставка</small>${safe(o.delivery_service)} · ${safe(o.pickup_address)}</div><div><small>Комментарий</small>${safe(o.comment||'—')}</div></div><div class="items">${(Array.isArray(o.items)?o.items:[]).map(i=>safe(i.title||i.id)+' · '+(i.ml?i.ml+' мл · ':'')+safe(i.qty)+' шт.').join('<br>')}</div><select data-id="${safe(o.public_id)}" aria-label="Статус заказа ${safe(o.public_id.slice(0,8))}">${Object.entries(statusLabels).map(([k,v])=>`<option value="${k}" ${o.status===k?'selected':''}>${v}</option>`).join('')}</select></article>`).join(''):'<p class="muted">Заказы не найдены.</p>'}
-async function load(){try{const data=await request('/api/admin');showDashboard(true);$('message').textContent='';cachedOrders=data.orders||[];renderOrders();}catch(e){if(e.status===401||e.status===503){showDashboard(false);$('loginStatus').textContent=e.status===503?'Панель пока не активирована. Настройте ADMIN_PASSWORD и ADMIN_SESSION_SECRET в Vercel.':''}else{$('message').textContent=e.message;$('message').className='error'}}}
-$('loginForm').addEventListener('submit',async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;$('loginStatus').textContent='';try{await request('/api/admin?action=login',{method:'POST',body:JSON.stringify({password:$('password').value})});$('password').value='';await load()}catch(err){$('loginStatus').textContent=err.message}finally{b.disabled=false}});
-$('orders').addEventListener('change',async e=>{const el=e.target.closest('select[data-id]');if(!el)return;el.disabled=true;$('message').textContent='';try{await request('/api/admin',{method:'PATCH',body:JSON.stringify({id:el.dataset.id,status:el.value})});$('message').textContent='Статус обновлён';$('message').className='success';await load()}catch(err){$('message').textContent=err.message;$('message').className='error';await load()}finally{el.disabled=false}});
-$('searchOrders').addEventListener('input',renderOrders);$('filterStatus').addEventListener('change',renderOrders);$('refresh').addEventListener('click',load);$('logout').addEventListener('click',async()=>{await request('/api/admin?action=logout',{method:'POST'});showDashboard(false)});load();
+
+const $=id=>document.getElementById(id);
+const statusLabels={new:'Новый',confirmed:'Подтверждён',paid:'Оплачен',shipped:'Отправлен',completed:'Завершён',cancelled:'Отменён'};
+const money=n=>new Intl.NumberFormat('ru-RU').format(Number(n)||0)+' ₽';
+const date=s=>new Date(s).toLocaleString('ru-RU',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Moscow'});
+const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const catalogNames=new Map(YAD_CATALOG_ROWS.map(([id,name])=>[id,name]));
+catalogNames.set('discovery','Discovery Set');
+let cachedOrders=[],pageNumber=0,hasMore=false,overview={},requestSeq=0,searchTimer=null;
+async function request(url,options={}){
+ const r=await fetch(url,{credentials:'same-origin',headers:{'Content-Type':'application/json'},...options});
+ const data=await r.json().catch(()=>({}));
+ if(!r.ok)throw Object.assign(new Error(data.error||'Ошибка сервера'),{status:r.status});
+ return data;
+}
+function showDashboard(on){
+ $('login').hidden=on;$('dashboard').hidden=!on;$('logout').hidden=!on;
+}
+function contactLink(o){
+ const c=String(o.contact_value||'').trim();
+ if(o.contact_method==='telegram'&&/^@[A-Za-z0-9_]{5,32}$/.test(c))return 'https://t.me/'+c.slice(1);
+ if(o.contact_method==='whatsapp'){
+  const digits=c.replace(/\D/g,'');
+  if(digits.length>=10&&digits.length<=15)return 'https://wa.me/'+digits;
+ }
+ return '';
+}
+function drawMetrics(){
+ $('todayCount').textContent=Number(overview.today_count)||0;
+ $('todaySum').textContent=money(overview.today_sum);
+ $('weekSum').textContent=money(overview.week_sum);
+ $('newCount').textContent=Number(overview.new_count)||0;
+}
+function renderOrders(){
+ drawMetrics();
+ const count=cachedOrders.length;
+ $('summary').textContent='Показано '+count+' · всего заявок: '+(Number(overview.all_count)||0);
+ $('pageLabel').textContent='Страница '+(pageNumber+1);
+ $('prevPage').disabled=pageNumber===0;
+ $('nextPage').disabled=!hasMore;
+ $('orders').innerHTML=count?cachedOrders.map(o=>{
+  const number=String(o.public_id||'').slice(0,8).toUpperCase();
+  const contact=contactLink(o);
+  const status=Object.prototype.hasOwnProperty.call(statusLabels,o.status)?o.status:'new';
+  const items=Array.isArray(o.items)?o.items:[];
+  const products=items.map(i=>{
+   const name=catalogNames.get(i.id)||i.title||i.id||'Аромат';
+   const volume=Number(i.ml)>0?String(i.ml)+' мл · ':'';
+   const variant=i.variant==='travel'?'Travel · '+String(i.color||'')+' · ':'';
+   const qty=Math.max(1,Number(i.qty)||1);
+   const sum=(Number(i.unit_price)||0)*qty;
+   return '<div class="order-item"><div>'+safe(name)+'<small class="muted">'+safe(volume+variant)+qty+' шт.</small></div><span>'+money(sum)+'</span></div>';
+  }).join('');
+  const statusChoices=Object.entries(statusLabels).map(([key,label])=>'<option value="'+key+'"'+(status===key?' selected':'')+'>'+label+'</option>').join('');
+  return '<article class="order">'+
+   '<div class="order-top"><div><div class="order-id" title="'+safe(o.public_id)+'">№'+safe(number)+'</div><div class="muted">'+safe(date(o.created_at))+'</div></div><div class="total">'+money(o.total_rub)+'</div></div>'+
+   '<div class="details"><div><small>Покупатель</small>'+safe(o.customer_name)+'</div>'+
+   '<div><small>Связь · '+safe(o.contact_method)+'</small>'+safe(o.contact_value)+(contact?'<div><a class="contact-link" target="_blank" rel="noopener noreferrer" href="'+safe(contact)+'">Написать покупателю ↗</a></div>':'')+'</div>'+
+   '<div><small>Доставка</small>'+safe(o.delivery_service)+' · '+safe(o.pickup_address)+'</div>'+
+   '<div><small>Комментарий</small>'+safe(o.comment||'—')+'</div></div>'+
+   '<div class="items">'+products+'</div>'+
+   '<div class="order-status"><label for="status-'+safe(o.public_id)+'">Статус заказа</label><select id="status-'+safe(o.public_id)+'" data-id="'+safe(o.public_id)+'" data-old="'+safe(status)+'" aria-label="Статус заказа '+safe(number)+'">'+statusChoices+'</select></div></article>';
+ }).join(''):'<p class="muted">Заказы по выбранным условиям не найдены.</p>';
+}
+async function load(){
+ const seq=++requestSeq;
+ $('refresh').disabled=true;
+ const params=new URLSearchParams({page:String(pageNumber),status:$('filterStatus').value,q:$('searchOrders').value.trim()});
+ try{
+  const data=await request('/api/admin?'+params.toString());
+  if(seq!==requestSeq)return;
+  showDashboard(true);
+  $('loginStatus').textContent='';
+  $('message').textContent='';
+  cachedOrders=Array.isArray(data.orders)?data.orders:[];
+  hasMore=!!data.has_more;
+  overview=data.metrics||{};
+  renderOrders();
+ }catch(e){
+  if(seq!==requestSeq)return;
+  if(e.status===401||e.status===503){
+   showDashboard(false);
+   $('loginStatus').textContent=e.status===503?'Административная панель пока не настроена.':'';
+  }else{
+   $('message').textContent=e.message;
+   $('message').className='error';
+  }
+ }finally{
+  if(seq===requestSeq)$('refresh').disabled=false;
+ }
+}
+$('loginForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const button=$('loginForm').querySelector('button');
+ button.disabled=true;$('loginStatus').textContent='';
+ try{
+  await request('/api/admin?action=login',{method:'POST',body:JSON.stringify({password:$('password').value})});
+  $('password').value='';
+  pageNumber=0;await load();
+ }catch(e){
+  $('loginStatus').textContent=e.message;
+ }finally{button.disabled=false}
+});
+$('orders').addEventListener('change',async e=>{
+ const el=e.target.closest('select[data-id]');
+ if(!el)return;
+ const before=el.dataset.old,after=el.value;
+ if(after===before)return;
+ if(after==='cancelled'&&!confirm('Отметить заказ как отменённый?')){el.value=before;return}
+ if(after==='paid'&&!confirm('Подтверждаете, что оплата за заказ действительно получена?')){el.value=before;return}
+ el.disabled=true;
+ $('message').textContent='';
+ try{
+  await request('/api/admin',{method:'PATCH',body:JSON.stringify({id:el.dataset.id,status:after})});
+  $('message').textContent='Статус заказа сохранён.';
+  $('message').className='success';
+  await load();
+ }catch(e){
+  $('message').textContent=e.message;
+  $('message').className='error';
+  el.value=before;el.disabled=false;
+ }
+});
+$('searchOrders').addEventListener('input',()=>{
+ clearTimeout(searchTimer);
+ searchTimer=setTimeout(()=>{pageNumber=0;load()},320);
+});
+$('filterStatus').addEventListener('change',()=>{pageNumber=0;load()});
+$('prevPage').addEventListener('click',()=>{if(pageNumber>0){pageNumber--;load()}});
+$('nextPage').addEventListener('click',()=>{if(hasMore){pageNumber++;load()}});
+$('refresh').addEventListener('click',load);
+$('logout').addEventListener('click',async()=>{
+ try{await request('/api/admin?action=logout',{method:'POST'})}catch{}
+ cachedOrders=[];pageNumber=0;overview={};showDashboard(false);
+ $('loginStatus').textContent='';
+});
+load();
 </script></body></html>
