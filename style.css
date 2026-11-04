@@ -423,7 +423,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* YAD studio photography: graceful fallback until all image assets are uploaded */
 .product-art,.market-card-photo{position:relative;overflow:hidden}
-.yad-volume-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;background:#f7f2ef;z-index:5}
+.yad-volume-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;background:radial-gradient(ellipse at 51% 30%,#fffdfb 0%,#f7f2ec 57%,#eee5dc 100%);z-index:5}
 .product-art.has-volume-photo .yad-product-bottle,.product-art.has-volume-photo .scene-backdrop,.market-card-photo.has-volume-photo .market-mini-bottle{visibility:hidden}
 .product-art.has-volume-photo,.market-card-photo.has-volume-photo{background:#f7f2ef}
 .market-card-photo .yad-volume-photo{object-fit:cover}
