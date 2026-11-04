@@ -2097,3 +2097,84 @@ body[data-page="cart"] #checkoutPanel input[aria-invalid="true"]:not([type="radi
  .order-receipt-number{gap:3px 9px}
  .order-receipt-number h3{font-size:23px}
 }
+
+
+/* Editorial note discovery: matches literal notes already listed in YAD catalog. */
+.yad-editorial-home .market-note-row{
+ grid-column:1/-1;
+ margin-top:clamp(3px,1vw,14px);
+ padding-top:17px;
+ border-top:1px solid #e8e3db;
+ min-width:0;
+}
+.yad-editorial-home .market-note-row>span{
+ display:block;margin-bottom:11px;color:#91877b;
+ font-size:10px;font-weight:650;letter-spacing:.105em;
+}
+.yad-editorial-home .market-note-options,
+#catalog .catalog-note-options{
+ display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+}
+.yad-editorial-home .market-note-options button,
+#catalog .catalog-note-options button{
+ display:inline-flex;align-items:center;gap:9px;
+ min-height:39px;padding:9px 13px;
+ border:1px solid #ddd6cb;border-radius:999px;
+ background:#fff;color:#544d44;
+ font:500 12px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+ white-space:nowrap;cursor:pointer;
+ transition:background-color .18s,border-color .18s,color .18s;
+}
+.yad-editorial-home .market-note-options button:hover,
+#catalog .catalog-note-options button:hover{border-color:#857766}
+#catalog .catalog-note-options button[aria-pressed="true"]{
+ color:#fff;border-color:#282823;background:#282823;
+}
+.yad-editorial-home .market-note-options .note-count,
+#catalog .catalog-note-options .note-count{
+ font-variant-numeric:tabular-nums;font-size:11px;
+ color:#8d8376;font-weight:500;
+}
+#catalog .catalog-note-options button[aria-pressed="true"] .note-count{color:#ded8cb}
+.yad-editorial-home .market-note-options button:focus-visible,
+#catalog .catalog-note-options button:focus-visible{
+ outline:2px solid #77664f;outline-offset:3px;
+}
+#catalog .catalog-note-finder{
+ border:1px solid #e6e0d6;border-radius:15px;
+ background:#fbfaf8;padding:clamp(18px,2.3vw,26px);
+ margin:18px 0 21px;min-width:0;
+}
+#catalog .catalog-note-heading span{
+ display:block;font-size:10px;font-weight:700;
+ letter-spacing:.1em;color:#8b7a67;margin-bottom:7px;
+}
+#catalog .catalog-note-heading h3{
+ color:#2e2b27;font:400 clamp(21px,2.6vw,29px)/1.2 Georgia,"Times New Roman",serif;
+ letter-spacing:-.02em;margin:0 0 7px;
+}
+#catalog .catalog-note-heading p{
+ color:#7a736b;font-size:12px;line-height:1.5;margin:0 0 17px;
+}
+#catalog .catalog-note-hint{
+ color:#82786e;font-size:11px;line-height:1.5;
+ margin:13px 0 0;
+}
+@media(max-width:760px){
+ .yad-editorial-home .market-note-options,
+ #catalog .catalog-note-options{
+  flex-wrap:nowrap;overflow-x:auto;
+  overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
+  scroll-snap-type:x proximity;scrollbar-width:none;
+  padding:3px 3px 10px;margin:0 -3px -6px;
+ }
+ .yad-editorial-home .market-note-options::-webkit-scrollbar,
+ #catalog .catalog-note-options::-webkit-scrollbar{display:none}
+ .yad-editorial-home .market-note-options button,
+ #catalog .catalog-note-options button{flex:0 0 auto;scroll-snap-align:start;min-height:42px}
+ #catalog .catalog-note-finder{margin:17px 0;padding:18px 16px}
+}
+@media(prefers-reduced-motion:reduce){
+ .yad-editorial-home .market-note-options button,
+ #catalog .catalog-note-options button{transition:none}
+}
