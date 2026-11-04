@@ -1,5 +1,6 @@
 const {neon}=require('@neondatabase/serverless');
 const crypto=require('node:crypto');
+const {ready:telegramReady,botInfo,webhookInfo,enableWebhook,notifyBuyerStatus}=require('../lib/yad-telegram');
 const COOKIE='yad_admin_session';
 const adminPassword=process.env.ADMIN_PASSWORD||process.env.Admin_password;
 const sessionSecret=process.env.ADMIN_SESSION_SECRET||process.env.admin_session_secret;
@@ -27,6 +28,20 @@ module.exports=async(req,res)=>{
  }
  if(req.method==='POST'&&req.query.action==='logout'){res.setHeader('Set-Cookie',cookie('',0));return res.status(200).json({ok:true})}
  if(!authorized(req))return res.status(401).json({error:'Требуется вход.'});
+ if(req.method==='GET'&&req.query.action==='telegram-config'){
+  if(!telegramReady())return res.status(200).json({configured:false,webhook_ready:false});
+  try{
+   const [bot,webhook]=await Promise.all([botInfo(),webhookInfo()]);
+   return res.status(200).json({configured:true,bot_username:bot.username,webhook_ready:webhook.active,webhook_conflict:webhook.conflict});
+  }catch(e){console.error('YAD Telegram status failed',e?.message);return res.status(503).json({error:'Не удалось проверить Telegram.'})}
+ }
+ if(req.method==='POST'&&req.query.action==='telegram-enable'){
+  try{
+   const result=await enableWebhook();
+   if(!result.ok)return res.status(result.conflict?409:503).json({error:result.error});
+   return res.status(200).json({ok:true,bot_username:result.username});
+  }catch(e){console.error('YAD Telegram activation failed',e?.message);return res.status(503).json({error:'Не удалось подключить Telegram.'})}
+ }
  const sql=neon(process.env.DATABASE_URL);
  try{
   if(req.method==='GET'){
@@ -52,9 +67,16 @@ module.exports=async(req,res)=>{
   if(req.method==='PATCH'){
    const b=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
    if(typeof b.id!=='string'||!/^[0-9a-f-]{36}$/i.test(b.id)||!statuses.has(b.status))return res.status(400).json({error:'Неверные данные.'});
-   const rows=await sql`UPDATE yad_orders SET status=${b.status} WHERE public_id=${b.id}::uuid RETURNING public_id,status`;
-   if(!rows.length)return res.status(404).json({error:'Заказ не найден.'});
-   return res.status(200).json({order:rows[0]});
+   const rows=await sql`UPDATE yad_orders SET status=${b.status} WHERE public_id=${b.id}::uuid AND status IS DISTINCT FROM ${b.status} RETURNING public_id,status`;
+   if(!rows.length){
+    const existing=await sql`SELECT public_id,status FROM yad_orders WHERE public_id=${b.id}::uuid LIMIT 1`;
+    if(!existing.length)return res.status(404).json({error:'Заказ не найден.'});
+    return res.status(200).json({order:existing[0],unchanged:true,notification_status:'unchanged'});
+   }
+   let notificationStatus='not_subscribed';
+   try{notificationStatus=await notifyBuyerStatus(rows[0].public_id,b.status)}
+   catch(err){notificationStatus='failed';console.error('YAD buyer notification failed',err?.message)}
+   return res.status(200).json({order:rows[0],notification_status:notificationStatus});
   }
   res.setHeader('Allow','GET, POST, PATCH');return res.status(405).json({error:'Method not allowed'});
  }catch(e){console.error('YAD admin failed',e?.message);return res.status(500).json({error:'Не удалось загрузить данные.'})}
