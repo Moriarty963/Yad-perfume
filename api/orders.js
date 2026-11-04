@@ -2,6 +2,7 @@ const {neon}=require('@neondatabase/serverless');
 const {issueToken}=require('../lib/order-status-token.js');
 const prices={6:500,10:700,20:1300,30:1800,50:2700,100:5000};
 const {YAD_CATALOG_ROWS}=require('../catalog-data.js');
+const {adminId}=require('../lib/yad-telegram-admin');
 const allowed=new Set(YAD_CATALOG_ROWS.map(([id])=>id));
 const fee=250;
 const travelSurcharge={6:90,10:90};
@@ -41,11 +42,14 @@ async function notifyTelegram(order,b,items){
   telegramEscape(b.address.trim())
  );
  if(b.comment.trim())lines.push('','💬 <b>КОММЕНТАРИЙ</b>',telegramEscape(b.comment.trim()));
+ // Telegram actions are restricted to a private administrator, never a group.
+ const allowed=adminId();
+ const markup=allowed!==null&&String(chat)===String(allowed)?{inline_keyboard:[[{text:'📋 Открыть заказ',callback_data:'ya:order:'+order.public_id}]]}:null;
  try{
   const response=await fetch('https://api.telegram.org/bot'+token+'/sendMessage',{
    method:'POST',
    headers:{'Content-Type':'application/json'},
-   body:JSON.stringify({chat_id:chat,text:lines.join('\n'),parse_mode:'HTML',disable_web_page_preview:true}),
+   body:JSON.stringify({chat_id:chat,text:lines.join('\n'),parse_mode:'HTML',disable_web_page_preview:true,...(markup?{reply_markup:markup}:{})}),
    signal:AbortSignal.timeout(3500)
   });
   if(!response.ok)console.error('YAD notification failed',response.status);
