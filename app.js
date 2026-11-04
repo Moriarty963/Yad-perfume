@@ -50,7 +50,7 @@ function yadDigitalBottle(id,ml){
 function yadProductImage(id,ml){
  const f=fragrances.find(x=>x.id===id);
  const slug=YAD_PHOTO_SLUGS[id]||id;
- const studio=f&&Object.prototype.hasOwnProperty.call(prices,ml)?'/assets/studio/'+slug+'-'+ml+'ml.webp':null;
+ const studio=f&&Object.prototype.hasOwnProperty.call(prices,ml)?'/assets/studio/'+slug+'-'+ml+'ml.webp?v=20261104-2':null;
  const photo=yadPhotoManifest(id,ml)?.main;
  const original=id==='imagination'&&!!photo;
  return {src:studio||photo||yadDigitalBottle(id,ml),isPhoto:original,isComposite:!!studio&&!original,isMockup:false};
