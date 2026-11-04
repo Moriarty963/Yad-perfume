@@ -34,7 +34,14 @@ const $=id=>document.getElementById(id);const key='yad-market-cart-v1';let cart=
 cart=Array.isArray(cart)?cart.filter(x=>x&&typeof x.id==='string'&&Number.isInteger(Number(x.qty))&&Number(x.qty)>0).map(x=>{const isSet=x.id==='discovery';const item=fragrances.find(f=>f.id===x.id);const ml=Number(x.ml);if(!isSet&&!item)return null;if(!isSet&&!Object.prototype.hasOwnProperty.call(prices,ml))return null;const variant=!isSet&&[6,10].includes(ml)&&x.variant==='travel'?'travel':'glass';const color=variant==='travel'&&travelColors.includes(x.color)?x.color:'Чёрный';return {id:x.id,ml:isSet?0:ml,title:isSet?'Discovery Set · 3 × 6 мл':item.name,variant:isSet?'glass':variant,color,price:isSet?990:itemPrice(ml,variant),qty:Math.min(99,Number(x.qty))}}).filter(Boolean):[];
 const rub=n=>new Intl.NumberFormat('ru-RU').format(n)+' ₽';const safe=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const yadPhoto=ml=>'/assets/yad-'+ml+'ml.webp';
-const YAD_PHOTO_MANIFEST={imagination:{20:{main:'/assets/real/imagination-20ml-main.webp',cap:'/assets/real/imagination-20ml-cap.webp',label:'/assets/real/imagination-20ml-label.webp',glass:'/assets/real/imagination-20ml-glass.webp'}}};
+const YAD_PHOTO_MANIFEST={imagination:{
+6:{main:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/8275abcb-2a55-4854-a0d1-894da87fee07.jpg'},
+10:{main:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/33d4d1a6-36dc-42f3-8eb8-5e46a7212063.jpg'},
+20:{main:'/assets/real/imagination-20ml-main.webp'},
+30:{main:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/8ed5016f-b1c1-402c-8210-1d5f9bb767d6.jpg'},
+50:{main:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/c992b3b0-982c-4f82-8723-bf6d42cc21e6.jpg'},
+100:{main:'https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/f61658bc-dbbf-4b70-b3cc-069d4c019287.jpg'}
+}}
 function fragranceAsset(id,ml){return '/assets/fragrances/'+id+(ml===20?'':'-'+ml+'ml')+'.svg'}
 function yadPhotoManifest(id,ml){return YAD_PHOTO_MANIFEST[id]?.[ml]||null}
 function yadProductImage(id,ml){const photo=yadPhotoManifest(id,ml)?.main;return {src:photo||fragranceAsset(id,ml),isPhoto:!!photo}}
