@@ -511,3 +511,27 @@ body[data-page^="fragrance/"] .detail-add{width:100%;min-height:65px;border-radi
 .detail-thumb img{width:100%;height:68px;object-fit:contain;display:block;border-radius:6px}
 .detail-thumb span{font-size:11px;font-weight:600;color:#514b43}
 @media(max-width:760px){.detail-thumbnails{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}.detail-thumbnails .detail-thumb{width:100%;min-width:0;min-height:75px;padding:3px;border-radius:8px}.detail-thumb img{height:50px}.detail-thumb span{font-size:10px}}
+
+/* YAD fragrance editorial product page, based on approved visual reference */
+body[data-page^="fragrance/"]{background:#fcfaf7;color:#1c1a18}
+body[data-page^="fragrance/"] .detail-layout{max-width:1510px;grid-template-columns:minmax(0,1.06fr) minmax(0,1fr);gap:clamp(26px,3.2vw,58px);align-items:start}
+body[data-page^="fragrance/"] .detail-copy{padding:12px 0}
+body[data-page^="fragrance/"] .detail-copy h1{font-family:Georgia,'Times New Roman',serif;font-weight:500;letter-spacing:-.055em;font-size:clamp(50px,5.5vw,82px);line-height:1.05;margin:13px 0 22px}
+body[data-page^="fragrance/"] .detail-story{font-family:Georgia,'Times New Roman',serif;font-size:clamp(16px,1.5vw,21px);line-height:1.55;max-width:640px;color:#37312c}
+body[data-page^="fragrance/"] .detail-gallery{grid-template-columns:78px minmax(0,1fr);gap:14px}
+body[data-page^="fragrance/"] .detail-gallery .detail-visual{min-height:610px;border-radius:24px;background:#f2eae1}
+body[data-page^="fragrance/"] .detail-gallery .detail-visual .product-art{min-height:610px}
+body[data-page^="fragrance/"] .detail-gallery .detail-visual .yad-volume-photo{object-fit:contain;background:#f4eee7}
+body[data-page^="fragrance/"] .detail-note-section h2{font-family:Georgia,'Times New Roman',serif;font-size:25px;font-weight:500;margin-bottom:15px}
+body[data-page^="fragrance/"] .detail-note-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+body[data-page^="fragrance/"] .detail-note-tile{border:0;background:#f5f1ec;border-radius:14px;min-height:125px;display:flex;flex-direction:column;justify-content:center;gap:9px;padding:12px 6px}
+body[data-page^="fragrance/"] .detail-note-icon{font-size:39px;line-height:1.2;display:block}
+body[data-page^="fragrance/"] .detail-note-tile strong{font-family:Georgia,'Times New Roman',serif;font-size:15px;font-weight:400}
+body[data-page^="fragrance/"] .detail-sizes{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+body[data-page^="fragrance/"] .detail-sizes button{border-radius:13px;min-height:83px;padding:10px 3px;background:#fbf8f5}
+body[data-page^="fragrance/"] .detail-add{background:linear-gradient(180deg,#292826,#070707);border-radius:14px;min-height:72px;font-family:Georgia,'Times New Roman',serif;font-size:19px}
+body[data-page^="fragrance/"] .detail-thumbnails .detail-thumb{background:#f7f1eb;border:1px solid #e7dcd2}
+body[data-page^="fragrance/"] .detail-thumbnails .detail-thumb.active{border:2px solid #201d1a}
+body[data-page^="fragrance/"] .detail-benefits{margin-top:30px}
+@media(max-width:950px){body[data-page^="fragrance/"] .detail-layout{grid-template-columns:1fr}body[data-page^="fragrance/"] .detail-gallery .detail-visual,body[data-page^="fragrance/"] .detail-gallery .detail-visual .product-art{min-height:480px}}
+@media(max-width:760px){body[data-page^="fragrance/"] .detail-gallery{grid-template-columns:1fr}body[data-page^="fragrance/"] .detail-gallery .detail-visual,body[data-page^="fragrance/"] .detail-gallery .detail-visual .product-art{min-height:390px;height:390px}body[data-page^="fragrance/"] .detail-copy h1{font-size:48px}body[data-page^="fragrance/"] .detail-sizes{grid-template-columns:repeat(3,minmax(0,1fr))}body[data-page^="fragrance/"] .detail-note-tile{min-height:102px}body[data-page^="fragrance/"] .detail-note-icon{font-size:30px}body[data-page^="fragrance/"] .detail-thumbnails{grid-template-columns:repeat(6,minmax(0,1fr))}}
