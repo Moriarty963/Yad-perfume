@@ -1345,3 +1345,85 @@ body[data-page="cart"] .drawer-bottom .delivery-choice label:has(input:checked){
  #products .product,#products .product.card-ready,
  .catalog-more-button{animation:none!important;transition:none!important}
 }
+
+
+/* YAD ATELIER 3.0 · Unified photographic presentation
+   Preserve original bottle artwork, proportions, reflections and label typography.
+   Use identical neutral stages rather than synthetic shadows/overlay effects. */
+#products .product-art,
+.yad-editorial-home .market-card-photo,
+body[data-page^="fragrance/"] .atelier-stage{
+ background:#f5f0eb!important;
+ isolation:isolate;
+}
+#products .product-art:before,
+#products .product-art:after{display:none!important}
+/* A photo-backed card starts as an empty, softly lit stage rather than a
+   visibly incorrect CSS bottle while its actual asset is downloading. */
+#products .product-art .yad-product-bottle,
+.yad-editorial-home .market-card-photo .market-mini-bottle{visibility:hidden!important}
+#products .product-art .yad-volume-photo,
+.yad-editorial-home .market-card-photo .yad-volume-photo{
+ object-fit:contain!important;
+ object-position:50% 50%!important;
+ background:#f5f0eb!important;
+ filter:none!important;
+ opacity:0;
+ transition:opacity .25s ease-out;
+}
+#products .product-art.has-volume-photo .yad-volume-photo:not(.yad-photo-entering),
+.yad-editorial-home .market-card-photo.has-volume-photo .yad-volume-photo{opacity:1}
+#products .product-art .yad-volume-photo.yad-photo-entering{opacity:0!important}
+#products .product-art .yad-previous-volume-photo{
+ position:absolute;
+ inset:0;
+ width:100%;
+ height:100%;
+ object-fit:contain;
+ object-position:50% 50%;
+ z-index:6;
+ opacity:1;
+ background:#f5f0eb;
+ pointer-events:none;
+ transition:opacity .28s ease-out;
+}
+#products .product-art .yad-previous-volume-photo.yad-photo-fading{opacity:0}
+.yad-editorial-home .market-card-photo .yad-volume-photo{
+ width:100%;
+ height:100%;
+}
+/* Keep the same quiet photographic backdrop on the fragrance page while the
+   visitor switches sizes. Do not crop the bottles or apply additional filters. */
+body[data-page^="fragrance/"] .atelier-stage .yad-detail-hero-photo,
+body[data-page^="fragrance/"] .atelier-stage .atelier-previous-photo{
+ object-fit:contain!important;
+ object-position:center!important;
+ filter:none!important;
+ background:#f5f0eb;
+}
+body[data-page^="fragrance/"] .atelier-mini-gallery button{
+ background:#f5f0eb!important;
+ border-color:#e4ded6;
+ overflow:hidden;
+}
+body[data-page^="fragrance/"] .atelier-mini-gallery button img{
+ display:block;
+ width:100%;
+ height:auto;
+ aspect-ratio:4 / 5;
+ object-fit:contain!important;
+ object-position:center;
+ border-radius:5px;
+ background:#f5f0eb;
+}
+body[data-page^="fragrance/"] .atelier-mini-gallery button[aria-pressed="true"]{
+ border-color:#9b8a77;
+ box-shadow:inset 0 0 0 1px #9b8a77;
+}
+@media(prefers-reduced-motion:reduce){
+ #products .product-art .yad-volume-photo,
+ #products .product-art .yad-previous-volume-photo,
+ .yad-editorial-home .market-card-photo .yad-volume-photo{
+  transition:none!important;
+ }
+}
