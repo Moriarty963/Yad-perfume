@@ -25,11 +25,27 @@ cart=Array.isArray(cart)?cart.filter(x=>x&&typeof x.id==='string'&&Number.isInte
 // Only the public order number and purchased items are kept for this tab.
 // Personal details (name, phone, address) are deliberately not stored here.
 const lastOrderSessionKey='yad-last-order-session-v1';
+const lastOrderDeviceKey='yad-last-order-status-v2';
+const lastOrderRetentionMs=180*24*60*60*1000;
 let lastOrder=null;
 try{
- const saved=JSON.parse(sessionStorage.getItem(lastOrderSessionKey)||'null');
- if(saved&&typeof saved.number==='string'&&Array.isArray(saved.items)&&saved.items.length<=30)lastOrder=saved;
+ const raw=localStorage.getItem(lastOrderDeviceKey)||sessionStorage.getItem(lastOrderSessionKey);
+ const saved=raw?JSON.parse(raw):null;
+ if(saved&&typeof saved.number==='string'&&Array.isArray(saved.items)&&saved.items.length<=30&&(!saved.savedAt||Date.now()-saved.savedAt<lastOrderRetentionMs))lastOrder=saved;
+ else if(saved){localStorage.removeItem(lastOrderDeviceKey);sessionStorage.removeItem(lastOrderSessionKey)}
 }catch{}
+function saveLastOrder(){
+ if(!lastOrder)return;
+ // Only order summary and read-only status token; no customer's name, phone or pickup address.
+ try{localStorage.setItem(lastOrderDeviceKey,JSON.stringify(lastOrder))}catch{}
+ try{sessionStorage.setItem(lastOrderSessionKey,JSON.stringify(lastOrder))}catch{}
+}
+function forgetLastOrder(){
+ lastOrder=null;
+ try{localStorage.removeItem(lastOrderDeviceKey);sessionStorage.removeItem(lastOrderSessionKey)}catch{}
+ renderOrderReceipt();
+ notify('Сведения о заявке удалены с этого устройства.');
+}
 const rub=n=>new Intl.NumberFormat('ru-RU').format(n)+' ₽';const safe=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const yadPhoto=ml=>'/assets/yad-'+ml+'ml.webp';
 // Approved Higgsfield concept visuals are registered here by fragrance and bottle size.
