@@ -1279,7 +1279,7 @@ body[data-page="cart"] .drawer-bottom .delivery-choice label:has(input:checked){
 }
 #products .product-info .product-price{
  margin-top:auto;margin-bottom:8px;
- font:600 19px/1.25 inherit;color:#252420;
+ font-size:19px;font-weight:600;line-height:1.25;color:#252420;
 }
 #products .product-info select{
  margin:6px 0 10px;min-height:46px;padding:10px 12px;
