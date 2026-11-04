@@ -503,3 +503,11 @@ body[data-page^="fragrance/"] .detail-add{width:100%;min-height:65px;border-radi
 .product-art .yad-volume-photo,.detail-gallery .yad-volume-photo{object-fit:contain;background:linear-gradient(145deg,#f9f6f0,#eee7dd);padding:0}
 .market-card-photo .yad-volume-photo{object-fit:contain;background:linear-gradient(145deg,#f9f6f0,#eee7dd)}
 .yad-volume-photo[hidden]{display:none!important}
+
+/* Honest gallery: six actual size-specific renders instead of simulated photo angles */
+.detail-gallery .detail-visual[data-gallery-current] .product-art{transform:none!important}
+.detail-thumbnails .detail-thumb{height:auto;min-height:98px;width:76px;padding:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#f8f5f0;transform:none}
+.detail-thumbnails .detail-thumb.active{background:#eee8df;border:2px solid #242321;transform:none}
+.detail-thumb img{width:100%;height:68px;object-fit:contain;display:block;border-radius:6px}
+.detail-thumb span{font-size:11px;font-weight:600;color:#514b43}
+@media(max-width:760px){.detail-thumbnails{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}.detail-thumbnails .detail-thumb{width:100%;min-width:0;min-height:75px;padding:3px;border-radius:8px}.detail-thumb img{height:50px}.detail-thumb span{font-size:10px}}
