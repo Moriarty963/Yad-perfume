@@ -2506,3 +2506,124 @@ body.compare-dialog-open .compare-tray{visibility:hidden}
 @media(prefers-reduced-motion:reduce){
  #products .product{transition:none!important}
 }
+
+
+/* YAD image integrity: studio mockups stay labeled, originals are separate.
+   A minimal zoom surface reveals label details without changing source images. */
+#yadPhotoLightbox[hidden]{display:none!important}
+body[data-page^="fragrance/"] .atelier-stage .atelier-image-zoom{
+ position:absolute;z-index:9;bottom:12px;right:12px;
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ min-height:39px;padding:9px 12px;border:1px solid #d9cfc1;
+ border-radius:999px;background:rgba(255,253,250,.95);color:#4c4339;
+ font-size:11px;line-height:1.2;font-weight:650;cursor:pointer;
+ box-shadow:0 3px 14px rgba(41,32,23,.06);
+ backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
+}
+body[data-page^="fragrance/"] .atelier-stage .atelier-image-zoom:hover{
+ background:#fff;border-color:#a59580;
+}
+body[data-page^="fragrance/"] .atelier-stage .atelier-image-zoom:focus-visible{
+ outline:2px solid #85715a;outline-offset:3px;
+}
+body[data-page^="fragrance/"] .atelier-real-photo-link{
+ display:flex;align-items:center;gap:11px;
+ width:100%;min-height:70px;margin-top:11px;padding:9px 11px;
+ border:1px solid #e8e1d8;border-radius:10px;
+ background:#fcfaf7;color:#514a42;text-align:left;cursor:pointer;
+}
+body[data-page^="fragrance/"] .atelier-real-photo-link img{
+ width:48px;height:53px;object-fit:contain;flex:0 0 48px;
+ border-radius:6px;background:#f0ece6;
+}
+body[data-page^="fragrance/"] .atelier-real-photo-link>span:nth-of-type(1){
+ display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;
+}
+body[data-page^="fragrance/"] .atelier-real-photo-link strong{
+ font-size:12px;font-weight:650;line-height:1.35;color:#37302b;
+}
+body[data-page^="fragrance/"] .atelier-real-photo-link small{
+ font-size:11px;line-height:1.3;color:#887b6b;
+}
+body[data-page^="fragrance/"] .atelier-real-photo-link>span:last-child{
+ font-size:16px;color:#766755;flex:none;
+}
+body[data-page^="fragrance/"] .atelier-real-photo-link:hover{
+ border-color:#c1b29f;background:#f7f3ec;
+}
+body[data-page^="fragrance/"] .atelier-real-photo-link:focus-visible{
+ outline:2px solid #85715a;outline-offset:3px;
+}
+body.yad-photo-open{overflow:hidden!important}
+.yad-photo-lightbox{
+ position:fixed;inset:0;z-index:240;
+ display:grid;place-items:center;padding:12px;
+}
+.yad-photo-lightbox-scrim{
+ position:absolute;inset:0;background:rgba(25,23,21,.75);
+ backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+}
+.yad-photo-lightbox-dialog{
+ position:relative;z-index:1;
+ display:flex;flex-direction:column;
+ width:min(760px,100%);max-height:calc(100dvh - 24px);
+ min-width:0;overflow:hidden;
+ border:1px solid #e6e0d7;border-radius:15px;
+ background:#faf9f6;color:#2b2722;
+ box-shadow:0 26px 75px rgba(0,0,0,.25);
+}
+.yad-photo-lightbox-head{
+ display:flex;align-items:center;justify-content:space-between;gap:16px;
+ padding:14px 16px;border-bottom:1px solid #e8e2d9;
+}
+.yad-photo-lightbox-head span{
+ display:block;font-size:10px;letter-spacing:.11em;font-weight:700;color:#8b7e6c;
+}
+.yad-photo-lightbox-head h2{
+ font:400 clamp(19px,3vw,25px)/1.2 Georgia,"Times New Roman",serif;
+ color:#302a24;margin:4px 0 0;letter-spacing:-.025em;
+}
+.yad-photo-lightbox-head button{
+ display:grid;place-items:center;flex:0 0 44px;
+ width:44px;height:44px;border-radius:50%;
+ border:1px solid #e0d7cb;background:#fff;color:#544b40;
+ cursor:pointer;font-size:17px;
+}
+.yad-photo-lightbox-head button:focus-visible{
+ outline:2px solid #826e55;outline-offset:3px;
+}
+.yad-photo-lightbox-stage{
+ display:flex;align-items:center;justify-content:center;
+ min-height:0;flex:1;overflow:auto;background:#f5f0eb;
+ padding:8px;
+}
+.yad-photo-lightbox-stage img{
+ display:block;max-width:100%;max-height:min(68dvh,840px);
+ width:auto;height:auto;object-fit:contain;
+}
+.yad-photo-lightbox-caption{
+ border-top:1px solid #e8e2d9;
+ padding:12px 16px 15px;margin:0;
+ text-align:center;color:#70665a;font-size:12px;line-height:1.45;
+}
+@media(max-width:760px){
+ body[data-page^="fragrance/"] .atelier-stage .atelier-image-zoom{
+  right:7px;bottom:7px;min-height:34px;
+  padding:7px 8px;font-size:10px;
+ }
+ body[data-page^="fragrance/"] .atelier-real-photo-link{
+  margin-top:8px;min-height:60px;padding:7px 9px;
+ }
+ body[data-page^="fragrance/"] .atelier-real-photo-link img{
+  width:38px;height:44px;flex-basis:38px;
+ }
+ .yad-photo-lightbox{padding:7px}
+ .yad-photo-lightbox-dialog{max-height:calc(100dvh - 14px);border-radius:12px}
+ .yad-photo-lightbox-head{padding:10px 12px}
+ .yad-photo-lightbox-stage img{max-height:70dvh}
+ .yad-photo-lightbox-caption{font-size:11px;padding:10px 12px}
+}
+@media(prefers-reduced-motion:reduce){
+ body[data-page^="fragrance/"] .atelier-stage .atelier-image-zoom,
+ body[data-page^="fragrance/"] .atelier-real-photo-link{transition:none!important}
+}
