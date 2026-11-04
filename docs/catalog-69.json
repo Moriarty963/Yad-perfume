@@ -1,0 +1,623 @@
+[
+  {
+    "id": "de-blue",
+    "name": "DE BLUE",
+    "notes": "Грейпфрут · Имбирь · Ладан",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "de-blue",
+    "sourcePage": 2
+  },
+  {
+    "id": "b683",
+    "name": "B683",
+    "notes": "Шафран · Лист фиалки · Амброксан",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "b683",
+    "sourcePage": 3
+  },
+  {
+    "id": "shaik-77",
+    "name": "SHAIK 77",
+    "notes": "Лаванда · Яблоко · Мускус",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "shaik-77",
+    "sourcePage": 4
+  },
+  {
+    "id": "happiness",
+    "name": "HAPPINESS",
+    "notes": "Бергамот · Лакрица · Ваниль",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "happiness",
+    "sourcePage": 5
+  },
+  {
+    "id": "acqua",
+    "name": "ACQUA",
+    "notes": "Лайм · Морские ноты · Белый мускус",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "acqua",
+    "sourcePage": 6
+  },
+  {
+    "id": "venetian-bergamot",
+    "name": "VENETIAN BERGAMOT",
+    "notes": "Бергамот · Гардения · Сандал",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "venetian-bergamot",
+    "sourcePage": 7
+  },
+  {
+    "id": "baccarat",
+    "name": "BACCARAT",
+    "notes": "Шафран · Амбровые ноты · Кедр",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "baccarat",
+    "sourcePage": 8
+  },
+  {
+    "id": "eclat",
+    "name": "ECLAT",
+    "notes": "Пион · Османтус · Амбра",
+    "family": "floral",
+    "glow": "#61505a",
+    "assetSlug": "eclat",
+    "sourcePage": 9
+  },
+  {
+    "id": "devils-intrigue",
+    "name": "DEVIL’S INTRIGUE",
+    "notes": "Османтус · Сандал · Ваниль",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "devils-intrigue",
+    "sourcePage": 10
+  },
+  {
+    "id": "ange-ou-demon",
+    "name": "ANGE OU DEMON",
+    "notes": "Шафран · Лилия · Ваниль",
+    "family": "floral",
+    "glow": "#61505a",
+    "assetSlug": "ange-ou-demon",
+    "sourcePage": 11
+  },
+  {
+    "id": "aphrodisiac",
+    "name": "APHRODISIAC",
+    "notes": "Белые цветы · Кожа · Ваниль",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "aphrodisiac",
+    "sourcePage": 12
+  },
+  {
+    "id": "lost-cherry",
+    "name": "LOST CHERRY",
+    "notes": "Горький миндаль · Вишня · Ваниль",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "lost-cherry",
+    "sourcePage": 13
+  },
+  {
+    "id": "terre",
+    "name": "TERRE",
+    "notes": "Апельсин · Перец · Ветивер",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "terre",
+    "sourcePage": 14
+  },
+  {
+    "id": "sauvage",
+    "name": "SAUVAGE",
+    "notes": "Бергамот · Лаванда · Амброксан",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "sauvage",
+    "sourcePage": 15
+  },
+  {
+    "id": "fleur-narcotique",
+    "name": "FLEUR NARCOTIQUE",
+    "notes": "Личи · Пион · Мускус",
+    "family": "floral",
+    "glow": "#61505a",
+    "assetSlug": "fleur-narcotique",
+    "sourcePage": 16
+  },
+  {
+    "id": "hayati",
+    "name": "HAYATI",
+    "notes": "Малина · Взбитые сливки · Ваниль",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "hayati",
+    "sourcePage": 17
+  },
+  {
+    "id": "escentric02",
+    "name": "MOLECULES 02",
+    "notes": "Амброксан · Ирис · Мускус",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "molecules-02",
+    "sourcePage": 18
+  },
+  {
+    "id": "erba-pura",
+    "name": "ERBA PURA",
+    "notes": "Фруктовые ноты · Ирис · Мускус",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "erba-pura",
+    "sourcePage": 19
+  },
+  {
+    "id": "aqva-marine",
+    "name": "AQVA MARINE",
+    "notes": "Грейпфрут · Морские ноты · Кедр",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "aqva-marine",
+    "sourcePage": 20
+  },
+  {
+    "id": "aventus",
+    "name": "AVENTUS",
+    "notes": "Бергамот · Ананас · Берёза",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "aventus",
+    "sourcePage": 21
+  },
+  {
+    "id": "black-afgano",
+    "name": "BLACK AFGANO",
+    "notes": "Зелёные ноты · Смолы · Уд",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "black-afgano",
+    "sourcePage": 22
+  },
+  {
+    "id": "homme-sport",
+    "name": "HOMME SPORT",
+    "notes": "Лимон · Имбирь · Розмарин",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "homme-sport",
+    "sourcePage": 23
+  },
+  {
+    "id": "1-million",
+    "name": "1 MILLION",
+    "notes": "Красный мандарин · Корица · Амбра",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "1-million",
+    "sourcePage": 24
+  },
+  {
+    "id": "eau-fraiche",
+    "name": "EAU FRAICHE",
+    "notes": "Лимон · Кедр · Мускус",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "eau-fraiche",
+    "sourcePage": 25
+  },
+  {
+    "id": "kirke",
+    "name": "KIRKE",
+    "notes": "Маракуйя · Ландыш · Мускус",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "kirke",
+    "sourcePage": 26
+  },
+  {
+    "id": "cherry",
+    "name": "CHERRY",
+    "notes": "Вишня · Маршмеллоу · Мускус",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "cherry",
+    "sourcePage": 27
+  },
+  {
+    "id": "apres-lamour-no-4",
+    "name": "APRÈS L’AMOUR NO. 4",
+    "notes": "Цедра лимона · Специи · Мускус",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "apres-lamour-no-4",
+    "sourcePage": 28
+  },
+  {
+    "id": "good-girl",
+    "name": "GOOD GIRL",
+    "notes": "Апельсиновый цвет · Жасмин · Мускус",
+    "family": "floral",
+    "glow": "#61505a",
+    "assetSlug": "good-girl",
+    "sourcePage": 29
+  },
+  {
+    "id": "bal-dafrique",
+    "name": "BAL D'AFRIQUE",
+    "notes": "Бергамот · Фиалка · Ветивер",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "bal-dafrique",
+    "sourcePage": 30
+  },
+  {
+    "id": "atlantiqve",
+    "name": "ATLANTIQVE",
+    "notes": "Цитрусы · Морские ноты · Ветивер",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "atlantiqve",
+    "sourcePage": 31
+  },
+  {
+    "id": "blackpepper",
+    "name": "BLACK PEPPER",
+    "notes": "Чёрный перец · Амбра · Древесные ноты",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "black-pepper",
+    "sourcePage": 32
+  },
+  {
+    "id": "tobacco-vanille",
+    "name": "TOBACCO VANILLE",
+    "notes": "Лист табака · Ваниль · Сухофрукты",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "tobacco-vanille",
+    "sourcePage": 33
+  },
+  {
+    "id": "roses-musk",
+    "name": "ROSES MUSK",
+    "notes": "Роза · Цветочные ноты · Мускус",
+    "family": "floral",
+    "glow": "#61505a",
+    "assetSlug": "roses-musk",
+    "sourcePage": 34
+  },
+  {
+    "id": "bad-boys",
+    "name": "BAD BOYS",
+    "notes": "Кола · Корица · Кедр",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "bad-boys",
+    "sourcePage": 35
+  },
+  {
+    "id": "invictus",
+    "name": "INVICTUS",
+    "notes": "Морские ноты · Лавр · Серая амбра",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "invictus",
+    "sourcePage": 36
+  },
+  {
+    "id": "naxos",
+    "name": "NAXOS",
+    "notes": "Лаванда · Мёд · Лист табака",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "naxos",
+    "sourcePage": 37
+  },
+  {
+    "id": "psychedelic-love",
+    "name": "PSYCHEDELIC LOVE",
+    "notes": "Иланг-иланг · Гелиотроп · Мирра",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "psychedelic-love",
+    "sourcePage": 38
+  },
+  {
+    "id": "funny",
+    "name": "FUNNY",
+    "notes": "Горький апельсин · Зелёный чай · Кедр",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "funny",
+    "sourcePage": 39
+  },
+  {
+    "id": "bitter-peach",
+    "name": "BITTER PEACH",
+    "notes": "Персик · Ром · Ваниль",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "bitter-peach",
+    "sourcePage": 40
+  },
+  {
+    "id": "fireplace",
+    "name": "FIREPLACE",
+    "notes": "Гвоздика · Каштан · Ваниль",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "fireplace",
+    "sourcePage": 41
+  },
+  {
+    "id": "amberwood",
+    "name": "AMBER WOOD",
+    "notes": "Кардамон · Кедр · Амбра",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "amber-wood",
+    "sourcePage": 42
+  },
+  {
+    "id": "bright-crystal",
+    "name": "BRIGHT CRYSTAL",
+    "notes": "Юзу · Пион · Мускус",
+    "family": "floral",
+    "glow": "#61505a",
+    "assetSlug": "bright-crystal",
+    "sourcePage": 43
+  },
+  {
+    "id": "lust-in-paradise",
+    "name": "LUST IN PARADISE",
+    "notes": "Пион · Мускус",
+    "family": "floral",
+    "glow": "#61505a",
+    "assetSlug": "lust-in-paradise",
+    "sourcePage": 44
+  },
+  {
+    "id": "la-vie-est-belle",
+    "name": "LA VIE EST BELLE",
+    "notes": "Чёрный перец · Амбра · Древесные ноты",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "la-vie-est-belle",
+    "sourcePage": 45
+  },
+  {
+    "id": "red-tobacco",
+    "name": "RED TOBACCO",
+    "notes": "Корица · Пачули · Табак",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "red-tobacco",
+    "sourcePage": 46
+  },
+  {
+    "id": "ombre-leather",
+    "name": "OMBRE LEATHER",
+    "notes": "Кожа · Амбра",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "ombre-leather",
+    "sourcePage": 47
+  },
+  {
+    "id": "212vip",
+    "name": "212VIP",
+    "notes": "Ром · Гардения · Ваниль",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "212vip",
+    "sourcePage": 48
+  },
+  {
+    "id": "chance",
+    "name": "CHANCE",
+    "notes": "Жасмин · Пачули",
+    "family": "floral",
+    "glow": "#61505a",
+    "assetSlug": "chance",
+    "sourcePage": 49
+  },
+  {
+    "id": "clinique-happy",
+    "name": "CLINIQUE HAPPY",
+    "notes": "Мандарин · Фрезия · Кипарис",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "clinique-happy",
+    "sourcePage": 50
+  },
+  {
+    "id": "ganymede",
+    "name": "GANYMEDE",
+    "notes": "Шафран · Османтус · Минеральные ноты",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "ganymede",
+    "sourcePage": 51
+  },
+  {
+    "id": "rehab",
+    "name": "REHAB",
+    "notes": "Лаванда · Кедр · Сандал",
+    "family": "intense",
+    "glow": "#58463b",
+    "assetSlug": "rehab",
+    "sourcePage": 52
+  },
+  {
+    "id": "megamare",
+    "name": "MEGAMARE",
+    "notes": "Бергамот · Морские ноты · Мускус",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "megamare",
+    "sourcePage": 53
+  },
+  {
+    "id": "blue-seduction",
+    "name": "BLUE SEDUCTION",
+    "notes": "Дыня · Морская вода · Древесные ноты",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "blue-seduction",
+    "sourcePage": 54
+  },
+  {
+    "id": "tilia",
+    "name": "TILIA",
+    "notes": "Липовый цвет · Гелиотроп · Амброфикс",
+    "family": "floral",
+    "glow": "#61505a",
+    "assetSlug": "tilia",
+    "sourcePage": 55
+  },
+  {
+    "id": "blackberry-and-bay",
+    "name": "BLACKBERRY & BAY",
+    "notes": "Ягодные ноты · Цветочные ноты · Мускус",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "blackberry-and-bay",
+    "sourcePage": 56
+  },
+  {
+    "id": "vanilla-extasy",
+    "name": "VANILLA EXTASY",
+    "notes": "Абрикос · Ваниль · Бензоин",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "vanilla-extasy",
+    "sourcePage": 57
+  },
+  {
+    "id": "symphony",
+    "name": "SYMPHONY",
+    "notes": "Цитрусы · Цветочные ноты · Мускус",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "symphony",
+    "sourcePage": 58
+  },
+  {
+    "id": "tygar",
+    "name": "TYGAR",
+    "notes": "Грейпфрут · Имбирь · Амброксан",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "tygar",
+    "sourcePage": 59
+  },
+  {
+    "id": "tribute",
+    "name": "TRIBUTE",
+    "notes": "Мускатный орех · Амбра · Мускус",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "tribute",
+    "sourcePage": 60
+  },
+  {
+    "id": "nomade",
+    "name": "NOMADE",
+    "notes": "Слива мирабель · Фрезия · Дубовый мох",
+    "family": "floral",
+    "glow": "#61505a",
+    "assetSlug": "nomade",
+    "sourcePage": 61
+  },
+  {
+    "id": "limperatrice-3",
+    "name": "L'IMPERATRICE 3",
+    "notes": "Киви · Арбуз · Мускус",
+    "family": "floral",
+    "glow": "#61505a",
+    "assetSlug": "limperatrice-3",
+    "sourcePage": 62
+  },
+  {
+    "id": "blue-talisman",
+    "name": "BLUE TALISMAN",
+    "notes": "Груша · Цветок апельсина · Мускус",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "blue-talisman",
+    "sourcePage": 63
+  },
+  {
+    "id": "montabaco",
+    "name": "MONTABACO",
+    "notes": "Кардамон · Чай · Лист табака",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "montabaco",
+    "sourcePage": 64
+  },
+  {
+    "id": "l-12-12-white",
+    "name": "L.12.12. WHITE",
+    "notes": "Грейпфрут · Иланг-иланг · Древесные ноты",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "l-12-12-white",
+    "sourcePage": 65
+  },
+  {
+    "id": "immensite",
+    "name": "L’IMMENSITÉ",
+    "notes": "Грейпфрут · Имбирь · Амброксан",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "limmensite",
+    "sourcePage": 66
+  },
+  {
+    "id": "imagination",
+    "name": "IMAGINATION",
+    "notes": "Цитрон · Нероли · Чёрный чай",
+    "family": "fresh",
+    "glow": "#405359",
+    "assetSlug": "imagination",
+    "sourcePage": 67
+  },
+  {
+    "id": "bombshell",
+    "name": "BOMBSHELL",
+    "notes": "Маракуйя · Пион · Мускус",
+    "family": "floral",
+    "glow": "#61505a",
+    "assetSlug": "bombshell",
+    "sourcePage": 68
+  },
+  {
+    "id": "bois-imperial",
+    "name": "BOIS IMPÉRIAL",
+    "notes": "Базилик · Акигалвуд · Пачули",
+    "family": "woody",
+    "glow": "#494d47",
+    "assetSlug": "bois-imperial",
+    "sourcePage": 69
+  },
+  {
+    "id": "joy",
+    "name": "JOY",
+    "notes": "Бергамот · Жасмин · Белый мускус",
+    "family": "floral",
+    "glow": "#61505a",
+    "assetSlug": "joy",
+    "sourcePage": 70
+  }
+]
