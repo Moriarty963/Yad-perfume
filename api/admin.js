@@ -1,6 +1,7 @@
 const {neon}=require('@neondatabase/serverless');
 const crypto=require('node:crypto');
 const {ready:telegramReady,botInfo,webhookInfo,enableWebhook,notifyBuyerStatus}=require('../lib/yad-telegram');
+const {ensureTelegramTables}=require('../lib/yad-telegram-schema');
 const COOKIE='yad_admin_session';
 const adminPassword=process.env.ADMIN_PASSWORD||process.env.Admin_password;
 const sessionSecret=process.env.ADMIN_SESSION_SECRET||process.env.admin_session_secret;
@@ -45,6 +46,7 @@ module.exports=async(req,res)=>{
  const sql=neon(process.env.DATABASE_URL);
  try{
   if(req.method==='POST'&&req.query.action==='telegram-retry'){
+   await ensureTelegramTables(sql);
    const b=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
    const id=typeof b.id==='string'?b.id:'';
    if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))
@@ -62,6 +64,8 @@ module.exports=async(req,res)=>{
    return res.status(200).json({notification_status:outcome,status:order.status});
   }
   if(req.method==='GET'){
+   // Admin authenticated: repair only missing Telegram tables in the live database.
+   await ensureTelegramTables(sql);
    const page=Number(req.query.page??0);
    const filter=String(req.query.status??'all');
    const query=String(req.query.q??'').trim();
@@ -87,6 +91,7 @@ module.exports=async(req,res)=>{
    return res.status(200).json({orders:rows.slice(0,pageSize),has_more:rows.length>pageSize,page,per_page:pageSize,metrics:metrics[0]});
   }
   if(req.method==='PATCH'){
+   await ensureTelegramTables(sql);
    const b=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
    if(typeof b.id!=='string'||!/^[0-9a-f-]{36}$/i.test(b.id)||!statuses.has(b.status))return res.status(400).json({error:'Неверные данные.'});
    const rows=await sql`UPDATE yad_orders SET status=${b.status} WHERE public_id=${b.id}::uuid AND status IS DISTINCT FROM ${b.status} RETURNING public_id,status`;
