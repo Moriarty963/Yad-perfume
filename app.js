@@ -311,10 +311,42 @@ function renderOrderReceipt(){
  const statusKey=Object.prototype.hasOwnProperty.call(orderStatusDetails,lastOrder.status)?lastOrder.status:'new';
  const [statusTitle,statusDescription]=orderStatusDetails[statusKey];
  const checkedLabel=orderStatusTimestamp(lastOrder.checkedAt);
+ const telegramUI=lastOrder.statusToken
+  ?'<section class="yad-tg-connect" aria-label="Подписка на уведомления"><div class="yad-tg-top"><strong>Уведомления в Telegram</strong><small>Только по вашему желанию</small></div><p>Подключите заказ к Telegram, чтобы получать сообщения при смене статуса и открыть свои заказы на другом устройстве. Отписаться можно командой /stop.</p><div class="yad-tg-actions"><button type="button" data-tg-connect>Подключить Telegram</button><button type="button" data-tg-check>Проверить подключение</button></div><p class="yad-tg-message" id="yadTgConnectStatus" role="status" aria-live="polite"></p></section>'
+  :'';
  const trackingUI=lastOrder.statusToken
   ?`<section class="order-tracking" aria-label="Статус заявки"><div class="order-tracking-heading"><span>Актуальный статус заказа</span><span class="order-tracking-checked">${safe(checkedLabel)}</span></div><strong class="order-tracking-state status-${statusKey}">${safe(statusTitle)}</strong><p>${safe(statusDescription)}</p><button type="button" data-order-status>Проверить статус</button><p id="orderStatusMessage" class="order-tracking-message" role="status" aria-live="polite"></p></section>`
   :'<p class="order-receipt-note">Онлайн-проверка статуса доступна для новых заявок. Для этой заявки можно уточнить статус через WhatsApp.</p>';
- holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><h3>Заказ №${safe(lastOrder.number)}</h3><p>Мы свяжемся с вами в ${lastOrder.method==='telegram'?'Telegram':'WhatsApp'} для подтверждения.</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div>${trackingUI}<div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div><p class="order-receipt-retention">История до 15 заявок хранится только в этом браузере, без имён, телефонов и адресов. Данные хранятся не дольше 180 дней, их можно удалить.</p><button type="button" class="order-forget" data-order-forget>Удалить сведения о заявке с устройства</button>`;
+ holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><h3>Заказ №${safe(lastOrder.number)}</h3><p>Мы свяжемся с вами в ${lastOrder.method==='telegram'?'Telegram':'WhatsApp'} для подтверждения.</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div>${trackingUI}${telegramUI}<div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div><p class="order-receipt-retention">История до 15 заявок хранится только в этом браузере, без имён, телефонов и адресов. Данные хранятся не дольше 180 дней, их можно удалить.</p><button type="button" class="order-forget" data-order-forget>Удалить сведения о заявке с устройства</button>`;
+}
+async function customerTelegramConnect(button,action){
+ const order=lastOrder;if(!order?.statusToken)return;
+ const label=$('yadTgConnectStatus');
+ if(button){button.disabled=true;button.textContent=action==='link'?'Создаём ссылку…':'Проверяем…'}
+ if(label)label.textContent=action==='link'?'Создаём безопасную ссылку для Telegram…':'Проверяем подписку…';
+ try{
+  const response=await fetch('/api/telegram-link',{method:'POST',credentials:'same-origin',cache:'no-store',
+   headers:{'Content-Type':'application/json'},body:JSON.stringify({action,token:order.statusToken})});
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(result.error||'Не удалось подключить Telegram.');
+  if(lastOrder?.number!==order.number)return;
+  const holder=$('yadTgConnectStatus');if(!holder)return;
+  if(result.connected){
+   holder.textContent='Telegram подключён. Уведомления будут приходить при изменении статуса.';
+   return;
+  }
+  if(action==='link'&&typeof result.url==='string'&&/^https:\/\/t\.me\/[A-Za-z0-9_]{5,32}\?start=yad_[A-Za-z0-9_-]{32}$/.test(result.url)){
+   holder.innerHTML='Ссылка действует 30 минут. Откройте Telegram и нажмите Start: <a href="'+safe(result.url)+'" target="_blank" rel="noopener noreferrer">Открыть бота ↗</a>. Затем нажмите «Проверить подключение».';
+  }else if(!result.webhook_ready){
+   holder.textContent='Telegram-бот ещё не активирован. Сейчас можно проверять статус заказа на сайте.';
+  }else{
+   holder.textContent='Подписка пока не найдена. Нажмите «Подключить Telegram» и подтвердите запуск бота.';
+  }
+ }catch(error){
+  const holder=$('yadTgConnectStatus');if(holder)holder.textContent=String(error?.message||'Telegram временно недоступен.');
+ }finally{
+  if(button){button.disabled=false;button.textContent=action==='link'?'Подключить Telegram':'Проверить подключение'}
+ }
 }
 async function checkLastOrderStatus(button){
  if(!lastOrder?.statusToken)return;
@@ -346,6 +378,10 @@ async function checkLastOrderStatus(button){
 }
 $('orderReceipt').addEventListener('click',async event=>{
  if(!lastOrder)return;
+ const tgConnect=event.target.closest('[data-tg-connect]');
+ if(tgConnect){await customerTelegramConnect(tgConnect,'link');return}
+ const tgCheck=event.target.closest('[data-tg-check]');
+ if(tgCheck){await customerTelegramConnect(tgCheck,'info');return}
  const check=event.target.closest('[data-order-status]');
  if(check){await checkLastOrderStatus(check);return}
  if(event.target.closest('[data-order-forget]')){
