@@ -31,6 +31,12 @@ button.primary{background:#2b2925;color:#fff;border-color:#2b2925}
 .order-item span{white-space:nowrap;font-weight:600}
 .order-status select{width:100%}
 @media(max-width:550px){main{padding:20px 13px 95px}.login{padding:21px}.order-top{gap:8px}.total{font-size:19px}.metric{padding:13px}.metric strong{font-size:21px}.controls input,.controls select{width:100%}.pager{gap:9px}.pager button{padding:9px 11px}}
+
+/* Manual, consent-respecting admin status updates */
+.customer-update-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:9px}
+.customer-update-actions .contact-link{margin:0}
+.status-draft{background:#f8f5ef;color:#453c32;border:1px solid #d9cec1;min-height:39px;padding:8px 12px;font-size:12px}
+.status-draft-note{display:block;color:#827c72;font-size:11px;margin-top:6px}
 </style></head>
 <body><main><header><div class="logo">YAD</div><button id="logout" hidden>Выйти</button></header><section id="login" class="login"><h1>Управление заказами</h1><p class="muted">Закрытая панель YAD</p><form id="loginForm"><input type="password" id="password" autocomplete="current-password" placeholder="Пароль администратора" required minlength="12"><button class="primary" type="submit">Войти</button></form><p id="loginStatus" class="error" role="status"></p></section>
 <section id="dashboard" hidden><h1>Заказы</h1><p class="muted">Заказы YAD · Москва (UTC+3) · доступ только администратору</p><div class="metrics"><div class="metric"><span class="muted">Сегодня · заказы</span><strong id="todayCount">0</strong></div><div class="metric"><span class="muted">Сегодня · сумма</span><strong id="todaySum">0 ₽</strong></div><div class="metric"><span class="muted">За 7 дней · сумма заявок</span><strong id="weekSum">0 ₽</strong></div><div class="metric"><span class="muted">Новые · требуют внимания</span><strong id="newCount">0</strong></div></div><div class="toolbar"><span id="summary" class="muted"></span><button id="refresh">Обновить</button></div><div class="controls"><input id="searchOrders" type="search" placeholder="Номер, имя, контакт, адрес" aria-label="Поиск заказов"><select id="filterStatus" aria-label="Фильтр по статусу"><option value="all">Все статусы</option><option value="new">Новые</option><option value="confirmed">Подтверждённые</option><option value="paid">Оплачен</option><option value="shipped">Отправленные</option><option value="completed">Завершённые</option><option value="cancelled">Отменённые</option></select></div><p id="message" role="status" aria-live="polite"></p><div id="orders" class="orders"></div><div class="pager"><button id="prevPage" type="button">← Назад</button><span id="pageLabel" class="muted"></span><button id="nextPage" type="button">Дальше →</button></div><p class="admin-footnote">Суммы показывают стоимость заявок, а не фактически полученную оплату. Статус «Оплачен» ставьте только после подтверждения поступления денег.</p></section></main>
@@ -53,12 +59,17 @@ async function request(url,options={}){
 function showDashboard(on){
  $('login').hidden=on;$('dashboard').hidden=!on;$('logout').hidden=!on;
 }
+function statusMessage(o){
+ const name=Object.prototype.hasOwnProperty.call(statusLabels,o.status)?statusLabels[o.status]:'Новый';
+ const number=String(o.public_id||'').slice(0,8).toUpperCase();
+ return 'Здравствуйте! Это YAD. Статус вашего заказа №'+number+': «'+name+'». Спасибо, что выбрали YAD. Если возникнут вопросы, напишите нам.';
+}
 function contactLink(o){
  const c=String(o.contact_value||'').trim();
  if(o.contact_method==='telegram'&&/^@[A-Za-z0-9_]{5,32}$/.test(c))return 'https://t.me/'+c.slice(1);
  if(o.contact_method==='whatsapp'){
   const digits=c.replace(/\D/g,'');
-  if(digits.length>=10&&digits.length<=15)return 'https://wa.me/'+digits;
+  if(digits.length>=10&&digits.length<=15)return 'https://wa.me/'+digits+'?text='+encodeURIComponent(statusMessage(o));
  }
  return '';
 }
@@ -92,7 +103,7 @@ function renderOrders(){
   return '<article class="order">'+
    '<div class="order-top"><div><div class="order-id" title="'+safe(o.public_id)+'">№'+safe(number)+'</div><div class="muted">'+safe(date(o.created_at))+'</div></div><div class="total">'+money(o.total_rub)+'</div></div>'+
    '<div class="details"><div><small>Покупатель</small>'+safe(o.customer_name)+'</div>'+
-   '<div><small>Связь · '+safe(o.contact_method)+'</small>'+safe(o.contact_value)+(contact?'<div><a class="contact-link" target="_blank" rel="noopener noreferrer" href="'+safe(contact)+'">Написать покупателю ↗</a></div>':'')+'</div>'+
+   '<div><small>Связь · '+safe(o.contact_method)+'</small>'+safe(o.contact_value)+(contact?'<div class="customer-update-actions"><a class="contact-link" target="_blank" rel="noopener noreferrer" href="'+safe(contact)+'">'+(o.contact_method==='whatsapp'?'Открыть сообщение ↗':'Открыть чат ↗')+'</a><button class="status-draft" data-draft-id="'+safe(o.public_id)+'" type="button">Скопировать сообщение</button></div><small class="status-draft-note">Уведомление подготовлено, но не отправлено. Отправка вручную.</small>':'')+'</div>'+
    '<div><small>Доставка</small>'+safe(o.delivery_service)+' · '+safe(o.pickup_address)+'</div>'+
    '<div><small>Комментарий</small>'+safe(o.comment||'—')+'</div></div>'+
    '<div class="items">'+products+'</div>'+
@@ -137,6 +148,20 @@ $('loginForm').addEventListener('submit',async e=>{
  }catch(e){
   $('loginStatus').textContent=e.message;
  }finally{button.disabled=false}
+});
+$('orders').addEventListener('click',async e=>{
+ const button=e.target.closest('[data-draft-id]');if(!button)return;
+ const row=cachedOrders.find(o=>String(o.public_id)===button.dataset.draftId);if(!row)return;
+ const message=statusMessage(row);
+ let copied=false;
+ try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(message);copied=true}}catch{}
+ if(!copied){
+  const field=document.createElement('textarea');field.value=message;
+  field.style.position='fixed';field.style.opacity='0';document.body.appendChild(field);field.select();
+  try{copied=document.execCommand('copy')}catch{}field.remove();
+ }
+ $('message').textContent=copied?'Текст уведомления скопирован. Откройте чат и отправьте его покупателю.':'Не удалось скопировать сообщение. Проверьте разрешение на буфер обмена.';
+ $('message').className=copied?'success':'error';
 });
 $('orders').addEventListener('change',async e=>{
  const el=e.target.closest('select[data-id]');
