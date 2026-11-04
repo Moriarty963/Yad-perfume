@@ -206,15 +206,46 @@ function scentMatches(f,terms){
  const latin=translitScent(base);
  return terms.every(term=>base.includes(term)||latin.includes(translitScent(term)));
 }
+// Small, transparent note finder based only on notes in YAD's own catalog.
+// A match means the named note appears in the catalog description, not
+// a personal recommendation or a guarantee about how perfume will smell.
+const scentNoteFilters=[
+ ['мускус','Мускус'],['ваниль','Ваниль'],['бергамот','Бергамот'],
+ ['амбра','Амбра'],['кедр','Кедр'],['грейпфрут','Грейпфрут']
+];
+let activeScentNote='';
+function matchesCatalogNote(f,note){
+ return !note||foldScent(f.notes).includes(foldScent(note));
+}
+function renderNoteOptions(){
+ const template=(source)=>scentNoteFilters.map(([key,label])=>{
+  const count=fragrances.filter(f=>matchesCatalogNote(f,key)).length;
+  return '<button type="button" data-note-filter="'+key+'" data-note-source="'+source+'" aria-pressed="false" aria-label="Нота '+safe(label)+', '+count+' ароматов">'+safe(label)+' <span class="note-count" aria-hidden="true">'+count+'</span></button>';
+ }).join('');
+ $('marketNoteOptions').innerHTML=template('home');
+ $('catalogNoteOptions').innerHTML=template('catalog');
+}
+function syncNoteOptions(matchCount){
+ document.querySelectorAll('[data-note-filter]').forEach(button=>{
+  const pressed=button.dataset.noteFilter===activeScentNote;
+  button.setAttribute('aria-pressed',String(pressed));
+ });
+ const hint=$('noteFilterHint');if(!hint)return;
+ const entry=scentNoteFilters.find(([key])=>key===activeScentNote);
+ hint.textContent=entry
+  ?(matchCount?('Нота «'+entry[1]+'»: '+matchCount+' ароматов с учётом остальных фильтров. Нажмите ещё раз, чтобы убрать ноту.'):'С этой нотой и текущими фильтрами ничего не найдено. Уберите ноту или сбросьте фильтры.')
+  :'Выберите одну ноту, чтобы уточнить поиск. Числа показывают ароматы с этой нотой в каталоге.';
+}
+renderNoteOptions();
 const catalogPageSize=12;
 let catalogVisibleLimit=catalogPageSize,catalogViewKey='',renderedCatalogIds=[];
-function renderProducts(){const query=foldScent($('search').value);const terms=query?query.split(/\s+/).filter(Boolean):[];const family=$('family').value,audience=$('audience').value;let items=fragrances.filter(f=>(!favoritesOnly||favorites.includes(f.id))&&(family==='all'||f.family===family)&&(audience==='all'||f.audience===audience)&&scentMatches(f,terms));const sort=$('sort').value;if(sort==='name')items.sort((a,b)=>a.name.localeCompare(b.name,'ru'));if(sort==='name-desc')items.sort((a,b)=>b.name.localeCompare(a.name,'ru'));const key=JSON.stringify([query,family,audience,sort,favoritesOnly]);if(catalogViewKey!==key){catalogViewKey=key;catalogVisibleLimit=catalogPageSize;renderedCatalogIds=[]}
+function renderProducts(){const query=foldScent($('search').value);const terms=query?query.split(/\s+/).filter(Boolean):[];const family=$('family').value,audience=$('audience').value;let items=fragrances.filter(f=>(!favoritesOnly||favorites.includes(f.id))&&(family==='all'||f.family===family)&&(audience==='all'||f.audience===audience)&&scentMatches(f,terms)&&matchesCatalogNote(f,activeScentNote));const sort=$('sort').value;if(sort==='name')items.sort((a,b)=>a.name.localeCompare(b.name,'ru'));if(sort==='name-desc')items.sort((a,b)=>b.name.localeCompare(a.name,'ru'));const key=JSON.stringify([query,family,audience,sort,favoritesOnly,activeScentNote]);if(catalogViewKey!==key){catalogViewKey=key;catalogVisibleLimit=catalogPageSize;renderedCatalogIds=[]}
 const shown=items.slice(0,catalogVisibleLimit),shownIds=shown.map(f=>f.id);
 const append=renderedCatalogIds.length>0&&shownIds.length>renderedCatalogIds.length&&renderedCatalogIds.every((id,index)=>id===shownIds[index]);
 const toRender=append?shown.slice(renderedCatalogIds.length):shown;
-$('catalogCount').textContent=items.length===0?'Ничего не найдено':`Показано ${shown.length} из ${items.length} ароматов`;
+$('catalogCount').textContent=items.length===0?'Ничего не найдено':`Показано ${shown.length} из ${items.length} ароматов`;syncNoteOptions(items.length);
 const markup=toRender.map((f,index)=>`<article class="product" data-card-detail="${f.id}"><div class="product-art scene-${f.family} " style="--glow:${f.glow}"><div class="scene-backdrop" aria-hidden="true"><i class="scene-light"></i><i class="scene-ridge ridge-one"></i><i class="scene-ridge ridge-two"></i><i class="scene-branch"></i><i class="scene-stone"></i><i class="scene-foreground"></i></div>${photoMarkup(20,f.id,!append&&index<2)}<span class="atelier-card-media-label" aria-label="Тип изображения">${yadMediaLabel(yadProductImage(f.id,20))}</span><div class="yad-product-bottle volume-20" aria-hidden="true"><div class="yad-cap"></div><div class="yad-collar"></div><div class="yad-glass"><div class="yad-tube"></div><div class="yad-label"><span>YAD PERFUME</span><strong>${safe(f.name)}</strong><small>EXTRAIT DE PARFUM<br><span class="bottle-volume">20 мл</span></small></div></div></div><button type="button" class="favorite-toggle" data-favorite="${f.id}" aria-pressed="${favorites.includes(f.id)}" aria-label="${favorites.includes(f.id)?'Убрать из избранного':'В избранное'}: ${safe(f.name)}">${favorites.includes(f.id)?'♥':'♡'}</button></div><div class="product-info"><a class="product-image-link" href="/fragrance/${f.id}" data-detail="${f.id}" aria-label="Подробнее об аромате ${safe(f.name)}">Подробнее об аромате ↗</a><div class="product-meta"><span class="product-audience" data-audience="${f.audience}">${audienceLabels[f.audience]}</span><span>№ ${String(fragrances.indexOf(f)+1).padStart(2,"0")}</span></div><h3><a class="product-detail-link" href="/fragrance/${f.id}" data-detail="${f.id}">${safe(f.name)}</a></h3><p class="product-aroma-description">${safe(aromaDescription(f))}</p><p class="product-aroma-notes"><span>Ноты</span> ${safe(f.notes)}</p><p class="product-price">${rub(prices[20])}</p><select aria-label="Объём ${safe(f.name)}" id="size-${f.id}">${Object.entries(prices).map(([ml,p])=>`<option value="${ml}" ${ml==='20'?'selected':''}>${ml} мл — ${rub(p)}</option>`).join('')}</select><button data-add="${f.id}">Добавить в корзину ↗</button></div></article>`).join('');
-const holder=$('products');if(append){holder.insertAdjacentHTML('beforeend',markup)}else{holder.innerHTML=markup||'<p>Ароматы не найдены. Попробуйте другой запрос.</p>'}
+const holder=$('products');if(append){holder.insertAdjacentHTML('beforeend',markup)}else{holder.innerHTML=markup||'<p>Ароматы не найдены. Попробуйте другую ноту, направление или сбросьте фильтры.</p>'}
 renderedCatalogIds=shownIds;
 const more=$('catalogMore');if(more){more.hidden=shown.length>=items.length;$('catalogMoreCount').textContent=more.hidden?'':`Ещё ${items.length-shown.length} ароматов в коллекции`;}
 }
@@ -478,7 +509,7 @@ function syncAudienceButtons(){const current=$('audience').value;document.queryS
 function selectAudience(value){if(!['all','men','women','unisex'].includes(value))return;$('audience').value=value;syncAudienceButtons();renderProducts()}
 $('catalogAudiences').addEventListener('click',e=>{const b=e.target.closest('[data-audience]');if(b)selectAudience(b.dataset.audience)});
 $('audience').addEventListener('change',()=>selectAudience($('audience').value));
-$('search').addEventListener('input',renderProducts);$('family').addEventListener('change',renderProducts);$('sort').addEventListener('change',renderProducts);$('resetFilters').addEventListener('click',()=>{$('search').value='';$('family').value='all';$('audience').value='all';syncAudienceButtons();$('sort').value='default';favoritesOnly=false;updateFavoritesUI();renderProducts()});$('products').addEventListener('click',e=>{const favorite=e.target.closest('[data-favorite]');if(favorite){toggleFavorite(favorite.dataset.favorite);return}let b=e.target.closest('[data-add]');if(b){add(b.dataset.add,Number($('size-'+b.dataset.add).value));return}const detail=e.target.closest('[data-detail]');if(detail){e.preventDefault();navigate('fragrance/'+detail.dataset.detail);return}const share=e.target.closest('[data-share]');if(share){shareFragrance(share.dataset.share);return}const card=e.target.closest('.product[data-card-detail]');if(card&&!e.target.closest('button,select,option,input,textarea,label,a,[contenteditable]')){navigate('fragrance/'+card.dataset.cardDetail)}});$('favoritesFilter').addEventListener('click',()=>{favoritesOnly=!favoritesOnly;updateFavoritesUI();renderProducts()});updateFavoritesUI();$('addDiscovery').addEventListener('click',()=>add('discovery',0));$('cartButton').addEventListener('click',openCart);$('mobileCartBar').addEventListener('click',openCart);
+$('search').addEventListener('input',renderProducts);$('family').addEventListener('change',renderProducts);$('sort').addEventListener('change',renderProducts);$('resetFilters').addEventListener('click',()=>{$('search').value='';$('family').value='all';$('audience').value='all';syncAudienceButtons();$('sort').value='default';activeScentNote='';favoritesOnly=false;updateFavoritesUI();renderProducts()});$('products').addEventListener('click',e=>{const favorite=e.target.closest('[data-favorite]');if(favorite){toggleFavorite(favorite.dataset.favorite);return}let b=e.target.closest('[data-add]');if(b){add(b.dataset.add,Number($('size-'+b.dataset.add).value));return}const detail=e.target.closest('[data-detail]');if(detail){e.preventDefault();navigate('fragrance/'+detail.dataset.detail);return}const share=e.target.closest('[data-share]');if(share){shareFragrance(share.dataset.share);return}const card=e.target.closest('.product[data-card-detail]');if(card&&!e.target.closest('button,select,option,input,textarea,label,a,[contenteditable]')){navigate('fragrance/'+card.dataset.cardDetail)}});$('favoritesFilter').addEventListener('click',()=>{favoritesOnly=!favoritesOnly;updateFavoritesUI();renderProducts()});updateFavoritesUI();$('addDiscovery').addEventListener('click',()=>add('discovery',0));$('cartButton').addEventListener('click',openCart);$('mobileCartBar').addEventListener('click',openCart);
 const bottomNav=document.querySelector('.yad-bottom-nav');
 const pages=['home','catalog','favorites','cart'];
 function currentPage(){const p=location.pathname.split('/').filter(Boolean).join('/');return pages.includes(p)||(p.startsWith('fragrance/')&&fragrances.some(f=>f.id===p.slice(10)))?p:'home'}
@@ -544,7 +575,7 @@ function renderMarketHome(){
  $('marketFeatured').innerHTML=featured.map(f=>`<article class="market-card"><a href="/fragrance/${f.id}" data-market-detail="${f.id}" class="market-card-photo scene-${f.family}" style="--glow:${f.glow}" aria-label="Открыть ${safe(f.name)}">${photoMarkup(100,f.id)}<div class="market-mini-bottle"><span>YAD</span><small>${safe(f.name)}</small></div></a><div class="market-card-copy"><span>${audienceLabels[f.audience]} · ${safe(f.notes)}</span><a href="/fragrance/${f.id}" data-market-detail="${f.id}">${safe(f.name)}</a><div class="market-card-bottom"><strong>от ${rub(prices[6])}</strong><button type="button" data-market-add="${f.id}" aria-label="Выбрать объём ${safe(f.name)}">→</button></div></div></article>`).join('');
 }
 function marketCatalog(family='all',focus=false,audience='all'){
- navigate('catalog');$('family').value=family;$('audience').value=audience;syncAudienceButtons();$('search').value='';renderProducts();
+ activeScentNote='';navigate('catalog');$('family').value=family;$('audience').value=audience;syncAudienceButtons();$('search').value='';renderProducts();
  if(focus)$('search').focus();
 }
 $('marketSearch').addEventListener('click',()=>marketCatalog('all',true));
@@ -579,7 +610,7 @@ function renderPage(){
  const isDetail=page.startsWith('fragrance/');const catalogPage=page==='catalog'||page==='favorites';
  document.querySelectorAll('main > *').forEach(el=>{el.hidden=isDetail?el.id!=='fragranceDetail':catalogPage?el.id!=='catalog':page==='home'?el.id!=='marketHome':true});
  $('catalog').hidden=!catalogPage;if(isDetail)renderFragranceDetail(page.split('/')[1]);
- if(page==='favorites'){favoritesOnly=true;$('search').value='';$('family').value='all';$('audience').value='all';syncAudienceButtons()}
+ if(page==='favorites'){favoritesOnly=true;activeScentNote='';$('search').value='';$('family').value='all';$('audience').value='all';syncAudienceButtons()}
  else if(page==='catalog'){favoritesOnly=false}
  updateFavoritesUI();renderProducts();
  const isCart=page==='cart';
@@ -698,6 +729,24 @@ $('submitSiteOrder').addEventListener('click',async()=>{
 });
 async function shareFragrance(id){const item=fragrances.find(f=>f.id===id);if(!item)return;const url=new URL('/fragrance/'+encodeURIComponent(id),window.location.origin);const payload={title:'YAD — '+item.name,text:item.name+' · '+item.notes,url:url.toString()};try{if(navigator.share){await navigator.share(payload);return}}catch(error){if(error&&error.name==='AbortError')return}try{await navigator.clipboard.writeText(payload.url);notify('Ссылка на аромат скопирована')}catch{const field=document.createElement('textarea');field.value=payload.url;field.style.position='fixed';field.style.opacity='0';document.body.appendChild(field);field.select();const copied=document.execCommand('copy');field.remove();notify(copied?'Ссылка на аромат скопирована':'Не удалось скопировать ссылку')}}
 function openLinkedFragrance(){const id=new URLSearchParams(window.location.search).get('aroma');const item=fragrances.find(f=>f.id===id);if(!item)return;if(currentPage()!=='catalog')navigate('catalog');$('search').value='';$('family').value='all';$('audience').value='all';syncAudienceButtons();$('sort').value='default';syncMood();renderProducts();const index=fragrances.findIndex(f=>f.id===id);catalogVisibleLimit=Math.max(catalogVisibleLimit,Math.ceil((index+1)/catalogPageSize)*catalogPageSize);renderProducts();const card=[...document.querySelectorAll('.product[data-card-detail]')].find(el=>el.dataset.cardDetail===id);if(!card)return;card.classList.add('linked-product');requestAnimationFrame(()=>card.scrollIntoView({behavior:'auto',block:'center'}))}
+// One selected note at a time; on the homepage the tap opens real catalog results.
+document.addEventListener('click',event=>{
+ const chip=event.target.closest('[data-note-filter]');if(!chip)return;
+ const note=chip.dataset.noteFilter;
+ if(!scentNoteFilters.some(([key])=>key===note))return;
+ if(chip.dataset.noteSource==='home'){
+  marketCatalog();
+  activeScentNote=note;
+  renderProducts();
+  requestAnimationFrame(()=>$('catalogCount').scrollIntoView({
+   block:'start',
+   behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'
+  }));
+ }else{
+  activeScentNote=activeScentNote===note?'':note;
+  renderProducts();
+ }
+});
 const moodLabels={fresh:'Свежесть и свобода',woody:'Спокойная уверенность',floral:'Мягкость и нежность',intense:'Яркое впечатление'};function syncMood(){const selected=$('family').value;document.querySelectorAll('[data-mood]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mood===selected)));$('moodHint').textContent=moodLabels[selected]?'Подобраны ароматы направления «'+moodLabels[selected]+'». Это ориентир по нотам, а не индивидуальная рекомендация.':'Выберите настроение — покажем подходящее направление коллекции.'}document.querySelectorAll('[data-mood]').forEach(button=>button.addEventListener('click',()=>{$('search').value='';$('family').value=$('family').value===button.dataset.mood?'all':button.dataset.mood;syncMood();renderProducts();$('products').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'})}));$('family').addEventListener('change',syncMood);$('resetFilters').addEventListener('click',syncMood);syncMood();
 $('search').addEventListener('keydown',e=>{if(e.key==='Escape'&&$('search').value){$('search').value='';renderProducts()}});// Personal contact details stay in the current page only, not persistent browser storage.
 try{localStorage.removeItem('yad-customer-v1')}catch{};
