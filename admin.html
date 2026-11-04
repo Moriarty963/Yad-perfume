@@ -187,7 +187,10 @@ async function load(){
    showDashboard(false);
    $('loginStatus').textContent=e.status===503?'Административная панель пока не настроена.':'';
   }else{
-   $('message').textContent=e.message;
+   // A valid sign-in may succeed even if loading the database fails.
+   // Never conceal that error behind the login screen or imply a wrong password.
+   showDashboard(true);
+   $('message').textContent='Авторизация выполнена, но заказы не загрузились: '+e.message+'. Нажмите «Обновить».';
    $('message').className='error';
   }
  }finally{
