@@ -222,6 +222,7 @@ function renderCart(){const quantity=cart.reduce((s,x)=>s+x.qty,0);const sum=car
  $('checkoutPanel').hidden=cart.length===0;
  renderCheckoutReview();
  renderOrderReceipt();
+ renderOrderHistory();
 }
 function orderProductLine(x){
  return x.id==='discovery'?'Набор 3 × 6 мл':x.ml+' мл · '+packagingName(x);
@@ -253,6 +254,49 @@ function orderStatusTimestamp(iso){
  if(!iso||!Number.isFinite(new Date(iso).getTime()))return 'Пока не проверяли';
  return 'Проверено '+new Date(iso).toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'});
 }
+function renderOrderHistory(){
+ const holder=$('orderHistory');if(!holder)return;
+ const show=orderHistory.length>1||(orderHistory.length>0&&cart.length>0);
+ holder.hidden=!show;
+ if(!show){holder.innerHTML='';return}
+ const list=holder.querySelector('.order-history-list');
+ const expanded=list?list.open:true;
+ const expandedItems=new Set(Array.from(holder.querySelectorAll('details[data-history-detail][open]')).map(x=>x.dataset.historyDetail));
+ const rows=orderHistory.map(o=>{
+  const valid=Object.prototype.hasOwnProperty.call(orderStatusDetails,o.status);
+  const label=valid?orderStatusDetails[o.status][0]:'Новый';
+  const date=new Date(o.savedAt).toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'});
+  const lines=o.items.map(x=>'<div class="order-history-product"><div><strong>'+safe(x.name)+'</strong><small>'+safe(x.description)+' · '+Number(x.qty)+' шт.</small></div><span>'+rub(Number(x.price)||0)+'</span></div>').join('');
+  const detailOpen=expandedItems.has(o.number);
+  return '<article class="order-history-item">'+
+   '<div class="order-history-head"><div><strong>№'+safe(o.number)+'</strong><small>'+safe(date)+'</small></div><div class="order-history-head-right"><span class="order-history-badge status-'+safe(o.status)+'">'+safe(label)+'</span><strong>'+rub(o.total)+'</strong></div></div>'+
+   '<details data-history-detail="'+safe(o.number)+'"'+(detailOpen?' open':'')+'><summary>Состав заказа</summary><div class="order-history-products">'+lines+'</div></details>'+
+   '<div class="order-history-actions"><button type="button" data-history-open="'+safe(o.number)+'">Открыть заказ</button>'+
+   (o.statusToken?'<button type="button" data-history-check="'+safe(o.number)+'">Проверить статус</button>':'')+
+   '<button type="button" class="order-history-remove" data-history-remove="'+safe(o.number)+'">Удалить</button></div></article>';
+ }).join('');
+ holder.innerHTML='<details class="order-history-list"'+(expanded?' open':'')+'><summary><span>Мои заявки</span><small>'+orderHistory.length+' сохранено на этом устройстве</small></summary><p class="order-history-note">Это история в текущем браузере, а не личный кабинет. Статусы обновляются только при проверке.</p>'+rows+'</details>';
+}
+$('orderHistory').addEventListener('click',async e=>{
+ const target=e.target.closest('[data-history-open],[data-history-check],[data-history-remove]');
+ if(!target)return;
+ const number=target.dataset.historyOpen||target.dataset.historyCheck||target.dataset.historyRemove;
+ const order=orderHistory.find(x=>x.number===number);if(!order)return;
+ if(target.hasAttribute('data-history-remove')){
+  if(window.confirm('Удалить заявку №'+number+' из истории на этом устройстве?'))deleteSavedOrder(number);
+  return;
+ }
+ lastOrder=order;
+ persistLocalOrderHistory();
+ if(target.hasAttribute('data-history-check')){
+  await checkLastOrderStatus(target);
+  return;
+ }
+ renderOrderReceipt();
+ renderOrderHistory();
+ if(!cart.length)$('orderReceipt')?.scrollIntoView({block:'start',behavior:'smooth'});
+ else notify('Заказ выбран. Чтобы просмотреть подтверждение, завершите или очистите текущую корзину.');
+});
 function renderOrderReceipt(){
  const holder=$('orderReceipt');if(!holder)return;
  const show=!cart.length&&!!lastOrder;
