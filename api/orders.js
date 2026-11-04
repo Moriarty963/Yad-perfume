@@ -1,10 +1,12 @@
 const {neon}=require('@neondatabase/serverless');
 const prices={6:500,10:700,20:1300,30:1800,50:2700,100:5000};
-const allowed=new Set(['immensite','imagination','escentric02','tygar','aventus','kirke','blackpepper','amberwood','tilia','megamare']);
+const {YAD_CATALOG_ROWS}=require('../catalog-data.js');
+const allowed=new Set(YAD_CATALOG_ROWS.map(([id])=>id));
 const fee=250;
 const travelSurcharge={6:90,10:90};
 const travelColors=new Set(['Чёрный','Белый мрамор','Серый мрамор']);
-const perfumeNames={immensite:"L’Immensité",imagination:"Imagination",escentric02:"Escentric 02",tygar:"Tygar",aventus:"Aventus",kirke:"Kirke",blackpepper:"Black Pepper",amberwood:"Amber Wood",tilia:"Tilia",megamare:"Megamare",discovery:"Discovery Set"};
+const perfumeNames=Object.fromEntries(YAD_CATALOG_ROWS.map(([id,name])=>[id,name]));
+perfumeNames.discovery='Discovery Set';
 function telegramEscape(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function rub(n){return new Intl.NumberFormat('ru-RU').format(n)+' ₽'}
 async function notifyTelegram(order,b,items){
