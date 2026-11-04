@@ -1189,3 +1189,10 @@ body[data-page="cart"] .drawer-bottom .delivery-choice label:has(input:checked){
  .detail-aroma-description{margin:14px 0 19px}
  .detail-aroma-description>p{font-size:12px;line-height:1.65}
 }
+
+/* Click-anywhere fragrance cards: keep product controls independent. */
+.products .product[data-card-detail]{cursor:pointer;transition:border-color .18s ease,box-shadow .18s ease}
+@media(hover:hover) and (pointer:fine){
+ .products .product[data-card-detail]:hover{border-color:#cbc1b4;box-shadow:0 9px 24px rgba(39,34,28,.09)}
+}
+@media(prefers-reduced-motion:reduce){.products .product[data-card-detail]{transition:none}}
