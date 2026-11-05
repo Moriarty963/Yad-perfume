@@ -76,7 +76,7 @@ module.exports=async(req,res)=>{
   if(req.method==='PATCH'&&req.query.action==='review'){
    const body=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
    const rid=String(body.id||''),state=String(body.status||'');
-   if(!/^\\d{1,18}$/.test(rid)||!['approved','rejected'].includes(state))
+   if(!/^\d{1,18}$/.test(rid)||!['approved','rejected'].includes(state))
     return res.status(400).json({error:'Неверное действие.'});
    const result=await sql`UPDATE yad_fragrance_reviews SET status=${state},moderated_at=now()
     WHERE id=${rid}::bigint AND status='pending' RETURNING id,status`;
