@@ -1,6 +1,6 @@
 'use strict';
 const crypto=require('node:crypto');
-const {database,available}=require('../lib/yad-club-db');
+const {database,available,storageAvailable}=require('../lib/yad-club-db');
 const COOKIE='yad_club_session';
 const DAYS=30;
 const MAX_BODY=1700;
@@ -45,16 +45,17 @@ module.exports=async(req,res)=>{
  res.setHeader('Cache-Control','no-store');
  res.setHeader('X-Content-Type-Options','nosniff');
  if(!['GET','POST','PATCH','DELETE'].includes(req.method)){res.setHeader('Allow','GET, POST, PATCH, DELETE');return res.status(405).json({error:'Метод не поддерживается.'})}
- if(!available())return res.status(503).json({enabled:false,error:'Регистрация YAD Club готовится к запуску.'});
+ if(!storageAvailable())return res.status(503).json({enabled:false,error:'Регистрация YAD Club готовится к запуску.'});
  if(req.method!=='GET'&&!sameOrigin(req))return res.status(403).json({error:'Запрос не прошёл проверку безопасности.'});
  const action=String(req.query?.action||'');
  try{
   const db=database();
   if(req.method==='GET'){
    const member=await getMember(db,req);
-   return res.status(200).json({enabled:true,authenticated:Boolean(member),member:member?publicMember(member):null});
+   return res.status(200).json({enabled:true,signup_open:available(),authenticated:Boolean(member),member:member?publicMember(member):null});
   }
   if(req.method==='POST'&&action==='start'){
+   if(!available())return res.status(503).json({error:'Письма для регистрации сейчас недоступны.'});
    const b=await safeBody(req);
    const email=formatEmail(b.email);
    const name=String(b.name||'').trim();
