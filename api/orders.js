@@ -34,7 +34,7 @@ async function notifyTelegram(order,b,items){
   '',
   '👤 <b>ПОКУПАТЕЛЬ</b>',
   telegramEscape(b.name.trim()),
-  'Связь: '+(b.method==='whatsapp'?'WhatsApp':'Telegram'),
+  'Связь: '+(b.method==='whatsapp'?'WhatsApp':'Telegram (бот после подключения)'),
   '<code>'+telegramEscape(b.contact.trim())+'</code>',
   '',
   '📦 <b>ДОСТАВКА</b>',
@@ -56,6 +56,7 @@ async function notifyTelegram(order,b,items){
  }catch(e){console.error('YAD notification unavailable',e?.message)}
 }
 function validText(v,max){return typeof v==='string'&&v.trim().length>0&&v.trim().length<=max}
+function validPhone(v){return typeof v==='string'&&/^\+?[\d\s()\-]{10,25}$/.test(v.trim())&&v.replace(/\D/g,'').length>=10&&v.replace(/\D/g,'').length<=15}
 module.exports=async(req,res)=>{
  res.setHeader('Cache-Control','no-store');
  if(req.method!=='POST'){res.setHeader('Allow','POST');return res.status(405).json({error:'Method not allowed'})}
@@ -63,8 +64,8 @@ module.exports=async(req,res)=>{
  try{
   const b=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
   if(!validText(b.name,100)||!validText(b.contact,150)||!validText(b.address,350)||!['telegram','whatsapp'].includes(b.method)||!['Wildberries','Ozon'].includes(b.delivery)||typeof b.comment!=='string'||b.comment.length>500)return res.status(400).json({error:'Проверьте данные покупателя и доставки.'});
-  if(b.method==='telegram'&&!/^@[A-Za-z0-9_]{5,32}$/.test(b.contact.trim()))return res.status(400).json({error:'Укажите Telegram в формате @username (от 5 символов).'});
-  if(b.method==='whatsapp'&&!/^\+?[\d\s()\-]{10,25}$/.test(b.contact.trim()))return res.status(400).json({error:'Укажите номер WhatsApp.'});
+  if(b.method==='telegram'&&!validPhone(b.contact)&&!/^@[A-Za-z0-9_]{5,32}$/.test(b.contact.trim()))return res.status(400).json({error:'Укажите телефон для связи. Telegram можно подключить после заказа.'});
+  if(b.method==='whatsapp'&&!validPhone(b.contact))return res.status(400).json({error:'Укажите корректный номер телефона для WhatsApp.'});
   if(!Array.isArray(b.items)||b.items.length<1||b.items.length>30)return res.status(400).json({error:'Добавьте товары в корзину.'});
   let subtotal=0;
   const items=[];
@@ -80,7 +81,7 @@ module.exports=async(req,res)=>{
   if(subtotal>1000000)return res.status(400).json({error:'Слишком большая сумма заказа.'});
   const orderDeliveryFee=items.some(item=>item.ml===100)?0:fee;
   const sql=neon(process.env.DATABASE_URL);
-  const rows=await sql`INSERT INTO yad_orders (customer_name,customer_phone,contact_method,contact_value,delivery_service,pickup_address,comment,items,subtotal_rub,delivery_rub,total_rub) VALUES (${b.name.trim()},${b.method==='whatsapp'?b.contact.trim():null},${b.method},${b.contact.trim()},${b.delivery},${b.address.trim()},${b.comment.trim()},${JSON.stringify(items)}::jsonb,${subtotal},${orderDeliveryFee},${subtotal+orderDeliveryFee}) RETURNING public_id,created_at,subtotal_rub,delivery_rub,total_rub`;
+  const rows=await sql`INSERT INTO yad_orders (customer_name,customer_phone,contact_method,contact_value,delivery_service,pickup_address,comment,items,subtotal_rub,delivery_rub,total_rub) VALUES (${b.name.trim()},${validPhone(b.contact)?b.contact.trim():null},${b.method},${b.contact.trim()},${b.delivery},${b.address.trim()},${b.comment.trim()},${JSON.stringify(items)}::jsonb,${subtotal},${orderDeliveryFee},${subtotal+orderDeliveryFee}) RETURNING public_id,created_at,subtotal_rub,delivery_rub,total_rub`;
   await notifyTelegram(rows[0],b,items);return res.status(201).json({order_id:rows[0].public_id,total:rows[0].total_rub,status_token:issueToken(rows[0].public_id)});
  }catch(e){console.error('YAD order submission failed',e?.message);return res.status(500).json({error:'Не удалось сохранить заказ. Попробуйте ещё раз.'})}
 };
