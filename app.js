@@ -444,7 +444,7 @@ function renderCheckoutReview(){
  holder.innerHTML=cart.map(x=>`<div class="checkout-review-row"><img src="${x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}" loading="lazy" alt="" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div><strong>${safe(x.title)}</strong><small>${safe(orderProductLine(x))} · ${x.qty} шт.</small></div><span>${rub(x.price*x.qty)}</span></div>`).join('');
 }
 function receiptPlainText(order){
- return ['YAD / PERFUME ATELIER','Заявка №'+order.number,'','Состав заказа:',...order.items.map((x,i)=>(i+1)+'. '+x.name+' — '+x.description+' × '+x.qty+' = '+rub(Number(x.price)||0)),'','Доставка: '+order.delivery,'Итого с доставкой: '+rub(Number(order.total)||0),'','Заявка отправлена. '+(order.method==='telegram'?'Подключите бота Telegram в заказе, чтобы получать уведомления; без подключения мы свяжемся по вашему телефону.':'Дождитесь подтверждения от YAD в WhatsApp.')].join('\n');
+ return ['YAD / PERFUME ATELIER','Заявка №'+order.number,'','Состав заказа:',...order.items.map((x,i)=>(i+1)+'. '+x.name+' — '+x.description+' × '+x.qty+' = '+rub(Number(x.price)||0)),'','Доставка: '+order.delivery,'Итого с доставкой: '+rub(Number(order.total)||0),'','Заявка отправлена. '+(order.method==='telegram'?'Подключите бота для уведомлений в Telegram. YAD свяжется по оставленному контакту.':'Дождитесь подтверждения от YAD в WhatsApp.')].join('\n');
 }
 function orderInquiryUrl(order){
  const number=String(window.YAD_WHATSAPP_NUMBER||'').replace(/\D/g,'');
@@ -523,7 +523,7 @@ function renderOrderReceipt(){
  const trackingUI=lastOrder.statusToken
   ?`<section class="order-tracking" aria-label="Статус заявки"><div class="order-tracking-heading"><span>Актуальный статус заказа</span><span class="order-tracking-checked">${safe(checkedLabel)}</span></div><strong class="order-tracking-state status-${statusKey}">${safe(statusTitle)}</strong><p>${safe(statusDescription)}</p><button type="button" data-order-status>Проверить статус</button><p id="orderStatusMessage" class="order-tracking-message" role="status" aria-live="polite"></p></section>`
   :'<p class="order-receipt-note">Онлайн-проверка статуса доступна для новых заявок. Для этой заявки можно уточнить статус через WhatsApp.</p>';
- holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><div class="order-receipt-number"><h3>Заказ №${safe(lastOrder.number)}</h3><button type="button" class="order-copy-number" data-order-copy-number aria-label="Скопировать номер заказа ${safe(lastOrder.number)}">Скопировать №</button></div><p>${lastOrder.method==='telegram'?'Чтобы получать уведомления в Telegram, подключите бота ниже. Если не подключите, мы свяжемся по телефону.':'Мы свяжемся с вами в WhatsApp для подтверждения.'}</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div>${trackingUI}${telegramUI}<div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div><p class="order-receipt-retention">История до 15 заявок хранится только в этом браузере, без имён, телефонов и адресов. Данные хранятся не дольше 180 дней, их можно удалить.</p><button type="button" class="order-forget" data-order-forget>Удалить сведения о заявке с устройства</button>`;
+ holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><div class="order-receipt-number"><h3>Заказ №${safe(lastOrder.number)}</h3><button type="button" class="order-copy-number" data-order-copy-number aria-label="Скопировать номер заказа ${safe(lastOrder.number)}">Скопировать №</button></div><p>${lastOrder.method==='telegram'?'Чтобы получать уведомления в Telegram, подключите бота ниже. Для подтверждения свяжемся по оставленному Telegram-контакту или телефону.':'Мы свяжемся с вами в WhatsApp для подтверждения.'}</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div>${trackingUI}${telegramUI}<div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div><p class="order-receipt-retention">История до 15 заявок хранится только в этом браузере, без имён, телефонов и адресов. Данные хранятся не дольше 180 дней, их можно удалить.</p><button type="button" class="order-forget" data-order-forget>Удалить сведения о заявке с устройства</button>`;
 }
 async function customerTelegramConnect(button,action){
  const order=lastOrder;if(!order?.statusToken)return;
@@ -771,10 +771,10 @@ window.YadMiniApp?.setBackHandler(()=>{
 document.addEventListener('click',e=>{const link=e.target.closest('a[href^="#"]');if(!link)return;const href=link.getAttribute('href');if(href==='#catalog'||href==='#discovery'||href==='#philosophy'||href==='#questions'||href==='#top'){e.preventDefault();const page=href==='#catalog'?'catalog':'home';navigate(page);if(page==='home'&&href!=='#top')requestAnimationFrame(()=>document.querySelector(href)?.scrollIntoView({behavior:'smooth'}))}});
 $('continueShopping').addEventListener('click',()=>navigate('catalog'));$('clearCart').addEventListener('click',()=>{if(!cart.length)return;if(!window.confirm('Удалить все товары из корзины?'))return;cart=[];persist();$('status').textContent='Корзина очищена.';notify('Корзина очищена')});$('closeCart').addEventListener('click',closeCart);$('overlay').addEventListener('click',closeCart);document.addEventListener('keydown',e=>{if(!$('drawer').classList.contains('open')||currentPage()==='cart')return;if(e.key==='Escape'){e.preventDefault();closeCart();return}if(e.key==='Tab'){const nodes=[...$('drawer').querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),a[href]')].filter(el=>el.getClientRects().length);if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});$('cartItems').addEventListener('click',e=>{let b=e.target.closest('[data-remove],[data-increase]');if(!b)return;let i=Number(b.dataset.remove??b.dataset.increase);if(!cart[i])return;if(b.hasAttribute('data-increase')){if(cart[i].qty>=30){notify('Для одного товара максимум 30 штук.');return}cart[i].qty+=1}else{cart[i].qty--;if(!cart[i].qty)cart.splice(i,1)}persist()});
 // Checkout feedback appears next to the field requiring attention.
-const checkoutFieldIds=['customerName','customerPhone','customerAddress','customerComment'];
+const checkoutFieldIds=['customerName','customerPhone','customerAddress','customerComment','customerTelegramContact'];
 function clearCheckoutFieldIssue(){
  const note=$('checkoutFieldError');if(note)note.remove();
- checkoutFieldIds.forEach(id=>{const field=$(id);field?.removeAttribute('aria-invalid');if(id==='customerAddress')field?.setAttribute('aria-describedby','pickupServiceHint');else field?.removeAttribute('aria-describedby')});
+ checkoutFieldIds.forEach(id=>{const field=$(id);field?.removeAttribute('aria-invalid');if(id==='customerAddress')field?.setAttribute('aria-describedby','pickupServiceHint');else if(id==='customerTelegramContact')field?.setAttribute('aria-describedby','telegramCheckoutHint');else field?.removeAttribute('aria-describedby')});
 }
 function checkoutProblem(message,id){
  clearCheckoutFieldIssue();
@@ -785,7 +785,7 @@ function checkoutProblem(message,id){
  if(field){
   if(id==='customerComment')$('checkoutOptional').open=true;
   field.setAttribute('aria-invalid','true');
-  field.setAttribute('aria-describedby',id==='customerAddress'?'pickupServiceHint checkoutFieldError':'checkoutFieldError');
+  field.setAttribute('aria-describedby',id==='customerAddress'?'pickupServiceHint checkoutFieldError':id==='customerTelegramContact'?'telegramCheckoutHint checkoutFieldError':'checkoutFieldError');
   const note=document.createElement('span');
   note.id='checkoutFieldError';
   note.className='checkout-field-error';
@@ -812,6 +812,13 @@ function buildOrder(){
  if(!address)return checkoutProblem('Укажите город и адрес пункта выдачи.','customerAddress');
  if(address.length>350)return checkoutProblem('Адрес слишком длинный — не более 350 символов.','customerAddress');
  if(comment.length>500)return checkoutProblem('Сократите комментарий до 500 символов.','customerComment');
+ if(method==='telegram'){
+  const tg=$('customerTelegramContact').value.trim();
+  const tgDigits=tg.replace(/\D/g,'');
+  const tgPhone=/^\+?[\d\s()\-]{10,25}$/.test(tg)&&tgDigits.length>=10&&tgDigits.length<=15;
+  if(tg&&!/^@[A-Za-z0-9_]{5,32}$/.test(tg)&&!tgPhone)
+   return checkoutProblem('Введите Telegram @username или телефон от 10 до 15 цифр.','customerTelegramContact');
+ }
  if(!['whatsapp','telegram'].includes(method))
   return checkoutProblem('Выберите, где удобнее подтвердить заказ.');
  return true;
@@ -836,7 +843,7 @@ document.querySelectorAll('input[name="deliveryService"]').forEach(input=>
 );
 syncPickupService();
 const contactMethods=[...document.querySelectorAll('input[name="contactMethod"]')];
-function updatePreferredContact(){const method=document.querySelector('input[name="contactMethod"]:checked')?.value;const hint=$('telegramCheckoutHint');if(hint)hint.hidden=method!=='telegram';}
+function updatePreferredContact(){const method=document.querySelector('input[name="contactMethod"]:checked')?.value;const fields=$('telegramContactFields');if(fields)fields.hidden=method!=='telegram';}
 contactMethods.forEach(input=>input.addEventListener('change',updatePreferredContact));updatePreferredContact();
 // Keep the order overview available, but avoid pushing contact fields below the fold
 // on phones. Desktop retains the expanded review.
@@ -846,9 +853,10 @@ $('submitSiteOrder').addEventListener('click',async()=>{
  clearCheckoutFieldIssue();
  if(!buildOrder())return;
  const method=document.querySelector('input[name="contactMethod"]:checked')?.value;
- const contact=$('customerPhone').value.trim();
+ const phone=$('customerPhone').value.trim();
+ const contact=method==='telegram'?($('customerTelegramContact').value.trim()||phone):phone;
 
- const body={name:$('customerName').value.trim(),contact,method,address:$('customerAddress').value.trim(),delivery:document.querySelector('input[name="deliveryService"]:checked')?.value,comment:$('customerComment').value.trim(),items:cart.map(x=>({id:x.id,ml:x.ml,qty:x.qty,variant:x.variant||'glass',color:x.variant==='travel'?x.color:undefined}))};
+ const body={name:$('customerName').value.trim(),phone,contact,method,address:$('customerAddress').value.trim(),delivery:document.querySelector('input[name="deliveryService"]:checked')?.value,comment:$('customerComment').value.trim(),items:cart.map(x=>({id:x.id,ml:x.ml,qty:x.qty,variant:x.variant||'glass',color:x.variant==='travel'?x.color:undefined}))};
  button.disabled=true;button.textContent='Оформляем заказ…';status.textContent='Сохраняем заявку…';
  try{
   const response=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});

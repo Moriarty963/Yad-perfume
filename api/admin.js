@@ -71,7 +71,7 @@ module.exports=async(req,res)=>{
    const query=String(req.query.q??'').trim();
    if(!Number.isInteger(page)||page<0||page>10000||!(filter==='all'||statuses.has(filter))||query.length>120)return res.status(400).json({error:'Неверные параметры фильтра.'});
    const offset=page*pageSize,term='%'+query+'%';
-   const rows=await sql`SELECT o.public_id,o.created_at,o.customer_name,o.contact_method,o.contact_value,
+   const rows=await sql`SELECT o.public_id,o.created_at,o.customer_name,o.customer_phone,o.contact_method,o.contact_value,
     o.delivery_service,o.pickup_address,o.comment,o.items,o.subtotal_rub,o.delivery_rub,o.total_rub,o.status,
     (sub.chat_id IS NOT NULL) AS telegram_connected,
     sub.last_notified_status AS telegram_last_status,
