@@ -10,7 +10,7 @@
 .yr-stars{font-size:17px;letter-spacing:2px;color:#9e7950;white-space:nowrap}
 .yr-stars>span{color:#c8c0b7}
 .yr-toolbar{display:flex;justify-content:space-between;align-items:center;gap:18px;border-bottom:1px solid #e8e3db;padding:12px 0 22px}
-.yr-write,.yr-submit{background:#302b25;border:1px solid #302b25;color:#fff;border-radius:3px;font:600 12px/1.4 inherit;padding:14px 22px;cursor:pointer;min-height:44px}
+.yr-write,.yr-submit{background:#302b25;border:1px solid #302b25;color:#fff;border-radius:3px;font-weight:600;font-size:12px;line-height:1.4;font-family:inherit;padding:14px 22px;cursor:pointer;min-height:44px}
 .yr-write span{padding-left:16px}
 .yr-write:hover,.yr-submit:hover{background:#514436}
 .yr-toolbar label{display:flex;align-items:center;gap:11px;color:#8a8075;font-size:12px}
