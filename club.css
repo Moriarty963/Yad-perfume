@@ -53,3 +53,10 @@
  .yad-bottom-nav button{min-width:0;padding-inline:1px;font-size:clamp(8px,2.4vw,10px)}
  .yad-bottom-nav button svg{width:21px;height:21px}
 }
+
+/* Pre-launch: a useful, non-collecting alternative while registrations are disabled. */
+#clubPage .club-launch-note{padding:23px;background:#f7f4ec;border:1px solid #dfd6c9;margin:19px 0 8px}
+#clubPage .club-launch-note strong{display:block;color:#3c342c;font:400 24px/1.25 Georgia,"Times New Roman",serif}
+#clubPage .club-launch-note p{color:#73675b;font-size:13px;line-height:1.7;margin:11px 0 20px}
+#clubPage .club-launch-note a{display:inline-flex;align-items:center;justify-content:center;background:#2c2925;color:#f8f4ee;text-decoration:none;padding:13px 18px;min-height:44px;font-size:12px;font-weight:600}
+#clubPage .club-launch-note a:hover{background:#534839}
