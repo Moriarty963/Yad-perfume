@@ -41,9 +41,6 @@ async function safeBody(req){
  catch{throw Object.assign(new Error('Некорректные данные.'),{http:400})}
 }
 function publicMember(row){return {name:row.display_name,email:row.email,verified:Boolean(row.verified_at),promotions:Boolean(row.promotions_opt_in),created_at:row.created_at}}
-async function markConsent(db,memberId,enabled,source){
- await db.query(`INSERT INTO yad_club_consent_log(member_id,consent_version,action,source) VALUES($1,$2,$3,$4)`,[memberId,CONSENT_VERSION,enabled?'opt_in':'opt_out',source]);
-}
 module.exports=async(req,res)=>{
  res.setHeader('Cache-Control','no-store');
  res.setHeader('X-Content-Type-Options','nosniff');
@@ -137,11 +134,22 @@ module.exports=async(req,res)=>{
   if(req.method==='PATCH'){
    const b=await safeBody(req);
    if(!nameValid(b.name)||typeof b.promotions!=='boolean')return res.status(400).json({error:'Проверьте имя и настройки рассылки.'});
-   await db.query(`UPDATE yad_club_members SET display_name=$1,
-    promotions_opt_in=$2,promotions_consented_at=CASE WHEN $2 AND NOT promotions_opt_in THEN now() ELSE promotions_consented_at END,
-    promotions_revoked_at=CASE WHEN NOT $2 AND promotions_opt_in THEN now() ELSE promotions_revoked_at END,
-    consent_version=$3 WHERE id=$4`,[b.name.trim(),b.promotions,CONSENT_VERSION,member.id]);
-   if(member.promotions_opt_in!==b.promotions)await markConsent(db,member.id,b.promotions,'profile');
+   const client=await db.connect();
+   try{
+    await client.query('BEGIN');
+    const previous=await client.query(`SELECT promotions_opt_in FROM yad_club_members WHERE id=$1 FOR UPDATE`,[member.id]);
+    if(!previous.rows.length){await client.query('ROLLBACK');return res.status(401).json({error:'Сессия больше не действует.'})}
+    await client.query(`UPDATE yad_club_members SET display_name=$1,
+     promotions_opt_in=$2,promotions_consented_at=CASE WHEN $2 AND NOT promotions_opt_in THEN now() ELSE promotions_consented_at END,
+     promotions_revoked_at=CASE WHEN NOT $2 AND promotions_opt_in THEN now() ELSE promotions_revoked_at END,
+     consent_version=$3 WHERE id=$4`,[b.name.trim(),b.promotions,CONSENT_VERSION,member.id]);
+    if(previous.rows[0].promotions_opt_in!==b.promotions){
+     await client.query(`INSERT INTO yad_club_consent_log(member_id,consent_version,action,source) VALUES($1,$2,$3,'profile')`,
+      [member.id,CONSENT_VERSION,b.promotions?'opt_in':'opt_out']);
+    }
+    await client.query('COMMIT');
+   }catch(e){await client.query('ROLLBACK');throw e}
+   finally{client.release()}
    const updated=await getMember(db,req);
    return res.status(200).json({member:publicMember(updated)});
   }
