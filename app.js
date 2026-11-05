@@ -37,9 +37,86 @@ function aromaDescription(f){
   (notes.length?' В её звучании сочетаются '+notes.join(', ')+'.':'');
 }
 const favoritesKey='yad-favorites-v1';let favorites=[];try{const saved=JSON.parse(localStorage.getItem(favoritesKey)||'[]');favorites=Array.isArray(saved)?saved.filter(id=>fragrances.some(f=>f.id===id)):[]}catch{};let favoritesOnly=false;function updateFavoritesUI(){$('favoritesCount').textContent=favorites.length;$('favoritesFilter').setAttribute('aria-pressed',String(favoritesOnly));$('favoritesFilter').classList.toggle('active',favoritesOnly)}function toggleFavorite(id){if(!fragrances.some(f=>f.id===id))return;favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];try{localStorage.setItem(favoritesKey,JSON.stringify(favorites))}catch{}updateFavoritesUI();renderProducts();notify(favorites.includes(id)?'Аромат сохранён в избранном':'Аромат удалён из избранного')}
-const $=id=>document.getElementById(id);const key='yad-market-cart-v1';let cart=[];try{cart=JSON.parse(localStorage.getItem(key))||[]}catch{};
+const $=id=>document.getElementById(id);
+/* YAD Gift Set: three chosen fragrances at a fixed 4 900 ₽ price. */
+const giftSetPrice=4900;
+const giftSetTitle='YAD Gift Set · 3 × 20 мл';
+const giftSetPhoto='https://d2ol7oe51mr4n9.cloudfront.net/user_3FG45Orhn5vqJJg4K5Lfxp15zdo/138fb41f-bbce-429d-9d4f-75faa0380572.jpg';
+function validGiftScents(scents){
+ return Array.isArray(scents)&&scents.length===3&&scents.every(id=>typeof id==='string'&&fragrances.some(f=>f.id===id));
+}
+function giftSetNames(scents){
+ return Array.isArray(scents)?scents.map(id=>fragrances.find(f=>f.id===id)?.name||'Аромат').join(' · '):'';
+}
+function cartProductPhoto(x){return x.id==='gift-set'?giftSetPhoto:x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}
+function addGiftSet(scents){
+ if(!validGiftScents(scents)){notify('Выберите три аромата для подарочного набора.');return false}
+ const chosen=scents.slice();
+ let item=cart.find(x=>x.id==='gift-set'&&validGiftScents(x.scents)&&x.scents.slice().sort().join(',')===chosen.slice().sort().join(','));
+ if(item){if(item.qty>=30){notify('Для одной позиции максимум 30 наборов.');return false}item.qty+=1}
+ else{if(cart.length>=30){notify('В корзине максимум 30 разных позиций.');return false}
+  cart.push({id:'gift-set',ml:0,title:giftSetTitle,variant:'gift',scents:chosen,price:giftSetPrice,qty:1})}
+ persist();notify('Подарочный набор добавлен в корзину');return true;
+}
+function giftSetCardMarkup(){
+ return '<a href="/gift-set" data-gift-detail class="yad-gift-catalog-card">'+
+  '<span class="yad-gift-catalog-image"><img src="'+giftSetPhoto+'" alt="Три флакона YAD 20 мл в чёрной подарочной коробке" loading="lazy" decoding="async"></span>'+
+  '<span class="yad-gift-catalog-copy"><span class="editorial-kicker">YAD / GIFT COLLECTION</span>'+
+  '<strong>Подарочный набор · 3 × 20 мл</strong><small>Любые три аромата на выбор в красивой коробке.</small>'+
+  '<span class="yad-gift-catalog-bottom"><b>'+rub(giftSetPrice)+'</b><em>Собрать набор ↗</em></span></span></a>';
+}
+let giftSetReturnPage='catalog';
+function renderGiftSetDetail(){
+ const root=$('giftSetDetail');if(root.dataset.ready==='true')return;
+ const options='<option value="">Выберите аромат</option>'+fragrances.map(f=>'<option value="'+safe(f.id)+'">'+safe(f.name)+'</option>').join('');
+ root.innerHTML='<div class="yad-gift-breadcrumb"><a href="/catalog" data-gift-back>← К ароматам</a><span>YAD / GIFT COLLECTION</span></div>'+
+  '<div class="yad-gift-layout"><div class="yad-gift-stage"><img src="'+giftSetPhoto+'" alt="Подарочный набор из трёх флаконов YAD по 20 мл в чёрной коробке" width="1122" height="1402" decoding="async" fetchpriority="high"></div>'+
+  '<div class="yad-gift-info"><span class="editorial-kicker">YAD / GIFT SET</span><h1>Подарочный набор<br><em>3 × 20 мл</em></h1>'+
+  '<p class="yad-gift-lead">Три любимых аромата в элегантной подарочной коробке с фактурой кожи. Соберите свой набор для близкого человека или для себя.</p>'+
+  '<div class="yad-gift-includes"><span>Три флакона по 20 мл</span><span>Подарочная коробка</span><span>Выбор из всей коллекции</span></div>'+
+  '<fieldset class="yad-gift-picker"><legend>Соберите свой набор</legend><p>Выберите любые три аромата. При желании можно выбрать один аромат несколько раз.</p>'+
+  '<label for="giftScent1">Первый аромат<select id="giftScent1" required>'+options+'</select></label>'+
+  '<label for="giftScent2">Второй аромат<select id="giftScent2" required>'+options+'</select></label>'+
+  '<label for="giftScent3">Третий аромат<select id="giftScent3" required>'+options+'</select></label>'+
+  '<p id="giftSelectionStatus" class="yad-gift-selection-status" aria-live="polite" role="status">Выберите 3 аромата.</p></fieldset>'+
+  '<div class="yad-gift-purchase"><div><small>Стоимость набора</small><strong>'+rub(giftSetPrice)+'</strong></div>'+
+  '<button type="button" id="giftAddToCart">Добавить набор в корзину ↗</button></div>'+
+  '<p class="yad-gift-delivery">Доставка до ПВЗ Wildberries или Ozon — 250 ₽. При наличии в заказе флакона 100 мл доставка бесплатна. Оплата после согласования.</p></div></div>';
+ root.dataset.ready='true';
+}
+$('giftSetDetail').addEventListener('change',e=>{
+ if(!e.target.matches('#giftScent1,#giftScent2,#giftScent3'))return;
+ const scents=[1,2,3].map(i=>$('giftScent'+i).value).filter(Boolean);
+ const status=$('giftSelectionStatus');status.classList.remove('error');
+ status.textContent=scents.length===3?'Ваш набор: '+giftSetNames(scents):'Выбрано '+scents.length+' из 3 ароматов';
+});
+$('giftSetDetail').addEventListener('click',e=>{
+ const back=e.target.closest('[data-gift-back]');if(back){e.preventDefault();navigate(giftSetReturnPage);return}
+ if(!e.target.closest('#giftAddToCart'))return;
+ const scents=[1,2,3].map(i=>$('giftScent'+i).value);
+ if(!validGiftScents(scents)){
+  $('giftSelectionStatus').classList.add('error');$('giftSelectionStatus').textContent='Выберите все три аромата.';
+  [1,2,3].map(i=>$('giftScent'+i)).find(el=>!el.value)?.focus();return
+ }
+ if(addGiftSet(scents))navigate('cart');
+});
+document.addEventListener('click',e=>{
+ const link=e.target.closest('[data-gift-detail]');if(!link)return;
+ e.preventDefault();navigate('gift-set');
+});
+
+const key='yad-market-cart-v1';let cart=[];try{cart=JSON.parse(localStorage.getItem(key))||[]}catch{};
 // Rebuild saved cart from the current catalog and price list; never trust stale prices.
-cart=Array.isArray(cart)?cart.filter(x=>x&&typeof x.id==='string'&&Number.isInteger(Number(x.qty))&&Number(x.qty)>0).map(x=>{const isSet=x.id==='discovery';const item=fragrances.find(f=>f.id===x.id);const ml=Number(x.ml);if(!isSet&&!item)return null;if(!isSet&&!Object.prototype.hasOwnProperty.call(prices,ml))return null;const variant=!isSet&&[6,10].includes(ml)&&x.variant==='travel'?'travel':'glass';const color=variant==='travel'&&travelColors.includes(x.color)?x.color:'Чёрный';return {id:x.id,ml:isSet?0:ml,title:isSet?'Discovery Set · 3 × 6 мл':item.name,variant:isSet?'glass':variant,color,price:isSet?990:itemPrice(ml,variant),qty:Math.min(30,Number(x.qty))}}).filter(Boolean):[];
+cart=Array.isArray(cart)?cart.filter(x=>x&&typeof x.id==='string'&&Number.isInteger(Number(x.qty))&&Number(x.qty)>0).map(x=>{
+ const qty=Math.min(30,Number(x.qty));
+ if(x.id==='gift-set')return validGiftScents(x.scents)?{id:'gift-set',ml:0,title:giftSetTitle,variant:'gift',scents:x.scents.slice(),price:giftSetPrice,qty}:null;
+ if(x.id==='discovery')return {id:'discovery',ml:0,title:'Discovery Set · 3 × 6 мл',variant:'glass',color:'Чёрный',price:990,qty};
+ const item=fragrances.find(f=>f.id===x.id),ml=Number(x.ml);
+ if(!item||!Object.prototype.hasOwnProperty.call(prices,ml))return null;
+ const variant=[6,10].includes(ml)&&x.variant==='travel'?'travel':'glass';
+ const color=variant==='travel'&&travelColors.includes(x.color)?x.color:'Чёрный';
+ return {id:x.id,ml,title:item.name,variant,color,price:itemPrice(ml,variant),qty};
+}).filter(Boolean):[];
 // Only the public order number and purchased items are kept for this tab.
 // Personal details (name, phone, address) are deliberately not stored here.
 const lastOrderSessionKey='yad-last-order-session-v1';
@@ -420,6 +497,7 @@ const shown=items.slice(0,catalogVisibleLimit),shownIds=shown.map(f=>f.id);
 const append=renderedCatalogIds.length>0&&shownIds.length>renderedCatalogIds.length&&renderedCatalogIds.every((id,index)=>id===shownIds[index]);
 const toRender=append?shown.slice(renderedCatalogIds.length):shown;
 $('catalogCount').textContent=items.length===0?'Ничего не найдено':`Показано ${shown.length} из ${items.length} ароматов`;syncNoteOptions(items.length);syncCatalogFilterUI(items.length);
+const giftHighlight=$('giftCatalogHighlight');if(giftHighlight){const showGift=currentPage()==='catalog'&&!favoritesOnly&&!query&&family==='all'&&audience==='all'&&!activeScentNote&&sort==='default';giftHighlight.hidden=!showGift;if(showGift)giftHighlight.innerHTML=giftSetCardMarkup()}
 const markup=toRender.map((f,index)=>`<article class="product" data-card-detail="${f.id}"><div class="product-art scene-${f.family} " style="--glow:${f.glow}"><div class="scene-backdrop" aria-hidden="true"><i class="scene-light"></i><i class="scene-ridge ridge-one"></i><i class="scene-ridge ridge-two"></i><i class="scene-branch"></i><i class="scene-stone"></i><i class="scene-foreground"></i></div><span class="atelier-card-stamp" aria-hidden="true">YAD / ATELIER</span>${photoMarkup(20,f.id,!append&&index<2)}<span class="atelier-card-volume" aria-label="Показанный объём">20 мл</span><span class="atelier-card-media-label" aria-label="Тип изображения">${yadMediaLabel(yadProductImage(f.id,20))}</span><div class="yad-product-bottle volume-20" aria-hidden="true"><div class="yad-cap"></div><div class="yad-collar"></div><div class="yad-glass"><div class="yad-tube"></div><div class="yad-label"><span>YAD PERFUME</span><strong>${safe(f.name)}</strong><small>EXTRAIT DE PARFUM<br><span class="bottle-volume">20 мл</span></small></div></div></div><button type="button" class="favorite-toggle" data-favorite="${f.id}" aria-pressed="${favorites.includes(f.id)}" aria-label="${favorites.includes(f.id)?'Убрать из избранного':'В избранное'}: ${safe(f.name)}">${favorites.includes(f.id)?'♥':'♡'}</button></div><div class="product-info"><a class="product-image-link" href="/fragrance/${f.id}" data-detail="${f.id}" aria-label="Подробнее об аромате ${safe(f.name)}">Подробнее об аромате ↗</a><div class="product-meta"><span class="product-audience" data-audience="${f.audience}">${audienceLabels[f.audience]}</span><span class="product-family">${fragranceFamilyLabels[f.family]||'Ароматический'}</span><span class="product-number">№ ${String(fragrances.indexOf(f)+1).padStart(2,"0")}</span></div><h3><a class="product-detail-link" href="/fragrance/${f.id}" data-detail="${f.id}">${safe(f.name)}</a></h3><p class="product-aroma-description">${safe(aromaDescription(f))}</p><div class="product-aroma-notes" aria-label="Ноты аромата: ${safe(f.notes)}"><span class="product-notes-kicker">НОТЫ КОМПОЗИЦИИ</span><div class="product-note-tags">${f.notes.split(' · ').map(note=>`<span>${safe(note)}</span>`).join('')}</div></div><button type="button" class="product-compare" data-compare="${f.id}" aria-pressed="${comparedScents.includes(f.id)}">${comparedScents.includes(f.id)?"✓ В сравнении":"+ Сравнить"}</button><p class="product-price">${rub(prices[20])}</p><div class="product-volume-choice"><label for="size-${f.id}">Выберите объём</label><select aria-label="Объём ${safe(f.name)}" id="size-${f.id}">${Object.entries(prices).map(([ml,p])=>`<option value="${ml}" ${ml==='20'?'selected':''}>${ml} мл — ${rub(p)}</option>`).join('')}</select></div><button data-add="${f.id}">Добавить в корзину ↗</button></div></article>`).join('');
 const holder=$('products');if(append){holder.insertAdjacentHTML('beforeend',markup)}else{holder.innerHTML=markup||'<p>Ароматы не найдены. Попробуйте другую ноту, направление или сбросьте фильтры.</p>'}
 renderedCatalogIds=shownIds;
@@ -499,7 +577,7 @@ function syncCheckoutAction(){
 }
 function notify(message){const el=$('toast');if(!el)return;el.textContent=message;el.hidden=false;clearTimeout(notify.timer);notify.timer=setTimeout(()=>{el.hidden=true},3500)}function add(id,ml,variant='glass',color='Чёрный'){let title=id==='discovery'?'Discovery Set · 3 × 6 мл':fragrances.find(f=>f.id===id)?.name;if(!title)return;if(![6,10].includes(ml))variant='glass';if(variant!=='travel')variant='glass';if(!travelColors.includes(color))color='Чёрный';let price=id==='discovery'?990:itemPrice(ml,variant);if(!Number.isFinite(price))return;let found=cart.find(x=>x.id===id&&x.ml===ml&&(x.variant||'glass')===variant&&(variant!=='travel'||x.color===color));if(found){if(found.qty>=30){notify('Для одного товара максимум 30 штук.');return}found.qty+=1}else{if(cart.length>=30){notify('В корзине максимум 30 разных позиций.');return}cart.push({id,ml,title,variant,color,price,qty:1})}persist();notify('Добавлено в корзину · '+cart.reduce((sum,x)=>sum+x.qty,0)+' шт.')}
 function persist(){try{localStorage.setItem(key,JSON.stringify(cart))}catch{}renderCart()}
-function renderCart(){const quantity=cart.reduce((s,x)=>s+x.qty,0);const sum=cart.reduce((s,x)=>s+x.qty*x.price,0);const shipping=cartDeliveryFee(cart);$('count').textContent=quantity;$('subtotal').textContent=rub(sum);$('deliveryPrice').textContent=quantity&&shipping===0?'Бесплатно':rub(shipping);$('deliveryChoiceLegend').textContent=shipping===0?'Куда доставить заказ · Бесплатно':'Куда доставить заказ · 250 ₽';$('total').textContent=rub(sum+shipping);$('mobileCartCount').textContent=quantity;$('mobileCartTotal').textContent=rub(sum+shipping);$('mobileCartBar').hidden=true;$('navCartCount').textContent=quantity>99?'99+':quantity;$('navCartCount').hidden=quantity===0;$('clearCart').hidden=quantity===0;$('cartItems').innerHTML=cart.length?cart.map((x,i)=>`<div class="cart-row"><div class="cart-product"><img class="cart-bottle-photo" alt="" loading="lazy" decoding="async" src="${x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div class="cart-product-copy">${safe(x.title)}<small>${x.id==='discovery'?'Набор':x.ml+' мл · '+packagingName(x)} · ${x.qty} шт. · ${rub(x.price*x.qty)}</small></div></div><div class="cart-qty"><button data-remove="${i}" aria-label="Уменьшить количество ${safe(x.title)}">−</button><span aria-label="Количество">${x.qty}</span><button data-increase="${i}" aria-label="Увеличить количество ${safe(x.title)}">+</button></div></div>`).join(''):'<p class="cart-empty-state">Пока пусто. Выберите аромат из коллекции.</p>';
+function renderCart(){const quantity=cart.reduce((s,x)=>s+x.qty,0);const sum=cart.reduce((s,x)=>s+x.qty*x.price,0);const shipping=cartDeliveryFee(cart);$('count').textContent=quantity;$('subtotal').textContent=rub(sum);$('deliveryPrice').textContent=quantity&&shipping===0?'Бесплатно':rub(shipping);$('deliveryChoiceLegend').textContent=shipping===0?'Куда доставить заказ · Бесплатно':'Куда доставить заказ · 250 ₽';$('total').textContent=rub(sum+shipping);$('mobileCartCount').textContent=quantity;$('mobileCartTotal').textContent=rub(sum+shipping);$('mobileCartBar').hidden=true;$('navCartCount').textContent=quantity>99?'99+':quantity;$('navCartCount').hidden=quantity===0;$('clearCart').hidden=quantity===0;$('cartItems').innerHTML=cart.length?cart.map((x,i)=>`<div class="cart-row"><div class="cart-product"><img class="cart-bottle-photo" alt="" loading="lazy" decoding="async" src="${cartProductPhoto(x)}" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div class="cart-product-copy">${safe(x.title)}<small>${safe(orderProductLine(x))} · ${x.qty} шт. · ${rub(x.price*x.qty)}</small></div></div><div class="cart-qty"><button data-remove="${i}" aria-label="Уменьшить количество ${safe(x.title)}">−</button><span aria-label="Количество">${x.qty}</span><button data-increase="${i}" aria-label="Увеличить количество ${safe(x.title)}">+</button></div></div>`).join(''):'<p class="cart-empty-state">Пока пусто. Выберите аромат из коллекции.</p>';
  $('checkoutPanel').hidden=cart.length===0;
  renderCheckoutReview();
  renderOrderReceipt();
@@ -507,14 +585,14 @@ function renderCart(){const quantity=cart.reduce((s,x)=>s+x.qty,0);const sum=car
  syncCheckoutAction();
 }
 function orderProductLine(x){
- return x.id==='discovery'?'Набор 3 × 6 мл':x.ml+' мл · '+packagingName(x);
+ return x.id==='gift-set'?'3 × 20 мл · '+giftSetNames(x.scents):x.id==='discovery'?'Набор 3 × 6 мл':x.ml+' мл · '+packagingName(x);
 }
 function renderCheckoutReview(){
  const holder=$('checkoutReviewItems');if(!holder)return;
  const qty=cart.reduce((sum,x)=>sum+x.qty,0);
  $('checkoutReviewCount').textContent=qty+' шт.';
  $('checkoutReviewTotal').textContent=rub(cart.reduce((sum,x)=>sum+x.qty*x.price,0)+cartDeliveryFee(cart));
- holder.innerHTML=cart.map(x=>`<div class="checkout-review-row"><img src="${x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}" loading="lazy" alt="" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div><strong>${safe(x.title)}</strong><small>${safe(orderProductLine(x))} · ${x.qty} шт.</small></div><span>${rub(x.price*x.qty)}</span></div>`).join('');
+ holder.innerHTML=cart.map(x=>`<div class="checkout-review-row"><img src="${cartProductPhoto(x)}" loading="lazy" alt="" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div><strong>${safe(x.title)}</strong><small>${safe(orderProductLine(x))} · ${x.qty} шт.</small></div><span>${rub(x.price*x.qty)}</span></div>`).join('');
 }
 function receiptPlainText(order){
  return ['YAD / PERFUME ATELIER','Заявка №'+order.number,'','Состав заказа:',...order.items.map((x,i)=>(i+1)+'. '+x.name+' — '+x.description+' × '+x.qty+' = '+rub(Number(x.price)||0)),'','Доставка: '+order.delivery,'Итого с доставкой: '+rub(Number(order.total)||0),'','Заявка отправлена. '+(order.method==='telegram'?'Подключите бота для уведомлений в Telegram. YAD свяжется по оставленному контакту.':'Дождитесь подтверждения от YAD в WhatsApp.')].join('\n');
@@ -689,7 +767,7 @@ $('catalogAudiences').addEventListener('click',e=>{const b=e.target.closest('[da
 $('audience').addEventListener('change',()=>selectAudience($('audience').value));
 $('search').addEventListener('input',renderProducts);$('family').addEventListener('change',renderProducts);$('sort').addEventListener('change',renderProducts);$('resetFilters').addEventListener('click',()=>{$('search').value='';$('family').value='all';$('audience').value='all';syncAudienceButtons();$('sort').value='default';activeScentNote='';favoritesOnly=currentPage()==='favorites';updateFavoritesUI();renderProducts()});$('products').addEventListener('click',e=>{const favorite=e.target.closest('[data-favorite]');if(favorite){toggleFavorite(favorite.dataset.favorite);return}const compare=e.target.closest('[data-compare]');if(compare){toggleCompareScent(compare.dataset.compare);return}let b=e.target.closest('[data-add]');if(b){add(b.dataset.add,Number($('size-'+b.dataset.add).value));return}const detail=e.target.closest('[data-detail]');if(detail){e.preventDefault();navigate('fragrance/'+detail.dataset.detail);return}const share=e.target.closest('[data-share]');if(share){shareFragrance(share.dataset.share);return}const card=e.target.closest('.product[data-card-detail]');if(card&&!e.target.closest('button,select,option,input,textarea,label,a,[contenteditable]')){navigate('fragrance/'+card.dataset.cardDetail)}});$('favoritesFilter').addEventListener('click',()=>{favoritesOnly=!favoritesOnly;updateFavoritesUI();renderProducts()});updateFavoritesUI();$('addDiscovery').addEventListener('click',()=>add('discovery',0));$('cartButton').addEventListener('click',openCart);$('mobileCartBar').addEventListener('click',openCart);
 const bottomNav=document.querySelector('.yad-bottom-nav');
-const pages=['home','catalog','favorites','cart'];
+const pages=['home','catalog','favorites','cart','gift-set'];
 // Keep a short-lived return point when shoppers open a fragrance from a list.
 // No profile, contact or browsing position is written to persistent storage.
 let fragranceReturnContext=null;
@@ -797,17 +875,17 @@ function renderPage(){
  const returnToList=lastRenderedPage.startsWith('fragrance/')&&fragranceReturnContext?.page===page;
  const returnScrollY=returnToList?fragranceReturnContext.scrollY:0;
  document.body.dataset.page=page;
- const isDetail=page.startsWith('fragrance/');const catalogPage=page==='catalog'||page==='favorites';
- document.querySelectorAll('main > *').forEach(el=>{el.hidden=isDetail?el.id!=='fragranceDetail':catalogPage?el.id!=='catalog':page==='home'?el.id!=='marketHome':true});
- $('catalog').hidden=!catalogPage;if(isDetail)renderFragranceDetail(page.split('/')[1]);
+ const isDetail=page.startsWith('fragrance/'),isGift=page==='gift-set';const catalogPage=page==='catalog'||page==='favorites';
+ document.querySelectorAll('main > *').forEach(el=>{el.hidden=isGift?el.id!=='giftSetDetail':isDetail?el.id!=='fragranceDetail':catalogPage?el.id!=='catalog':page==='home'?el.id!=='marketHome':true});
+ $('catalog').hidden=!catalogPage;if(isDetail)renderFragranceDetail(page.split('/')[1]);if(isGift)renderGiftSetDetail();
  if(page==='favorites'){favoritesOnly=true;activeScentNote='';$('search').value='';$('family').value='all';$('audience').value='all';syncAudienceButtons();syncMood()}
  else if(page==='catalog'){favoritesOnly=false}
  updateFavoritesUI();renderProducts();
  const isCart=page==='cart';
  $('overlay').hidden=true;$('drawer').classList.toggle('open',isCart);$('drawer').setAttribute('aria-hidden',String(!isCart));
  document.body.classList.toggle('cart-open',isCart);
- setBottomActive(isDetail?'catalog':page);
- document.title=(page==='home'?'YAD — Ароматы с характером':page==='catalog'?'Каталог ароматов — YAD':page==='favorites'?'Избранное — YAD':isDetail?fragrances.find(f=>f.id===page.split('/')[1]).name+' — YAD':'Корзина — YAD');
+ setBottomActive(isGift||isDetail?'catalog':page);
+ document.title=(page==='home'?'YAD — Ароматы с характером':page==='catalog'?'Каталог ароматов — YAD':page==='favorites'?'Избранное — YAD':isGift?'Подарочный набор 3 × 20 мл — YAD':isDetail?fragrances.find(f=>f.id===page.split('/')[1]).name+' — YAD':'Корзина — YAD');
  renderCompareTray();
  window.YadMiniApp?.syncNavigation(page);
  lastRenderedPage=page;
@@ -823,6 +901,7 @@ function renderPage(){
 function navigate(page){
  const next=pages.includes(page)||(page.startsWith('fragrance/')&&fragrances.some(f=>f.id===page.slice(10)))?page:'home';
  const origin=currentPage();
+ if(next==='gift-set'&&origin!=='gift-set')giftSetReturnPage=['home','catalog','favorites'].includes(origin)?origin:'catalog';
  if(next.startsWith('fragrance/')&&!origin.startsWith('fragrance/')){
   fragranceReturnContext={page:['home','catalog','favorites'].includes(origin)?origin:'catalog',scrollY:window.scrollY};
  }
@@ -838,7 +917,8 @@ window.YadMiniApp?.setBackHandler(()=>{
  if(!$('catalogFilterLayer').hidden){closeCatalogFilters();return}
  if(!$('compareOverlay').hidden){closeCompareDialog();return}
  const page=currentPage();
- if(page.startsWith('fragrance/'))navigate(fragranceReturnContext?.page||'catalog');
+ if(page==='gift-set')navigate(giftSetReturnPage);
+ else if(page.startsWith('fragrance/'))navigate(fragranceReturnContext?.page||'catalog');
  else if(page==='cart')navigate('catalog');
  else navigate('home');
 });
@@ -931,7 +1011,7 @@ $('submitSiteOrder').addEventListener('click',async()=>{
  const phone=$('customerPhone').value.trim();
  const contact=method==='telegram'?($('customerTelegramContact').value.trim()||phone):phone;
 
- const body={name:$('customerName').value.trim(),phone,contact,method,address:$('customerAddress').value.trim(),delivery:document.querySelector('input[name="deliveryService"]:checked')?.value,comment:$('customerComment').value.trim(),items:cart.map(x=>({id:x.id,ml:x.ml,qty:x.qty,variant:x.variant||'glass',color:x.variant==='travel'?x.color:undefined}))};
+ const body={name:$('customerName').value.trim(),phone,contact,method,address:$('customerAddress').value.trim(),delivery:document.querySelector('input[name="deliveryService"]:checked')?.value,comment:$('customerComment').value.trim(),items:cart.map(x=>({id:x.id,ml:x.ml,qty:x.qty,variant:x.variant||'glass',color:x.variant==='travel'?x.color:undefined,...(x.id==='gift-set'?{scents:x.scents.slice()}: {})}))};
  button.disabled=true;button.textContent='Оформляем заказ…';status.textContent='Сохраняем заявку…';
  try{
   const response=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
