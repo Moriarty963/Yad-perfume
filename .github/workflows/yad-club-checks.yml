@@ -5,6 +5,10 @@ on:
       - 'api/club*.js'
       - 'lib/yad-club*.js'
       - 'tests/club.test.js'
+      - 'tests/campaign.test.js'
+      - 'api/admin.js'
+      - 'club-promos-admin.js'
+      - 'migrations/20261106_yad_campaign_drafts.sql'
       - 'package.json'
       - '.github/workflows/yad-club-checks.yml'
   workflow_dispatch:
