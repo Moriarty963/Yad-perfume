@@ -444,7 +444,7 @@ function renderCheckoutReview(){
  holder.innerHTML=cart.map(x=>`<div class="checkout-review-row"><img src="${x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}" loading="lazy" alt="" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div><strong>${safe(x.title)}</strong><small>${safe(orderProductLine(x))} · ${x.qty} шт.</small></div><span>${rub(x.price*x.qty)}</span></div>`).join('');
 }
 function receiptPlainText(order){
- return ['YAD / PERFUME ATELIER','Заявка №'+order.number,'','Состав заказа:',...order.items.map((x,i)=>(i+1)+'. '+x.name+' — '+x.description+' × '+x.qty+' = '+rub(Number(x.price)||0)),'','Доставка: '+order.delivery,'Итого с доставкой: '+rub(Number(order.total)||0),'','Заявка отправлена. '+(order.method==='telegram'?'Подключите бота Telegram в заказе, чтобы получать уведомления; без подключения мы свяжемся по вашему телефону.':'Дождитесь подтверждения от YAD в WhatsApp.')].join('\n');
+ return ['YAD / PERFUME ATELIER','Заявка №'+order.number,'','Состав заказа:',...order.items.map((x,i)=>(i+1)+'. '+x.name+' — '+x.description+' × '+x.qty+' = '+rub(Number(x.price)||0)),'','Доставка: '+order.delivery,'Итого с доставкой: '+rub(Number(order.total)||0),'','Заявка отправлена. '+(order.method==='telegram'?'Подключите бота для уведомлений в Telegram. YAD свяжется по оставленному контакту.':'Дождитесь подтверждения от YAD в WhatsApp.')].join('\n');
 }
 function orderInquiryUrl(order){
  const number=String(window.YAD_WHATSAPP_NUMBER||'').replace(/\D/g,'');
@@ -523,7 +523,7 @@ function renderOrderReceipt(){
  const trackingUI=lastOrder.statusToken
   ?`<section class="order-tracking" aria-label="Статус заявки"><div class="order-tracking-heading"><span>Актуальный статус заказа</span><span class="order-tracking-checked">${safe(checkedLabel)}</span></div><strong class="order-tracking-state status-${statusKey}">${safe(statusTitle)}</strong><p>${safe(statusDescription)}</p><button type="button" data-order-status>Проверить статус</button><p id="orderStatusMessage" class="order-tracking-message" role="status" aria-live="polite"></p></section>`
   :'<p class="order-receipt-note">Онлайн-проверка статуса доступна для новых заявок. Для этой заявки можно уточнить статус через WhatsApp.</p>';
- holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><div class="order-receipt-number"><h3>Заказ №${safe(lastOrder.number)}</h3><button type="button" class="order-copy-number" data-order-copy-number aria-label="Скопировать номер заказа ${safe(lastOrder.number)}">Скопировать №</button></div><p>${lastOrder.method==='telegram'?'Чтобы получать уведомления в Telegram, подключите бота ниже. Если не подключите, мы свяжемся по телефону.':'Мы свяжемся с вами в WhatsApp для подтверждения.'}</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div>${trackingUI}${telegramUI}<div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div><p class="order-receipt-retention">История до 15 заявок хранится только в этом браузере, без имён, телефонов и адресов. Данные хранятся не дольше 180 дней, их можно удалить.</p><button type="button" class="order-forget" data-order-forget>Удалить сведения о заявке с устройства</button>`;
+ holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><div class="order-receipt-number"><h3>Заказ №${safe(lastOrder.number)}</h3><button type="button" class="order-copy-number" data-order-copy-number aria-label="Скопировать номер заказа ${safe(lastOrder.number)}">Скопировать №</button></div><p>${lastOrder.method==='telegram'?'Чтобы получать уведомления в Telegram, подключите бота ниже. Для подтверждения свяжемся по оставленному Telegram-контакту или телефону.':'Мы свяжемся с вами в WhatsApp для подтверждения.'}</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div>${trackingUI}${telegramUI}<div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div><p class="order-receipt-retention">История до 15 заявок хранится только в этом браузере, без имён, телефонов и адресов. Данные хранятся не дольше 180 дней, их можно удалить.</p><button type="button" class="order-forget" data-order-forget>Удалить сведения о заявке с устройства</button>`;
 }
 async function customerTelegramConnect(button,action){
  const order=lastOrder;if(!order?.statusToken)return;
@@ -774,7 +774,7 @@ $('continueShopping').addEventListener('click',()=>navigate('catalog'));$('clear
 const checkoutFieldIds=['customerName','customerPhone','customerAddress','customerComment','customerTelegramContact'];
 function clearCheckoutFieldIssue(){
  const note=$('checkoutFieldError');if(note)note.remove();
- checkoutFieldIds.forEach(id=>{const field=$(id);field?.removeAttribute('aria-invalid');if(id==='customerAddress')field?.setAttribute('aria-describedby','pickupServiceHint');else field?.removeAttribute('aria-describedby')});
+ checkoutFieldIds.forEach(id=>{const field=$(id);field?.removeAttribute('aria-invalid');if(id==='customerAddress')field?.setAttribute('aria-describedby','pickupServiceHint');else if(id==='customerTelegramContact')field?.setAttribute('aria-describedby','telegramCheckoutHint');else field?.removeAttribute('aria-describedby')});
 }
 function checkoutProblem(message,id){
  clearCheckoutFieldIssue();
@@ -785,7 +785,7 @@ function checkoutProblem(message,id){
  if(field){
   if(id==='customerComment')$('checkoutOptional').open=true;
   field.setAttribute('aria-invalid','true');
-  field.setAttribute('aria-describedby',id==='customerAddress'?'pickupServiceHint checkoutFieldError':'checkoutFieldError');
+  field.setAttribute('aria-describedby',id==='customerAddress'?'pickupServiceHint checkoutFieldError':id==='customerTelegramContact'?'telegramCheckoutHint checkoutFieldError':'checkoutFieldError');
   const note=document.createElement('span');
   note.id='checkoutFieldError';
   note.className='checkout-field-error';
