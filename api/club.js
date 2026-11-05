@@ -65,15 +65,18 @@ module.exports=async(req,res)=>{
    const ipHash=crypto.createHmac('sha256',secret()).update('ip:'+daily+':'+ip).digest('hex');
    const recent=await db.query(`SELECT count(*)::int AS n FROM yad_club_request_log WHERE ip_hash=$1 AND requested_at>now()-interval '1 hour'`,[ipHash]);
    if(Number(recent.rows[0].n)>=10)return res.status(429).json({error:'Слишком много запросов. Повторите позже.'});
-   const prior=await db.query(`SELECT sent_at FROM yad_club_challenges WHERE email=$1`,[email]);
-   if(prior.rows.length&&Date.now()-new Date(prior.rows[0].sent_at).getTime()<60000)return res.status(429).json({error:'Повторно запросить код можно через минуту.'});
    const code=String(crypto.randomInt(0,1000000)).padStart(6,'0');
-   // Do not create an account or activate marketing consent until the email is verified.
-   await db.query(`INSERT INTO yad_club_challenges(email,display_name,code_hash,expires_at,sent_at,attempts,promotions_requested,request_ip_hash)
+   // The database enforces a 60-second cooldown even under simultaneous requests.
+   // Do not create a member or subscribe them until this code is verified.
+   const challenge=await db.query(`INSERT INTO yad_club_challenges
+    (email,display_name,code_hash,expires_at,sent_at,attempts,promotions_requested,request_ip_hash)
     VALUES($1,$2,$3,now()+interval '10 minutes',now(),0,$4,$5)
     ON CONFLICT(email) DO UPDATE SET display_name=excluded.display_name,code_hash=excluded.code_hash,
-     expires_at=excluded.expires_at,sent_at=now(),attempts=0,promotions_requested=excluded.promotions_requested,request_ip_hash=excluded.request_ip_hash`,
-    [email,name,codeHash(email,code),b.promotions,ipHash]);
+     expires_at=excluded.expires_at,sent_at=now(),attempts=0,promotions_requested=excluded.promotions_requested,
+     request_ip_hash=excluded.request_ip_hash
+    WHERE yad_club_challenges.sent_at <= now()-interval '60 seconds'
+    RETURNING email`,[email,name,codeHash(email,code),b.promotions,ipHash]);
+   if(!challenge.rows.length)return res.status(429).json({error:'Повторно запросить код можно через минуту.'});
    await db.query(`INSERT INTO yad_club_request_log(ip_hash) VALUES($1)`,[ipHash]);
    try{await emailCode(email,code)}catch(e){
     // Delete the unused code so the user can safely retry after a sending outage.
