@@ -89,20 +89,21 @@ module.exports=async(req,res)=>{
   if(req.method==='POST'&&action==='verify'){
    const b=await safeBody(req),email=formatEmail(b.email),code=String(b.code||'');
    if(!emailValid(email)||!/^[0-9]{6}$/.test(code))return res.status(400).json({error:'Введите код из шести цифр.'});
-   const candidate=await db.query(`SELECT code_hash,display_name,promotions_requested,attempts FROM yad_club_challenges
-    WHERE email=$1 AND expires_at>now() AND attempts<5 LIMIT 1`,[email]);
-   if(!candidate.rows.length)return res.status(400).json({error:'Код недействителен или истёк. Запросите новый.'});
-   const value=candidate.rows[0];
-   const expected=Buffer.from(value.code_hash,'hex'),received=Buffer.from(codeHash(email,code),'hex');
-   if(!crypto.timingSafeEqual(expected,received)){
-    await db.query(`UPDATE yad_club_challenges SET attempts=attempts+1 WHERE email=$1`,[email]);
-    return res.status(400).json({error:'Код не подходит. Проверьте письмо.'});
-   }
-   // Serialize successful verification to prevent duplicate session/account creation.
    const client=await db.connect();
    let member,token;
    try{
     await client.query('BEGIN');
+    const candidate=await client.query(`SELECT code_hash,display_name,promotions_requested,attempts FROM yad_club_challenges
+    WHERE email=$1 AND expires_at>now() AND attempts<5 FOR UPDATE`,[email]);
+   if(!candidate.rows.length){await client.query('ROLLBACK');return res.status(400).json({error:'Код недействителен или истёк. Запросите новый.'})}
+   const value=candidate.rows[0];
+   const expected=Buffer.from(value.code_hash,'hex'),received=Buffer.from(codeHash(email,code),'hex');
+   if(!crypto.timingSafeEqual(expected,received)){
+    await client.query(`UPDATE yad_club_challenges SET attempts=attempts+1 WHERE email=$1`,[email]);
+    await client.query('COMMIT');
+    return res.status(400).json({error:'Код не подходит. Проверьте письмо.'});
+   }
+   // Serialize successful verification to prevent duplicate session/account creation.
     const consumed=await client.query(`DELETE FROM yad_club_challenges WHERE email=$1 AND code_hash=$2 AND attempts<5 AND expires_at>now() RETURNING display_name,promotions_requested`,[email,value.code_hash]);
     if(!consumed.rows.length){await client.query('ROLLBACK');return res.status(409).json({error:'Код уже использован.'})}
     const existing=await client.query(`SELECT id FROM yad_club_members WHERE email=$1`,[email]);
