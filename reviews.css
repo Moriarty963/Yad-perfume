@@ -1,0 +1,82 @@
+/* YAD editorial reviews — isolated from catalogue styles */
+#yadReviewsRoot{display:block;width:min(1140px,calc(100% - 48px));margin:36px auto 82px;color:#302a25}
+.yr-title{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding:28px 0;border-top:1px solid #ddd7cd}
+.yr-overline{display:block;font-size:10px;letter-spacing:.21em;color:#978878;font-weight:700}
+.yr-title h2{font:400 clamp(28px,4vw,43px)/1.16 Georgia,"Times New Roman",serif;letter-spacing:-.03em;margin:10px 0 8px;color:#2c2825}
+.yr-title p,.yr-muted{color:#8c8076;margin:0;font-size:13px}
+.yr-rating{text-align:right;min-width:100px;display:flex;flex-direction:column;align-items:flex-end;line-height:1.25}
+.yr-rating strong{font:400 35px/1 Georgia,serif;color:#241e1a}
+.yr-rating small{color:#8b8177;margin-top:7px;font-size:11px}
+.yr-stars{font-size:17px;letter-spacing:2px;color:#9e7950;white-space:nowrap}
+.yr-stars>span{color:#c8c0b7}
+.yr-toolbar{display:flex;justify-content:space-between;align-items:center;gap:18px;border-bottom:1px solid #e8e3db;padding:12px 0 22px}
+.yr-write,.yr-submit{background:#302b25;border:1px solid #302b25;color:#fff;border-radius:3px;font:600 12px/1.4 inherit;padding:14px 22px;cursor:pointer;min-height:44px}
+.yr-write span{padding-left:16px}
+.yr-write:hover,.yr-submit:hover{background:#514436}
+.yr-toolbar label{display:flex;align-items:center;gap:11px;color:#8a8075;font-size:12px}
+.yr-toolbar select{border:1px solid #ded8d0;background:#fff;color:#4f453d;border-radius:3px;padding:12px 10px;min-height:43px;font-size:12px}
+.yr-items{display:grid;grid-template-columns:1fr 1fr;gap:0 34px}
+.yr-card{padding:25px 0 26px;border-bottom:1px solid #e8e3db;min-width:0}
+.yr-card-top{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;margin-bottom:12px}
+.yr-card-top strong{display:block;font-size:14px;color:#352e28}
+.yr-card time{color:#9b938c;font-size:11px;white-space:nowrap}
+.yr-verified{display:block;margin-top:5px;color:#6b8068;font-size:10px;letter-spacing:.015em}
+.yr-card p{font-size:13px;line-height:1.8;color:#514840;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0 14px}
+.yr-photos{display:flex;flex-wrap:wrap;gap:9px}
+.yr-photos button{border:0;background:transparent;padding:0;width:100px;height:100px;border-radius:3px;overflow:hidden;cursor:zoom-in}
+.yr-photos img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
+.yr-photos button:hover img{transform:scale(1.07)}
+.yr-empty{grid-column:1/-1;padding:40px 0;text-align:center;color:#8b8076}
+.yr-empty strong{display:block;color:#4b423b;font:400 22px Georgia,serif}
+.yr-empty p{font-size:13px}
+.yr-more{display:block;margin:28px auto 0;padding:13px 22px;background:transparent;border:1px solid #c9bfb3;color:#483a31;cursor:pointer}
+.yr-more[hidden],.yr-dialog[hidden]{display:none!important}
+.yr-more:disabled{opacity:.5}
+.yr-success{margin:14px 0;background:#eff4ed;color:#415c40;border:1px solid #cfddca;padding:14px 18px;font-size:13px}
+.yr-dialog{border:0;border-radius:5px;padding:0;color:#302922;background:#fdfbf8;width:min(560px,calc(100% - 24px));max-height:calc(100dvh - 22px);overflow-y:auto;box-shadow:0 25px 90px #0005}
+.yr-dialog::backdrop,.yr-lightbox::backdrop{background:#171511ad}
+.yr-dialog form{padding:28px clamp(18px,4vw,34px) 30px}
+.yr-dialog-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:23px}
+.yr-dialog-heading h2{font:400 30px/1.12 Georgia,serif;margin:9px 0}
+.yr-dialog-heading p{font-size:12px;color:#8b8177;margin:0}
+.yr-close{background:transparent;border:0;cursor:pointer;font-size:30px;line-height:1}
+.yr-field{display:flex;flex-direction:column;gap:8px;margin:18px 0;font-size:12px;font-weight:600;color:#544b41}
+.yr-field input:not([type=file]),.yr-field textarea{width:100%;background:#fff;border:1px solid #ddd5ca;color:#322b23;border-radius:3px;padding:12px 14px;font:400 14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.yr-field textarea{resize:vertical;min-height:100px}
+.yr-field input[type=file]{display:block;max-width:100%;font-size:12px}
+.yr-field small{color:#968a7d;font-weight:400}
+.yr-rate{border:0;padding:0;margin:18px 0}
+.yr-rate legend{font-size:12px;font-weight:600;color:#544b41}
+.yr-rate button{border:0;background:transparent;color:#d6cec3;font-size:30px;padding:6px 4px;cursor:pointer}
+.yr-rate button.active{color:#aa8255}
+.yr-previews{display:flex;flex-wrap:wrap;gap:8px;color:#8b8177;font-size:12px}
+.yr-previews img{width:78px;height:78px;object-fit:cover;border-radius:2px}
+.yr-proof{padding:15px;background:#f4f0e9;border:1px solid #e8e0d4;font-size:12px;color:#6f6052}
+.yr-proof p{margin:0 0 10px;line-height:1.6}
+.yr-proof p:last-child{margin-bottom:0}
+.yr-proof-ok{color:#597756}
+.yr-switch{font-size:12px;border:0;background:transparent;color:#594939;text-decoration:underline;padding:6px 0;cursor:pointer}
+.yr-manual-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.yr-manual-grid .yr-field{margin:8px 0}
+.yr-consent{font-size:11px;line-height:1.65;color:#8c8175;margin:18px 0}
+.yr-form-error{font-size:12px;color:#a43f34;min-height:1em;line-height:1.6}
+.yr-submit{width:100%;margin-top:6px;font-size:13px}
+.yr-submit:disabled{opacity:.5;cursor:wait}
+.yr-lightbox{background:#171717;border:0;padding:16px;max-height:95dvh;max-width:94vw}
+.yr-lightbox img{display:block;max-width:85vw;max-height:80dvh;object-fit:contain}
+.yr-lightbox button{position:absolute;right:5px;top:0;background:#161616;color:white;border:0;font-size:32px;cursor:pointer}
+@media(max-width:640px){
+ #yadReviewsRoot{width:calc(100% - 34px);margin:15px auto 60px}
+ .yr-title{align-items:flex-start;padding:22px 0}
+ .yr-title h2{font-size:30px}
+ .yr-rating strong{font-size:29px}
+ .yr-toolbar{align-items:stretch;gap:10px;flex-wrap:wrap}
+ .yr-toolbar label{margin-left:auto}
+ .yr-write{flex:1}
+ .yr-items{grid-template-columns:1fr}
+ .yr-card{padding:22px 0}
+ .yr-photos button{width:88px;height:88px}
+ .yr-manual-grid{grid-template-columns:1fr}
+ .yr-dialog form{padding:20px 18px 25px}
+ .yr-dialog-heading h2{font-size:27px}
+}
