@@ -63,6 +63,63 @@ module.exports=async(req,res)=>{
     return res.status(503).json({error:'Telegram не принял сообщение. Повторите попытку позже.',notification_status:outcome});
    return res.status(200).json({notification_status:outcome,status:order.status});
   }
+  if(req.query.action==='campaigns'&&req.method==='GET'){
+   const page=Number(req.query.page||0),limit=20;
+   if(!Number.isInteger(page)||page<0||page>100)return res.status(400).json({error:'Неверная страница.'});
+   const rows=await sql`SELECT id,title,body,target_url,revision,created_at,updated_at
+      FROM yad_campaign_drafts ORDER BY updated_at DESC,id DESC LIMIT ${limit+1} OFFSET ${page*limit}`;
+   return res.status(200).json({drafts:rows.slice(0,limit),has_more:rows.length>limit,page});
+  }
+  if(req.query.action==='campaign'&&['POST','PATCH','DELETE'].includes(req.method)){
+   // Only same-site browser interactions may change privately stored campaigns.
+   const origin=String(req.headers.origin||'');
+   let validOrigin=false;
+   try{const parsed=new URL(origin);validOrigin=parsed.protocol==='https:'&&parsed.host===req.headers.host}
+   catch{}
+   if(!validOrigin)return res.status(403).json({error:'Недопустимый источник изменения.'});
+   let body;
+   try{body=typeof req.body==='string'?JSON.parse(req.body):req.body||{}}
+   catch{return res.status(400).json({error:'Некорректный JSON.'})}
+   if(!body||typeof body!=='object'||Array.isArray(body))return res.status(400).json({error:'Некорректные данные.'});
+   if(JSON.stringify(body).length>2500)return res.status(413).json({error:'Слишком большой текст.'});
+   if(req.method==='DELETE'){
+    const id=String(body.id||'');
+    if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))
+      return res.status(400).json({error:'Некорректный черновик.'});
+    const removed=await sql`DELETE FROM yad_campaign_drafts WHERE id=${id}::uuid RETURNING id`;
+    return removed.length?res.status(200).json({ok:true}):res.status(404).json({error:'Черновик не найден.'});
+   }
+   const title=typeof body.title==='string'?body.title.trim():'';
+   const content=typeof body.body==='string'?body.body.trim():'';
+   let url=typeof body.url==='string'?body.url.trim():'';
+   if(title.length<2||title.length>110||content.length<5||content.length>1500||url.length>300)
+      return res.status(400).json({error:'Проверьте название и текст акции.'});
+   if(url){
+    try{
+     const dest=new URL(url);
+     if(dest.origin!=='https://yad-market.vercel.app'||dest.username||dest.password)throw Error('not YAD');
+     url=dest.href;
+     if(url.length>300)return res.status(400).json({error:'Ссылка слишком длинная.'});
+    }catch{return res.status(400).json({error:'Укажите ссылку на страницу YAD.'})}
+   }
+   if(req.method==='POST'){
+    const draft=await sql`INSERT INTO yad_campaign_drafts (title,body,target_url)
+     VALUES (${title},${content},${url})
+     RETURNING id,title,body,target_url,revision,created_at,updated_at`;
+    return res.status(201).json({draft:draft[0]});
+   }
+   const id=String(body.id||''),revision=Number(body.revision);
+   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+       ||!Number.isInteger(revision)||revision<1)
+     return res.status(400).json({error:'Неверная версия черновика.'});
+   const rows=await sql`UPDATE yad_campaign_drafts
+     SET title=${title},body=${content},target_url=${url},revision=revision+1,updated_at=now()
+     WHERE id=${id}::uuid AND revision=${revision}
+     RETURNING id,title,body,target_url,revision,created_at,updated_at`;
+   if(rows.length)return res.status(200).json({draft:rows[0]});
+   const existing=await sql`SELECT id FROM yad_campaign_drafts WHERE id=${id}::uuid LIMIT 1`;
+   return res.status(existing.length?409:404).json({error:existing.length?'Черновик изменён на другом устройстве. Обновите список.':'Черновик не найден.'});
+  }
   // Review moderation shares the existing HttpOnly administrator session.
   if(req.method==='GET'&&req.query.action==='reviews'){
    const state=String(req.query.status||'pending');
@@ -126,6 +183,6 @@ module.exports=async(req,res)=>{
    catch(err){notificationStatus='failed';console.error('YAD buyer notification failed',err?.message)}
    return res.status(200).json({order:rows[0],notification_status:notificationStatus});
   }
-  res.setHeader('Allow','GET, POST, PATCH');return res.status(405).json({error:'Method not allowed'});
+  res.setHeader('Allow','GET, POST, PATCH, DELETE');return res.status(405).json({error:'Method not allowed'});
  }catch(e){console.error('YAD admin failed',e?.message);return res.status(500).json({error:'Не удалось загрузить данные.'})}
 };
