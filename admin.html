@@ -74,6 +74,7 @@ const date=s=>new Date(s).toLocaleString('ru-RU',{dateStyle:'medium',timeStyle:'
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const catalogNames=new Map(YAD_CATALOG_ROWS.map(([id,name])=>[id,name]));
 catalogNames.set('discovery','Discovery Set');
+catalogNames.set('gift-set','YAD Gift Set · 3 × 20 мл');
 let cachedOrders=[],pageNumber=0,hasMore=false,overview={},requestSeq=0,searchTimer=null;
 async function request(url,options={}){
  const r=await fetch(url,{credentials:'same-origin',headers:{'Content-Type':'application/json'},...options});
@@ -120,7 +121,7 @@ function renderOrders(){
   const products=items.map(i=>{
    const name=catalogNames.get(i.id)||i.title||i.id||'Аромат';
    const volume=Number(i.ml)>0?String(i.ml)+' мл · ':'';
-   const variant=i.variant==='travel'?'Travel · '+String(i.color||'')+' · ':'';
+   const variant=i.variant==='travel'?'Travel · '+String(i.color||'')+' · ':i.id==='gift-set'?'3 × 20 мл · '+(Array.isArray(i.scents)?i.scents.map(id=>catalogNames.get(id)||id).join(' / '):'Не указан состав')+' · ':'';
    const qty=Math.max(1,Number(i.qty)||1);
    const sum=(Number(i.unit_price)||0)*qty;
    return '<div class="order-item"><div>'+safe(name)+'<small class="muted">'+safe(volume+variant)+qty+' шт.</small></div><span>'+money(sum)+'</span></div>';
