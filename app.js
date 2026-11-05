@@ -63,7 +63,7 @@ function normalizeLocalOrder(value){
   };
  });
  const token=typeof value.statusToken==='string'&&/^v1\.[0-9a-f-]{36}\.[0-9]{10}\.[a-f0-9]{64}$/.test(value.statusToken)?value.statusToken:null;
- return {number:value.number,method:value.method==='whatsapp'?'whatsapp':'telegram',
+ return {number:value.number,method:['phone','whatsapp','telegram'].includes(value.method)?value.method:'telegram',
  delivery:value.delivery==='Wildberries'?'Wildberries':'Ozon',
  total:Math.max(0,Math.min(1000000,Number(value.total)||0)),items,
  statusToken:token,status:['new','confirmed','paid','shipped','completed','cancelled'].includes(value.status)?value.status:'new',
@@ -444,7 +444,7 @@ function renderCheckoutReview(){
  holder.innerHTML=cart.map(x=>`<div class="checkout-review-row"><img src="${x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}" loading="lazy" alt="" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div><strong>${safe(x.title)}</strong><small>${safe(orderProductLine(x))} · ${x.qty} шт.</small></div><span>${rub(x.price*x.qty)}</span></div>`).join('');
 }
 function receiptPlainText(order){
- return ['YAD / PERFUME ATELIER','Заявка №'+order.number,'','Состав заказа:',...order.items.map((x,i)=>(i+1)+'. '+x.name+' — '+x.description+' × '+x.qty+' = '+rub(Number(x.price)||0)),'','Доставка: '+order.delivery,'Итого с доставкой: '+rub(Number(order.total)||0),'','Заявка отправлена. Дождитесь подтверждения от YAD в '+(order.method==='telegram'?'Telegram':'WhatsApp')+'.'].join('\n');
+ return ['YAD / PERFUME ATELIER','Заявка №'+order.number,'','Состав заказа:',...order.items.map((x,i)=>(i+1)+'. '+x.name+' — '+x.description+' × '+x.qty+' = '+rub(Number(x.price)||0)),'','Доставка: '+order.delivery,'Итого с доставкой: '+rub(Number(order.total)||0),'','Заявка отправлена. '+(order.method==='phone'?'Ожидайте звонка YAD для подтверждения.':'Дождитесь подтверждения от YAD в '+(order.method==='telegram'?'Telegram':'WhatsApp')+'.')].join('\n');
 }
 function orderInquiryUrl(order){
  const number=String(window.YAD_WHATSAPP_NUMBER||'').replace(/\D/g,'');
@@ -512,7 +512,7 @@ function renderOrderReceipt(){
  holder.hidden=!show;
  if(!show){holder.innerHTML='';return}
  const rows=lastOrder.items.map(x=>`<div class="order-receipt-row"><div><strong>${safe(x.name)}</strong><small>${safe(x.description)} · ${Number(x.qty)||1} шт.</small></div><span>${rub(Number(x.price)||0)}</span></div>`).join('');
- const inquiry=orderInquiryUrl(lastOrder);
+ const inquiry=lastOrder.method==='whatsapp'?orderInquiryUrl(lastOrder):'';
  const receiptActions=inquiry?'<a href="'+safe(inquiry)+'" target="_blank" rel="noopener noreferrer">Уточнить статус в WhatsApp ↗</a>':'';
  const statusKey=Object.prototype.hasOwnProperty.call(orderStatusDetails,lastOrder.status)?lastOrder.status:'new';
  const [statusTitle,statusDescription]=orderStatusDetails[statusKey];
@@ -522,8 +522,8 @@ function renderOrderReceipt(){
   :'';
  const trackingUI=lastOrder.statusToken
   ?`<section class="order-tracking" aria-label="Статус заявки"><div class="order-tracking-heading"><span>Актуальный статус заказа</span><span class="order-tracking-checked">${safe(checkedLabel)}</span></div><strong class="order-tracking-state status-${statusKey}">${safe(statusTitle)}</strong><p>${safe(statusDescription)}</p><button type="button" data-order-status>Проверить статус</button><p id="orderStatusMessage" class="order-tracking-message" role="status" aria-live="polite"></p></section>`
-  :'<p class="order-receipt-note">Онлайн-проверка статуса доступна для новых заявок. Для этой заявки можно уточнить статус через WhatsApp.</p>';
- holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><div class="order-receipt-number"><h3>Заказ №${safe(lastOrder.number)}</h3><button type="button" class="order-copy-number" data-order-copy-number aria-label="Скопировать номер заказа ${safe(lastOrder.number)}">Скопировать №</button></div><p>Мы свяжемся с вами в ${lastOrder.method==='telegram'?'Telegram':'WhatsApp'} для подтверждения.</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div>${trackingUI}${telegramUI}<div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div><p class="order-receipt-retention">История до 15 заявок хранится только в этом браузере, без имён, телефонов и адресов. Данные хранятся не дольше 180 дней, их можно удалить.</p><button type="button" class="order-forget" data-order-forget>Удалить сведения о заявке с устройства</button>`;
+  :'<p class="order-receipt-note">Онлайн-проверка статуса доступна для новых заявок. Для этой заявки можно уточнить статус по выбранному способу связи.</p>';
+ holder.innerHTML=`<div class="order-receipt-header"><span class="order-receipt-mark" aria-hidden="true">✓</span><div><span class="order-receipt-kicker">Заявка получена</span><div class="order-receipt-number"><h3>Заказ №${safe(lastOrder.number)}</h3><button type="button" class="order-copy-number" data-order-copy-number aria-label="Скопировать номер заказа ${safe(lastOrder.number)}">Скопировать №</button></div><p>Мы свяжемся с вами ${lastOrder.method==='phone'?'по телефону':'в '+(lastOrder.method==='telegram'?'Telegram':'WhatsApp')} для подтверждения.</p></div></div><div class="order-receipt-list">${rows}</div><div class="order-receipt-total"><span>Итого с доставкой (${safe(lastOrder.delivery)})</span><strong>${rub(Number(lastOrder.total)||0)}</strong></div>${trackingUI}${telegramUI}<div class="order-receipt-actions"><button type="button" data-order-copy>Скопировать состав заказа</button>${receiptActions}</div><p class="order-receipt-retention">История до 15 заявок хранится только в этом браузере, без имён, телефонов и адресов. Данные хранятся не дольше 180 дней, их можно удалить.</p><button type="button" class="order-forget" data-order-forget>Удалить сведения о заявке с устройства</button>`;
 }
 async function customerTelegramConnect(button,action){
  const order=lastOrder;if(!order?.statusToken)return;
@@ -814,7 +814,7 @@ function buildOrder(){
  if(comment.length>500)return checkoutProblem('Сократите комментарий до 500 символов.','customerComment');
  if(method==='telegram'&&!/^@[A-Za-z0-9_]{5,32}$/.test($('preferredContact').value.trim()))
   return checkoutProblem('Укажите Telegram в формате @username (не менее 5 символов после @).','preferredContact');
- if(!['whatsapp','telegram'].includes(method))
+ if(!['phone','whatsapp','telegram'].includes(method))
   return checkoutProblem('Выберите, где удобнее подтвердить заказ.');
  return true;
 }
@@ -848,7 +848,7 @@ $('submitSiteOrder').addEventListener('click',async()=>{
  clearCheckoutFieldIssue();
  if(!buildOrder())return;
  const method=document.querySelector('input[name="contactMethod"]:checked')?.value;
- const contact=method==='whatsapp'?$('customerPhone').value.trim():$('preferredContact').value.trim();
+ const contact=method==='telegram'?$('preferredContact').value.trim():$('customerPhone').value.trim();
 
  const body={name:$('customerName').value.trim(),contact,method,address:$('customerAddress').value.trim(),delivery:document.querySelector('input[name="deliveryService"]:checked')?.value,comment:$('customerComment').value.trim(),items:cart.map(x=>({id:x.id,ml:x.ml,qty:x.qty,variant:x.variant||'glass',color:x.variant==='travel'?x.color:undefined}))};
  button.disabled=true;button.textContent='Оформляем заказ…';status.textContent='Сохраняем заявку…';
