@@ -23,6 +23,18 @@
     {
       "source": "/gift-set",
       "destination": "/"
+    },
+    {
+      "source": "/account",
+      "destination": "/"
+    },
+    {
+      "source": "/club-privacy",
+      "destination": "/club-privacy.html"
+    },
+    {
+      "source": "/unsubscribe",
+      "destination": "/unsubscribe.html"
     }
   ]
 }

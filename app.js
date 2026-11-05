@@ -767,7 +767,7 @@ $('catalogAudiences').addEventListener('click',e=>{const b=e.target.closest('[da
 $('audience').addEventListener('change',()=>selectAudience($('audience').value));
 $('search').addEventListener('input',renderProducts);$('family').addEventListener('change',renderProducts);$('sort').addEventListener('change',renderProducts);$('resetFilters').addEventListener('click',()=>{$('search').value='';$('family').value='all';$('audience').value='all';syncAudienceButtons();$('sort').value='default';activeScentNote='';favoritesOnly=currentPage()==='favorites';updateFavoritesUI();renderProducts()});$('products').addEventListener('click',e=>{const favorite=e.target.closest('[data-favorite]');if(favorite){toggleFavorite(favorite.dataset.favorite);return}const compare=e.target.closest('[data-compare]');if(compare){toggleCompareScent(compare.dataset.compare);return}let b=e.target.closest('[data-add]');if(b){add(b.dataset.add,Number($('size-'+b.dataset.add).value));return}const detail=e.target.closest('[data-detail]');if(detail){e.preventDefault();navigate('fragrance/'+detail.dataset.detail);return}const share=e.target.closest('[data-share]');if(share){shareFragrance(share.dataset.share);return}const card=e.target.closest('.product[data-card-detail]');if(card&&!e.target.closest('button,select,option,input,textarea,label,a,[contenteditable]')){navigate('fragrance/'+card.dataset.cardDetail)}});$('favoritesFilter').addEventListener('click',()=>{favoritesOnly=!favoritesOnly;updateFavoritesUI();renderProducts()});updateFavoritesUI();$('addDiscovery').addEventListener('click',()=>add('discovery',0));$('cartButton').addEventListener('click',openCart);$('mobileCartBar').addEventListener('click',openCart);
 const bottomNav=document.querySelector('.yad-bottom-nav');
-const pages=['home','catalog','favorites','cart','gift-set'];
+const pages=['home','catalog','favorites','cart','gift-set','account'];
 // Keep a short-lived return point when shoppers open a fragrance from a list.
 // No profile, contact or browsing position is written to persistent storage.
 let fragranceReturnContext=null;
@@ -875,9 +875,9 @@ function renderPage(){
  const returnToList=lastRenderedPage.startsWith('fragrance/')&&fragranceReturnContext?.page===page;
  const returnScrollY=returnToList?fragranceReturnContext.scrollY:0;
  document.body.dataset.page=page;
- const isDetail=page.startsWith('fragrance/'),isGift=page==='gift-set';const catalogPage=page==='catalog'||page==='favorites';
- document.querySelectorAll('main > *').forEach(el=>{el.hidden=isGift?el.id!=='giftSetDetail':isDetail?el.id!=='fragranceDetail':catalogPage?el.id!=='catalog':page==='home'?el.id!=='marketHome':true});
- $('catalog').hidden=!catalogPage;if(isDetail)renderFragranceDetail(page.split('/')[1]);if(isGift)renderGiftSetDetail();
+ const isDetail=page.startsWith('fragrance/'),isGift=page==='gift-set',isAccount=page==='account';const catalogPage=page==='catalog'||page==='favorites';
+ document.querySelectorAll('main > *').forEach(el=>{el.hidden=isAccount?el.id!=='clubPage':isGift?el.id!=='giftSetDetail':isDetail?el.id!=='fragranceDetail':catalogPage?el.id!=='catalog':page==='home'?el.id!=='marketHome':true});
+ $('catalog').hidden=!catalogPage;if(isDetail)renderFragranceDetail(page.split('/')[1]);if(isGift)renderGiftSetDetail();if(isAccount)window.YadClub?.mount();
  if(page==='favorites'){favoritesOnly=true;activeScentNote='';$('search').value='';$('family').value='all';$('audience').value='all';syncAudienceButtons();syncMood()}
  else if(page==='catalog'){favoritesOnly=false}
  updateFavoritesUI();renderProducts();
@@ -885,7 +885,7 @@ function renderPage(){
  $('overlay').hidden=true;$('drawer').classList.toggle('open',isCart);$('drawer').setAttribute('aria-hidden',String(!isCart));
  document.body.classList.toggle('cart-open',isCart);
  setBottomActive(isGift||isDetail?'catalog':page);
- document.title=(page==='home'?'YAD — Ароматы с характером':page==='catalog'?'Каталог ароматов — YAD':page==='favorites'?'Избранное — YAD':isGift?'Подарочный набор 3 × 20 мл — YAD':isDetail?fragrances.find(f=>f.id===page.split('/')[1]).name+' — YAD':'Корзина — YAD');
+ document.title=(page==='home'?'YAD — Ароматы с характером':page==='catalog'?'Каталог ароматов — YAD':page==='favorites'?'Избранное — YAD':isGift?'Подарочный набор 3 × 20 мл — YAD':isDetail?fragrances.find(f=>f.id===page.split('/')[1]).name+' — YAD':(isAccount?'Личный кабинет — YAD':'Корзина — YAD'))
  renderCompareTray();
  window.YadMiniApp?.syncNavigation(page);
  lastRenderedPage=page;
@@ -910,6 +910,7 @@ function navigate(page){
  renderPage();
 }
 bottomNav.addEventListener('click',e=>{const button=e.target.closest('[data-nav]');if(button)navigate(button.dataset.nav)});
+document.addEventListener('click',e=>{const link=e.target.closest('[data-club-nav]');if(link){e.preventDefault();navigate('account')}});
 window.addEventListener('popstate',renderPage);
 // Native Telegram back arrow complements the existing bottom navigation.
 // Keep purchase/cart behavior identical to the regular web storefront.
