@@ -733,6 +733,7 @@ function renderPage(){
  setBottomActive(isDetail?'catalog':page);
  document.title=(page==='home'?'YAD — Ароматы с характером':page==='catalog'?'Каталог ароматов — YAD':page==='favorites'?'Избранное — YAD':isDetail?fragrances.find(f=>f.id===page.split('/')[1]).name+' — YAD':'Корзина — YAD');
  renderCompareTray();
+ window.YadMiniApp?.syncNavigation(page);
  lastRenderedPage=page;
  if(returnToList){
   // The product grid is rendered above; return near the same bottle.
@@ -755,6 +756,16 @@ function navigate(page){
 }
 bottomNav.addEventListener('click',e=>{const button=e.target.closest('[data-nav]');if(button)navigate(button.dataset.nav)});
 window.addEventListener('popstate',renderPage);
+// Native Telegram back arrow complements the existing bottom navigation.
+// Keep purchase/cart behavior identical to the regular web storefront.
+window.YadMiniApp?.setBackHandler(()=>{
+ if(!$('compareOverlay').hidden){closeCompareDialog();return}
+ const page=currentPage();
+ if(page.startsWith('fragrance/'))navigate(fragranceReturnContext?.page||'catalog');
+ else if(page==='cart')navigate('catalog');
+ else navigate('home');
+});
+
 document.addEventListener('click',e=>{const link=e.target.closest('a[href^="#"]');if(!link)return;const href=link.getAttribute('href');if(href==='#catalog'||href==='#discovery'||href==='#philosophy'||href==='#questions'||href==='#top'){e.preventDefault();const page=href==='#catalog'?'catalog':'home';navigate(page);if(page==='home'&&href!=='#top')requestAnimationFrame(()=>document.querySelector(href)?.scrollIntoView({behavior:'smooth'}))}});
 $('continueShopping').addEventListener('click',()=>navigate('catalog'));$('clearCart').addEventListener('click',()=>{if(!cart.length)return;if(!window.confirm('Удалить все товары из корзины?'))return;cart=[];persist();$('status').textContent='Корзина очищена.';notify('Корзина очищена')});$('closeCart').addEventListener('click',closeCart);$('overlay').addEventListener('click',closeCart);document.addEventListener('keydown',e=>{if(!$('drawer').classList.contains('open')||currentPage()==='cart')return;if(e.key==='Escape'){e.preventDefault();closeCart();return}if(e.key==='Tab'){const nodes=[...$('drawer').querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),a[href]')].filter(el=>el.getClientRects().length);if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});$('cartItems').addEventListener('click',e=>{let b=e.target.closest('[data-remove],[data-increase]');if(!b)return;let i=Number(b.dataset.remove??b.dataset.increase);if(!cart[i])return;if(b.hasAttribute('data-increase')){if(cart[i].qty>=30){notify('Для одного товара максимум 30 штук.');return}cart[i].qty+=1}else{cart[i].qty--;if(!cart[i].qty)cart.splice(i,1)}persist()});
 // Checkout feedback appears next to the field requiring attention.
