@@ -79,8 +79,8 @@ module.exports=async(req,res)=>{
    if(!/^\d{1,18}$/.test(rid)||!['approved','rejected'].includes(state))
     return res.status(400).json({error:'Неверное действие.'});
    const result=await sql`UPDATE yad_fragrance_reviews SET status=${state},moderated_at=now()
-    WHERE id=${rid}::bigint AND status='pending' RETURNING id,status`;
-   if(!result.length)return res.status(409).json({error:'Отзыв уже обработан.'});
+    WHERE id=${rid}::bigint AND status IS DISTINCT FROM ${state} RETURNING id,status`;
+   if(!result.length)return res.status(409).json({error:'Отзыв уже имеет выбранный статус.'});
    return res.status(200).json({review:result[0]});
   }
   if(req.method==='GET'){
