@@ -760,7 +760,7 @@ function renderMarketHome(){
  $('marketFeatured').innerHTML=featured.map(f=>`<article class="market-card"><a href="/fragrance/${f.id}" data-market-detail="${f.id}" class="market-card-photo scene-${f.family}" style="--glow:${f.glow}" aria-label="Открыть ${safe(f.name)}">${photoMarkup(100,f.id)}<div class="market-mini-bottle"><span>YAD</span><small>${safe(f.name)}</small></div></a><div class="market-card-copy"><span>${audienceLabels[f.audience]} · ${safe(f.notes)}</span><a href="/fragrance/${f.id}" data-market-detail="${f.id}">${safe(f.name)}</a><div class="market-card-bottom"><strong>от ${rub(prices[6])}</strong><button type="button" data-market-add="${f.id}" aria-label="Выбрать объём ${safe(f.name)}">→</button></div></div></article>`).join('');
 }
 function marketCatalog(family='all',focus=false,audience='all'){
- activeScentNote='';navigate('catalog');$('family').value=family;$('audience').value=audience;syncAudienceButtons();$('search').value='';renderProducts();
+ activeScentNote='';navigate('catalog');$('family').value=family;$('audience').value=audience;syncAudienceButtons();syncMood();$('search').value='';renderProducts();
  if(focus)$('search').focus();
 }
 $('marketSearch').addEventListener('click',()=>marketCatalog('all',true));
@@ -800,7 +800,7 @@ function renderPage(){
  const isDetail=page.startsWith('fragrance/');const catalogPage=page==='catalog'||page==='favorites';
  document.querySelectorAll('main > *').forEach(el=>{el.hidden=isDetail?el.id!=='fragranceDetail':catalogPage?el.id!=='catalog':page==='home'?el.id!=='marketHome':true});
  $('catalog').hidden=!catalogPage;if(isDetail)renderFragranceDetail(page.split('/')[1]);
- if(page==='favorites'){favoritesOnly=true;activeScentNote='';$('search').value='';$('family').value='all';$('audience').value='all';syncAudienceButtons()}
+ if(page==='favorites'){favoritesOnly=true;activeScentNote='';$('search').value='';$('family').value='all';$('audience').value='all';syncAudienceButtons();syncMood()}
  else if(page==='catalog'){favoritesOnly=false}
  updateFavoritesUI();renderProducts();
  const isCart=page==='cart';
