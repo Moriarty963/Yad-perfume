@@ -2506,3 +2506,18 @@ body.compare-dialog-open .compare-tray{visibility:hidden}
 @media(prefers-reduced-motion:reduce){
  #products .product{transition:none!important}
 }
+
+
+/* Telegram Mini App support: respect native Telegram safe areas,
+   without changing the public website or duplicating checkout actions. */
+@media (max-width:760px){
+ body.telegram-miniapp .yad-bottom-nav{
+  padding-bottom:calc(9px + max(env(safe-area-inset-bottom,0px),var(--tg-content-safe-area-inset-bottom,0px)));
+ }
+ body.telegram-miniapp:not(.cart-open){
+  padding-bottom:calc(77px + max(env(safe-area-inset-bottom,0px),var(--tg-content-safe-area-inset-bottom,0px)));
+ }
+ body.telegram-miniapp .compare-tray{
+  bottom:calc(86px + max(env(safe-area-inset-bottom,0px),var(--tg-content-safe-area-inset-bottom,0px)));
+ }
+}
