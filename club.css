@@ -46,3 +46,10 @@
  #clubPage .club-form-wrap{padding:22px 18px}
  #clubPage .club-form-header h2{font-size:28px}
 }
+
+/* Five compact mobile destinations: profile must stay on the first row. */
+@media(max-width:760px){
+ .yad-bottom-nav{grid-template-columns:repeat(5,minmax(0,1fr));}
+ .yad-bottom-nav button{min-width:0;padding-inline:1px;font-size:clamp(8px,2.4vw,10px)}
+ .yad-bottom-nav button svg{width:21px;height:21px}
+}
