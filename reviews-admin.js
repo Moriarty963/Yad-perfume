@@ -26,7 +26,7 @@
    document.getElementById('reviewAdminStatus').textContent=rows.length?'Найдено: '+rows.length:'Отзывов с таким статусом пока нет.';
    document.getElementById('reviewAdminList').innerHTML=rows.map(r=>{
     const imgs=(Array.isArray(r.photos)?r.photos:[]).map(p=>typeof p==='string'&&p.startsWith('data:image/jpeg;base64,')?'<img src="'+esc(p)+'" alt="Фото из отзыва">':'').join('');
-    const buttons=filter==='pending'?'<div class="actions"><button type="button" data-review-id="'+esc(r.id)+'" data-review-decision="approved">Опубликовать</button><button type="button" data-review-id="'+esc(r.id)+'" data-review-decision="rejected">Отклонить</button></div>':'';
+    const buttons='<div class="actions">'+(filter!=='approved'?'<button type="button" data-review-id="'+esc(r.id)+'" data-review-decision="approved">Опубликовать</button>':'')+(filter!=='rejected'?'<button type="button" data-review-id="'+esc(r.id)+'" data-review-decision="rejected">'+(filter==='approved'?'Снять с публикации':'Отклонить')+'</button>':'')+'</div>';
     return '<article class="yad-admin-review"><div class="meta">Заказ №'+esc(String(r.order_number).toUpperCase())+' · '+esc(nameMap.get(r.fragrance_id)||r.fragrance_id)+' · '+new Date(r.created_at).toLocaleString('ru-RU')+'</div><strong>'+esc(r.author_name)+' · '+esc(r.rating)+'/5 ★</strong><p class="body">'+esc(r.body)+'</p><div class="images">'+imgs+'</div>'+buttons+'</article>';
    }).join('');
   }catch(e){if(seq===sequence)document.getElementById('reviewAdminStatus').textContent=e.message}
