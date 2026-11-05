@@ -2792,3 +2792,5 @@ body[data-page="favorites"] #catalog .catalog-filter-last .favorites-filter{disp
  .yad-gift-purchase{flex-direction:column;align-items:stretch}
  .yad-gift-purchase button{width:100%}
 }
+
+.yad-gift-photo-note{display:block;padding:10px 13px;background:#fff;font-size:11px;line-height:1.5;color:#857a6d;text-align:center}
