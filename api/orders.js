@@ -28,8 +28,8 @@ async function notifyTelegram(order,b,items){
  lines.push(
   '',
   '💰 <b>ОПЛАТА</b>',
-  'Товары: '+rub(order.total_rub-fee),
-  'Доставка: '+rub(fee),
+  'Товары: '+rub(order.subtotal_rub),
+  'Доставка: '+(Number(order.delivery_rub)===0?'Бесплатно':rub(order.delivery_rub)),
   '<b>Итого: '+rub(order.total_rub)+'</b>',
   '',
   '👤 <b>ПОКУПАТЕЛЬ</b>',
@@ -78,8 +78,9 @@ module.exports=async(req,res)=>{
    items.push({id:x.id,title,ml,variant,color,qty:x.qty,unit_price:price});
   }
   if(subtotal>1000000)return res.status(400).json({error:'Слишком большая сумма заказа.'});
+  const orderDeliveryFee=items.some(item=>item.ml===100)?0:fee;
   const sql=neon(process.env.DATABASE_URL);
-  const rows=await sql`INSERT INTO yad_orders (customer_name,customer_phone,contact_method,contact_value,delivery_service,pickup_address,comment,items,subtotal_rub,delivery_rub,total_rub) VALUES (${b.name.trim()},${b.method==='whatsapp'?b.contact.trim():null},${b.method},${b.contact.trim()},${b.delivery},${b.address.trim()},${b.comment.trim()},${JSON.stringify(items)}::jsonb,${subtotal},${fee},${subtotal+fee}) RETURNING public_id,created_at,total_rub`;
+  const rows=await sql`INSERT INTO yad_orders (customer_name,customer_phone,contact_method,contact_value,delivery_service,pickup_address,comment,items,subtotal_rub,delivery_rub,total_rub) VALUES (${b.name.trim()},${b.method==='whatsapp'?b.contact.trim():null},${b.method},${b.contact.trim()},${b.delivery},${b.address.trim()},${b.comment.trim()},${JSON.stringify(items)}::jsonb,${subtotal},${orderDeliveryFee},${subtotal+orderDeliveryFee}) RETURNING public_id,created_at,subtotal_rub,delivery_rub,total_rub`;
   await notifyTelegram(rows[0],b,items);return res.status(201).json({order_id:rows[0].public_id,total:rows[0].total_rub,status_token:issueToken(rows[0].public_id)});
  }catch(e){console.error('YAD order submission failed',e?.message);return res.status(500).json({error:'Не удалось сохранить заказ. Попробуйте ещё раз.'})}
 };

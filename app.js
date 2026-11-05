@@ -1,5 +1,7 @@
 const prices={6:500,10:700,20:1300,30:1800,50:2700,100:5000};
 const deliveryFee=250;
+// Free pickup-point delivery for every order containing a 100 ml fragrance.
+function cartDeliveryFee(items){return items.length&&items.some(item=>item.id!=='discovery'&&item.ml===100&&item.qty>0)?0:(items.length?deliveryFee:0)}
 const travelSurcharge={6:90,10:90};
 const travelColors=['Чёрный','Белый мрамор','Серый мрамор'];
 function itemPrice(ml,variant){return prices[ml]+(variant==='travel'&&travelSurcharge[ml]?travelSurcharge[ml]:0)}
@@ -420,11 +422,11 @@ $('products').addEventListener('change',e=>{if(e.target.matches('select[id^="siz
 function syncCheckoutAction(){
  const button=$('submitSiteOrder');if(!button||button.disabled)return;
  const sum=cart.reduce((total,item)=>total+item.qty*item.price,0);
- button.innerHTML='Отправить заявку · '+rub(sum+(cart.length?deliveryFee:0))+' <span aria-hidden="true">↗</span>';
+ button.innerHTML='Отправить заявку · '+rub(sum+cartDeliveryFee(cart))+' <span aria-hidden="true">↗</span>';
 }
 function notify(message){const el=$('toast');if(!el)return;el.textContent=message;el.hidden=false;clearTimeout(notify.timer);notify.timer=setTimeout(()=>{el.hidden=true},3500)}function add(id,ml,variant='glass',color='Чёрный'){let title=id==='discovery'?'Discovery Set · 3 × 6 мл':fragrances.find(f=>f.id===id)?.name;if(!title)return;if(![6,10].includes(ml))variant='glass';if(variant!=='travel')variant='glass';if(!travelColors.includes(color))color='Чёрный';let price=id==='discovery'?990:itemPrice(ml,variant);if(!Number.isFinite(price))return;let found=cart.find(x=>x.id===id&&x.ml===ml&&(x.variant||'glass')===variant&&(variant!=='travel'||x.color===color));if(found){if(found.qty>=30){notify('Для одного товара максимум 30 штук.');return}found.qty+=1}else{if(cart.length>=30){notify('В корзине максимум 30 разных позиций.');return}cart.push({id,ml,title,variant,color,price,qty:1})}persist();notify('Добавлено в корзину · '+cart.reduce((sum,x)=>sum+x.qty,0)+' шт.')}
 function persist(){try{localStorage.setItem(key,JSON.stringify(cart))}catch{}renderCart()}
-function renderCart(){const quantity=cart.reduce((s,x)=>s+x.qty,0);const sum=cart.reduce((s,x)=>s+x.qty*x.price,0);$('count').textContent=quantity;$('subtotal').textContent=rub(sum);$('deliveryPrice').textContent=rub(quantity?deliveryFee:0);$('total').textContent=rub(quantity?sum+deliveryFee:0);$('mobileCartCount').textContent=quantity;$('mobileCartTotal').textContent=rub(quantity?sum+deliveryFee:0);$('mobileCartBar').hidden=true;$('navCartCount').textContent=quantity>99?'99+':quantity;$('navCartCount').hidden=quantity===0;$('clearCart').hidden=quantity===0;$('cartItems').innerHTML=cart.length?cart.map((x,i)=>`<div class="cart-row"><div class="cart-product"><img class="cart-bottle-photo" alt="" loading="lazy" decoding="async" src="${x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div class="cart-product-copy">${safe(x.title)}<small>${x.id==='discovery'?'Набор':x.ml+' мл · '+packagingName(x)} · ${x.qty} шт. · ${rub(x.price*x.qty)}</small></div></div><div class="cart-qty"><button data-remove="${i}" aria-label="Уменьшить количество ${safe(x.title)}">−</button><span aria-label="Количество">${x.qty}</span><button data-increase="${i}" aria-label="Увеличить количество ${safe(x.title)}">+</button></div></div>`).join(''):'<p class="cart-empty-state">Пока пусто. Выберите аромат из коллекции.</p>';
+function renderCart(){const quantity=cart.reduce((s,x)=>s+x.qty,0);const sum=cart.reduce((s,x)=>s+x.qty*x.price,0);const shipping=cartDeliveryFee(cart);$('count').textContent=quantity;$('subtotal').textContent=rub(sum);$('deliveryPrice').textContent=quantity&&shipping===0?'Бесплатно':rub(shipping);$('deliveryChoiceLegend').textContent=shipping===0?'Куда доставить заказ · Бесплатно':'Куда доставить заказ · 250 ₽';$('total').textContent=rub(sum+shipping);$('mobileCartCount').textContent=quantity;$('mobileCartTotal').textContent=rub(sum+shipping);$('mobileCartBar').hidden=true;$('navCartCount').textContent=quantity>99?'99+':quantity;$('navCartCount').hidden=quantity===0;$('clearCart').hidden=quantity===0;$('cartItems').innerHTML=cart.length?cart.map((x,i)=>`<div class="cart-row"><div class="cart-product"><img class="cart-bottle-photo" alt="" loading="lazy" decoding="async" src="${x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div class="cart-product-copy">${safe(x.title)}<small>${x.id==='discovery'?'Набор':x.ml+' мл · '+packagingName(x)} · ${x.qty} шт. · ${rub(x.price*x.qty)}</small></div></div><div class="cart-qty"><button data-remove="${i}" aria-label="Уменьшить количество ${safe(x.title)}">−</button><span aria-label="Количество">${x.qty}</span><button data-increase="${i}" aria-label="Увеличить количество ${safe(x.title)}">+</button></div></div>`).join(''):'<p class="cart-empty-state">Пока пусто. Выберите аромат из коллекции.</p>';
  $('checkoutPanel').hidden=cart.length===0;
  renderCheckoutReview();
  renderOrderReceipt();
@@ -438,7 +440,7 @@ function renderCheckoutReview(){
  const holder=$('checkoutReviewItems');if(!holder)return;
  const qty=cart.reduce((sum,x)=>sum+x.qty,0);
  $('checkoutReviewCount').textContent=qty+' шт.';
- $('checkoutReviewTotal').textContent=rub(cart.reduce((sum,x)=>sum+x.qty*x.price,0)+(cart.length?deliveryFee:0));
+ $('checkoutReviewTotal').textContent=rub(cart.reduce((sum,x)=>sum+x.qty*x.price,0)+cartDeliveryFee(cart));
  holder.innerHTML=cart.map(x=>`<div class="checkout-review-row"><img src="${x.id==='discovery'?'/assets/yad-6ml.webp':yadProductImage(x.id,x.ml).src}" loading="lazy" alt="" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div><strong>${safe(x.title)}</strong><small>${safe(orderProductLine(x))} · ${x.qty} шт.</small></div><span>${rub(x.price*x.qty)}</span></div>`).join('');
 }
 function receiptPlainText(order){
@@ -857,7 +859,7 @@ $('submitSiteOrder').addEventListener('click',async()=>{
   const publicNumber=String(result.order_id||'').slice(0,8).toUpperCase();
   lastOrder={
    number:publicNumber,method,delivery:body.delivery,
-   total:Number.isFinite(Number(result.total))?Number(result.total):cart.reduce((sum,x)=>sum+x.qty*x.price,0)+deliveryFee,
+   total:Number.isFinite(Number(result.total))?Number(result.total):cart.reduce((sum,x)=>sum+x.qty*x.price,0)+cartDeliveryFee(cart),
    items:cart.map(x=>({name:x.title,description:orderProductLine(x),qty:x.qty,price:x.qty*x.price})),
    statusToken:typeof result.status_token==='string'&&result.status_token.length<=160?result.status_token:null,
    status:'new',checkedAt:null,savedAt:Date.now()
