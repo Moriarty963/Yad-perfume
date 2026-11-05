@@ -835,6 +835,7 @@ window.addEventListener('popstate',renderPage);
 // Native Telegram back arrow complements the existing bottom navigation.
 // Keep purchase/cart behavior identical to the regular web storefront.
 window.YadMiniApp?.setBackHandler(()=>{
+ if(!$('catalogFilterLayer').hidden){closeCatalogFilters();return}
  if(!$('compareOverlay').hidden){closeCompareDialog();return}
  const page=currentPage();
  if(page.startsWith('fragrance/'))navigate(fragranceReturnContext?.page||'catalog');
