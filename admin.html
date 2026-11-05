@@ -92,6 +92,7 @@ function statusMessage(o){
 function contactLink(o){
  const c=String(o.contact_value||'').trim();
  if(o.contact_method==='telegram'&&/^@[A-Za-z0-9_]{5,32}$/.test(c))return 'https://t.me/'+c.slice(1);
+ if(o.contact_method==='phone'&&/^\+?[\d\s()\-]{10,25}$/.test(c))return 'tel:'+c.replace(/[^\d+]/g,'');
  if(o.contact_method==='whatsapp'){
   const digits=c.replace(/\D/g,'');
   if(digits.length>=10&&digits.length<=15)return 'https://wa.me/'+digits+'?text='+encodeURIComponent(statusMessage(o));
@@ -136,7 +137,7 @@ function renderOrders(){
   return '<article class="order">'+
    '<div class="order-top"><div><div class="order-id" title="'+safe(o.public_id)+'">№'+safe(number)+'</div><div class="muted">'+safe(date(o.created_at))+'</div></div><div class="total">'+money(o.total_rub)+'</div></div>'+
    '<div class="details"><div><small>Покупатель</small>'+safe(o.customer_name)+'</div>'+
-   '<div><small>Связь · '+safe(o.contact_method)+'</small>'+safe(o.contact_value)+(contact?'<div class="customer-update-actions"><a class="contact-link" target="_blank" rel="noopener noreferrer" href="'+safe(contact)+'">'+(o.contact_method==='whatsapp'?'Открыть сообщение ↗':'Открыть чат ↗')+'</a><button class="status-draft" data-draft-id="'+safe(o.public_id)+'" type="button">Скопировать сообщение</button></div><small class="status-draft-note">Уведомление подготовлено, но не отправлено. Отправка вручную.</small>':'')+'</div>'+
+   '<div><small>Связь · '+safe(({phone:'Телефон',whatsapp:'WhatsApp',telegram:'Telegram'}[o.contact_method]||o.contact_method))+'</small>'+safe(o.contact_value)+(contact?'<div class="customer-update-actions"><a class="contact-link" target="_blank" rel="noopener noreferrer" href="'+safe(contact)+'">'+(o.contact_method==='phone'?'Позвонить ↗':o.contact_method==='whatsapp'?'Открыть сообщение ↗':'Открыть чат ↗')+'</a><button class="status-draft" data-draft-id="'+safe(o.public_id)+'" type="button">Скопировать сообщение</button></div><small class="status-draft-note">Уведомление подготовлено, но не отправлено. Отправка вручную.</small>':'')+'</div>'+
    '<div><small>Доставка</small>'+safe(o.delivery_service)+' · '+safe(o.pickup_address)+'</div>'+
    '<div><small>Комментарий</small>'+safe(o.comment||'—')+'</div></div>'+
    '<div class="items">'+products+'</div>'+
