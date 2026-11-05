@@ -36,6 +36,7 @@ async function notifyTelegram(order,b,items){
   telegramEscape(b.name.trim()),
   'Связь: '+(b.method==='whatsapp'?'WhatsApp':'Telegram (бот после подключения)'),
   '<code>'+telegramEscape(b.contact.trim())+'</code>',
+  ...(b.method==='telegram'&&validPhone(b.phone)&&b.phone.trim()!==b.contact.trim()?['Телефон для связи: <code>'+telegramEscape(b.phone.trim())+'</code>']:[]),
   '',
   '📦 <b>ДОСТАВКА</b>',
   telegramEscape(b.delivery),
@@ -66,6 +67,7 @@ module.exports=async(req,res)=>{
   if(!validText(b.name,100)||!validText(b.contact,150)||!validText(b.address,350)||!['telegram','whatsapp'].includes(b.method)||!['Wildberries','Ozon'].includes(b.delivery)||typeof b.comment!=='string'||b.comment.length>500)return res.status(400).json({error:'Проверьте данные покупателя и доставки.'});
   if(b.method==='telegram'&&!validPhone(b.contact)&&!/^@[A-Za-z0-9_]{5,32}$/.test(b.contact.trim()))return res.status(400).json({error:'Укажите телефон для связи. Telegram можно подключить после заказа.'});
   if(b.method==='whatsapp'&&!validPhone(b.contact))return res.status(400).json({error:'Укажите корректный номер телефона для WhatsApp.'});
+  if(b.phone!==undefined&&!validPhone(b.phone))return res.status(400).json({error:'Укажите корректный номер телефона покупателя.'});
   if(!Array.isArray(b.items)||b.items.length<1||b.items.length>30)return res.status(400).json({error:'Добавьте товары в корзину.'});
   let subtotal=0;
   const items=[];
@@ -81,7 +83,7 @@ module.exports=async(req,res)=>{
   if(subtotal>1000000)return res.status(400).json({error:'Слишком большая сумма заказа.'});
   const orderDeliveryFee=items.some(item=>item.ml===100)?0:fee;
   const sql=neon(process.env.DATABASE_URL);
-  const rows=await sql`INSERT INTO yad_orders (customer_name,customer_phone,contact_method,contact_value,delivery_service,pickup_address,comment,items,subtotal_rub,delivery_rub,total_rub) VALUES (${b.name.trim()},${validPhone(b.contact)?b.contact.trim():null},${b.method},${b.contact.trim()},${b.delivery},${b.address.trim()},${b.comment.trim()},${JSON.stringify(items)}::jsonb,${subtotal},${orderDeliveryFee},${subtotal+orderDeliveryFee}) RETURNING public_id,created_at,subtotal_rub,delivery_rub,total_rub`;
+  const rows=await sql`INSERT INTO yad_orders (customer_name,customer_phone,contact_method,contact_value,delivery_service,pickup_address,comment,items,subtotal_rub,delivery_rub,total_rub) VALUES (${b.name.trim()},${validPhone(b.phone)?b.phone.trim():(validPhone(b.contact)?b.contact.trim():null)},${b.method},${b.contact.trim()},${b.delivery},${b.address.trim()},${b.comment.trim()},${JSON.stringify(items)}::jsonb,${subtotal},${orderDeliveryFee},${subtotal+orderDeliveryFee}) RETURNING public_id,created_at,subtotal_rub,delivery_rub,total_rub`;
   await notifyTelegram(rows[0],b,items);return res.status(201).json({order_id:rows[0].public_id,total:rows[0].total_rub,status_token:issueToken(rows[0].public_id)});
  }catch(e){console.error('YAD order submission failed',e?.message);return res.status(500).json({error:'Не удалось сохранить заказ. Попробуйте ещё раз.'})}
 };
