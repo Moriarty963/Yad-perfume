@@ -33,7 +33,17 @@
    member=response.member||null;draw();
   }catch(err){
    draw();
-   if(err.status===503){status('Регистрация готовится к запуску. Пока можно оформить заказ без аккаунта.',true);$('clubStart')?.querySelector('button[type="submit"]')?.setAttribute('disabled','true')}
+   if(err.status===503){
+    status('YAD Club скоро откроется. Пока можно оформить заказ без аккаунта.',true);
+    $('clubStart')?.querySelector('button[type="submit"]')?.setAttribute('disabled','true');
+    const form=$('clubStart');
+    if(form){
+     form.hidden=true;
+     const note=document.createElement('div');note.className='club-launch-note';
+     note.innerHTML='<strong>Узнавайте об акциях уже сейчас</strong><p>Подписывайтесь на наш официальный Telegram-канал: новые ароматы, подарочные наборы и специальные предложения.</p><a href="https://t.me/yad_parfume" target="_blank" rel="noopener noreferrer" data-yad-telegram-link>Канал YAD — смотреть новинки ↗</a>';
+     form.before(note);
+    }
+   }
    else status('Сейчас не удаётся загрузить профиль. Повторите позже.',true);
   }
  }
