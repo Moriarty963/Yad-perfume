@@ -2643,3 +2643,74 @@ body[data-page="cart"] .drawer-bottom .contact-choice label{
 .drawer-bottom .telegram-contact-fields .field-optional{color:#83796d;font-weight:400;font-size:12px}
 .drawer-bottom .telegram-contact-fields .checkout-contact-hint{margin:7px 0 0}
 .admin-fallback-phone{margin-top:7px;font-size:12px;line-height:1.4}
+
+
+/* YAD 2026: product-first catalog, filters in one accessible sheet. */
+#catalog.yad-catalog-compact{padding-top:clamp(22px,3vw,38px)}
+#catalog .catalog-heading{margin:0 0 15px;display:block}
+#catalog .catalog-heading h2{font:400 clamp(28px,3.5vw,43px)/1.16 Georgia,"Times New Roman",serif;letter-spacing:-.03em;margin:4px 0 0;color:#272521}
+#catalog .catalog-heading .eyebrow{font-size:10px;letter-spacing:.22em;margin:0}
+#catalog .catalog-toolbar{display:flex;align-items:stretch;gap:10px;margin:0 0 10px}
+#catalog .catalog-search-label{flex:1;min-width:0;position:relative;display:flex;align-items:center;margin:0}
+#catalog .catalog-search-icon{position:absolute;left:15px;font-size:24px;line-height:1;color:#887f71;pointer-events:none}
+#catalog #search{width:100%;min-width:0;margin:0;background:#fff;border:1px solid #ded8ce;border-radius:12px;color:#282724;font-size:16px;min-height:50px;padding:12px 14px 12px 44px;-webkit-appearance:none;appearance:none}
+#catalog #search::placeholder{color:#847e76;opacity:1}
+#catalog #search:focus-visible{outline:2px solid #8c795f;outline-offset:2px}
+#catalog .catalog-filter-open{display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;flex-shrink:0;min-height:50px;padding:0 17px;border:1px solid #d9d2c6;border-radius:12px;background:#fff;color:#39342e;font:600 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;cursor:pointer}
+#catalog .catalog-filter-open:active{background:#f2eee8}
+#catalog .catalog-filter-open:focus-visible,.catalog-filter-sheet button:focus-visible,.catalog-filter-sheet select:focus-visible,.catalog-active-filters button:focus-visible{outline:2px solid #776148;outline-offset:3px}
+#catalog .catalog-filter-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#292722;color:#fff;font-size:11px;font-weight:700}
+#catalog .catalog-filter-badge[hidden]{display:none!important}
+#catalog .catalog-count{font-size:11px;letter-spacing:.035em;text-transform:none;color:#77716a;margin:0 0 12px}
+#catalog .catalog-active-filters{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 10px}
+#catalog .catalog-active-filters[hidden]{display:none!important}
+#catalog .catalog-active-filters button{display:inline-flex;gap:9px;align-items:center;min-height:35px;padding:6px 11px;border:1px solid #d4ccbe;border-radius:999px;background:#ede8e0;color:#483f34;font:500 12px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;cursor:pointer}
+#catalog .catalog-active-filters button span{font-size:17px;line-height:1}
+#catalog .catalog-filter-layer[hidden]{display:none!important}
+#catalog .catalog-filter-layer{position:fixed;inset:0;z-index:250;display:flex;align-items:flex-end;justify-content:center}
+body.catalog-filter-open{overflow:hidden!important}
+#catalog .catalog-filter-backdrop{position:absolute;inset:0;background:rgba(19,18,16,.56);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+#catalog .catalog-filter-sheet{position:relative;z-index:1;width:min(100%,540px);max-height:min(92dvh,860px);display:flex;flex-direction:column;border-radius:22px 22px 0 0;background:#faf9f6;color:#292721;box-shadow:0 -18px 55px rgba(0,0,0,.24);overflow:hidden}
+#catalog .catalog-filter-sheet:focus{outline:none}
+#catalog .catalog-filter-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px 20px 15px;border-bottom:1px solid #e6e0d7}
+#catalog .catalog-filter-kicker{display:block;color:#91816e;font-size:10px;font-weight:600;letter-spacing:.17em}
+#catalog .catalog-filter-head h3{font:400 27px/1.18 Georgia,"Times New Roman",serif;letter-spacing:-.025em;margin:6px 0 0;color:#292621}
+#catalog .catalog-filter-close{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;min-width:44px;border:1px solid #e2dbd1;border-radius:50%;background:#fff;color:#544c41;font-size:16px;cursor:pointer}
+#catalog .catalog-filter-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;padding:9px 20px 18px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+#catalog .catalog-filter-group{padding:18px 0;border-bottom:1px solid #ebe6de}
+#catalog .catalog-filter-group h4,#catalog .catalog-filter-field-label{display:block;font:600 14px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#403a32;margin:0 0 12px}
+#catalog .catalog-filter-group .catalog-audiences{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0}
+#catalog .catalog-filter-group .catalog-audiences button{width:100%;min-width:0;min-height:44px;padding:10px 8px;font-size:13px}
+#catalog .catalog-filter-group .scent-finder{border:0;border-radius:0;background:transparent;margin:0;padding:0;box-shadow:none}
+#catalog .catalog-filter-group .scent-finder-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#catalog .catalog-filter-group .scent-finder-options button{width:100%;min-width:0;min-height:45px;margin:0;padding:10px 8px;white-space:normal;font-size:12px;line-height:1.35}
+#catalog .catalog-filter-group .mood-hint{margin:9px 0 0;font-size:11px;line-height:1.5;color:#83796d}
+#catalog .catalog-filter-group select[hidden]{display:none!important}
+#catalog .catalog-note-finder.catalog-filter-group{margin:0;padding:18px 0;border:0;border-bottom:1px solid #ebe6de;border-radius:0;background:transparent}
+#catalog .catalog-note-finder .catalog-note-heading h4{margin:0 0 4px}
+#catalog .catalog-note-finder .catalog-note-heading p{font-size:12px;margin:0 0 12px}
+#catalog .catalog-note-finder .catalog-note-options{display:flex;flex-wrap:wrap;gap:8px;overflow:visible;margin:0;padding:0;scroll-snap-type:none}
+#catalog .catalog-note-finder .catalog-note-options button{min-height:43px;font-size:12px;flex:0 0 auto}
+#catalog .catalog-note-finder .catalog-note-hint{font-size:11px;margin:10px 0 0}
+#catalog .catalog-filter-last{border-bottom:none;padding-bottom:4px}
+#catalog .catalog-filter-last select{width:100%;min-height:48px;margin:0 0 13px;padding:10px 13px;background:#fff;border:1px solid #dad3c9;border-radius:10px;color:#332d26;font-size:14px}
+#catalog .catalog-filter-last .favorites-filter{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:10px 14px;border:1px solid #dad3c9;border-radius:10px;background:#fff;color:#403a33;font-size:13px;cursor:pointer}
+#catalog .catalog-filter-last .favorites-filter[aria-pressed="true"]{background:#ede7dd;border-color:#a9967c}
+body[data-page="favorites"] #catalog .catalog-filter-last .favorites-filter{display:none}
+#catalog .catalog-filter-footer{flex:0 0 auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.65fr);gap:9px;padding:12px 20px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid #e6e0d7;background:#faf9f6}
+#catalog .catalog-filter-footer button{min-height:49px;border-radius:11px;font-size:13px;font-weight:650;cursor:pointer}
+#catalog .catalog-filter-footer .reset-filters{margin:0;border:1px solid #ddd6ca;background:#fff;color:#5e564b}
+#catalog .catalog-filter-footer .catalog-filter-apply{border:1px solid #292723;background:#292723;color:#fff;padding:10px 12px}
+@media(min-width:761px){#catalog .catalog-filter-layer{align-items:center;padding:20px}#catalog .catalog-filter-sheet{border-radius:20px;max-height:min(89dvh,850px)}}
+@media(max-width:760px){
+ #catalog.yad-catalog-compact{padding:23px 14px calc(105px + env(safe-area-inset-bottom,0px))}
+ #catalog .catalog-heading{margin-bottom:13px}
+ #catalog .catalog-heading h2{font-size:clamp(27px,7.6vw,34px)}
+ #catalog .catalog-toolbar{gap:8px}
+ #catalog .catalog-filter-open{padding:0 13px;min-width:110px}
+ #catalog .catalog-filter-head{padding:17px 18px 13px}
+ #catalog .catalog-filter-scroll{padding:7px 18px 15px}
+ #catalog .catalog-filter-footer{padding:11px 18px calc(13px + max(env(safe-area-inset-bottom,0px),var(--tg-content-safe-area-inset-bottom,0px)))}
+}
+@media(max-width:365px){#catalog .catalog-filter-open{min-width:49px;padding:0 11px;gap:5px}#catalog .catalog-filter-open>span:first-of-type{display:none}}
+@media(prefers-reduced-motion:reduce){#catalog .catalog-filter-layer,#catalog .catalog-filter-sheet{animation:none!important;transition:none!important}}
