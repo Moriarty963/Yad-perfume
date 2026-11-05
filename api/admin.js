@@ -77,7 +77,10 @@ module.exports=async(req,res)=>{
    try{const parsed=new URL(origin);validOrigin=parsed.protocol==='https:'&&parsed.host===req.headers.host}
    catch{}
    if(!validOrigin)return res.status(403).json({error:'Недопустимый источник изменения.'});
-   const body=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
+   let body;
+   try{body=typeof req.body==='string'?JSON.parse(req.body):req.body||{}}
+   catch{return res.status(400).json({error:'Некорректный JSON.'})}
+   if(!body||typeof body!=='object'||Array.isArray(body))return res.status(400).json({error:'Некорректные данные.'});
    if(JSON.stringify(body).length>2500)return res.status(413).json({error:'Слишком большой текст.'});
    if(req.method==='DELETE'){
     const id=String(body.id||'');
@@ -88,12 +91,16 @@ module.exports=async(req,res)=>{
    }
    const title=typeof body.title==='string'?body.title.trim():'';
    const content=typeof body.body==='string'?body.body.trim():'';
-   const url=typeof body.url==='string'?body.url.trim():'';
+   let url=typeof body.url==='string'?body.url.trim():'';
    if(title.length<2||title.length>110||content.length<5||content.length>1500||url.length>300)
       return res.status(400).json({error:'Проверьте название и текст акции.'});
    if(url){
-    try{const dest=new URL(url);if(dest.origin!=='https://yad-market.vercel.app'||dest.username||dest.password)throw Error('not YAD')}
-    catch{return res.status(400).json({error:'Укажите ссылку на страницу YAD.'})}
+    try{
+     const dest=new URL(url);
+     if(dest.origin!=='https://yad-market.vercel.app'||dest.username||dest.password)throw Error('not YAD');
+     url=dest.href;
+     if(url.length>300)return res.status(400).json({error:'Ссылка слишком длинная.'});
+    }catch{return res.status(400).json({error:'Укажите ссылку на страницу YAD.'})}
    }
    if(req.method==='POST'){
     const draft=await sql`INSERT INTO yad_campaign_drafts (title,body,target_url)
