@@ -2558,3 +2558,32 @@ body.compare-dialog-open .compare-tray{visibility:hidden}
   ));
  }
 }
+
+
+/* YAD Telegram community navigation — preserve compact four-tab mobile UX. */
+.yad-channel-header-link{display:none}
+@media(max-width:760px){
+ .header .yad-channel-header-link{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-height:38px;padding:7px 13px;margin-left:auto;
+  border:1px solid #ded9d0;border-radius:999px;
+  background:#fff;color:#544c40;font-size:12px;font-weight:600;
+  line-height:1.2;letter-spacing:.01em;white-space:nowrap;
+ }
+ .header .yad-channel-header-link:focus-visible{outline:2px solid #80725d;outline-offset:2px}
+}
+.editorial-social-links{
+ display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:15px;
+}
+.editorial-footer .editorial-social-links a,
+.yad-legacy-telegram-links a{
+ display:inline-flex;align-items:center;justify-content:center;
+ min-height:38px;padding:8px 11px;border:1px solid #e2dcd3;
+ border-radius:9px;background:#fff;color:#544b40;
+ font-size:12px;font-weight:600;line-height:1.35;text-decoration:none;
+ transition:background .2s ease,border-color .2s ease;
+}
+.editorial-footer .editorial-social-links a:hover,
+.yad-legacy-telegram-links a:hover{background:#f1eee9;border-color:#cfc3b4}
+.yad-legacy-telegram-links{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.yad-legacy-telegram-links a:focus-visible{outline:2px solid #80725d;outline-offset:2px}

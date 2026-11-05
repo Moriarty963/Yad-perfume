@@ -41,5 +41,14 @@
   try{if(!tg.isFullscreen&&typeof tg.requestFullscreen==='function')tg.requestFullscreen()}catch(_){}
  }
  setFullscreenClass();
+ // Open brand links in Telegram itself; normal browsers keep standard links.
+ document.addEventListener('click',function(event){
+  const link=event.target.closest('a[data-yad-telegram-link]');
+  if(!link||typeof tg.openTelegramLink!=='function')return;
+  const url=link.getAttribute('href');
+  if(!/^https:\/\/t\.me\/(?:yad_parfume|Yad_perfume_app)\/?$/i.test(url||''))return;
+  event.preventDefault();
+  try{tg.openTelegramLink(url)}catch(_){}
+ });
  try{tg.BackButton&&tg.BackButton.onClick(function(){if(backHandler)backHandler()})}catch(_){}
 })();
