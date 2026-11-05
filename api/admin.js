@@ -64,6 +64,17 @@ module.exports=async(req,res)=>{
    return res.status(200).json({notification_status:outcome,status:order.status});
   }
   // Review moderation shares the existing HttpOnly administrator session.
+  if(req.method==='GET'&&req.query.action==='club-stats'){
+   if(process.env.YAD_CLUB_DATA_REGION!=='RU'||process.env.YAD_CLUB_PRIVACY_APPROVED!=='true'||!process.env.YAD_CLUB_DATABASE_URL)
+    return res.status(200).json({configured:false,registered:0,subscribed:0});
+   try{
+    const {database}=require('../lib/yad-club-db');
+    const result=await database().query(`SELECT COUNT(*)::int AS registered,
+      COUNT(*) FILTER(WHERE promotions_opt_in=true AND verified_at IS NOT NULL)::int AS subscribed
+      FROM yad_club_members`);
+    return res.status(200).json({configured:true,...result.rows[0]});
+   }catch(e){console.error('YAD Club stats unavailable',e?.message);return res.status(503).json({error:'Статистика YAD Club временно недоступна.'})}
+  }
   if(req.method==='GET'&&req.query.action==='reviews'){
    const state=String(req.query.status||'pending');
    const page=Number(req.query.page||0),reviewPageSize=6;
