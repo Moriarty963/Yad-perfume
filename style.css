@@ -2714,3 +2714,83 @@ body[data-page="favorites"] #catalog .catalog-filter-last .favorites-filter{disp
 }
 @media(max-width:365px){#catalog .catalog-filter-open{min-width:49px;padding:0 11px;gap:5px}#catalog .catalog-filter-open>span:first-of-type{display:none}}
 @media(prefers-reduced-motion:reduce){#catalog .catalog-filter-layer,#catalog .catalog-filter-sheet{animation:none!important;transition:none!important}}
+
+/* Gift collection: actual gift box photo, three custom scents, mobile-first selectors. */
+.yad-home-gift{display:grid;grid-template-columns:1.08fr .92fr;gap:clamp(22px,4vw,65px);align-items:center;max-width:1320px;margin:0 auto 95px;padding:0 clamp(17px,5vw,50px)}
+.yad-home-gift-photo{display:block;aspect-ratio:6/5;overflow:hidden;border-radius:19px;background:#efe9e1}
+.yad-home-gift-photo img{width:100%;height:100%;object-fit:cover;object-position:center 48%;display:block}
+.yad-home-gift-body h2{font:400 clamp(28px,3.6vw,48px)/1.15 Georgia,"Times New Roman",serif;letter-spacing:-.03em;color:#2d2924;margin:14px 0}
+.yad-home-gift-body h2 em{color:#86735d;font-weight:400}
+.yad-home-gift-body p{max-width:400px;font-size:14px;line-height:1.75;color:#766c62}
+.yad-home-gift-bottom{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:26px}
+.yad-home-gift-bottom strong{font-size:24px;color:#292621}
+.yad-home-gift-bottom a,.yad-gift-catalog-bottom em{display:inline-flex;align-items:center;justify-content:center;background:#282723;border-radius:11px;color:#fff;text-decoration:none;min-height:48px;padding:12px 17px;font-size:13px;font-weight:650;font-style:normal}
+#catalog .yad-catalog-gift-highlight[hidden]{display:none!important}
+#catalog .yad-catalog-gift-highlight{margin:0 0 20px}
+.yad-gift-catalog-card{display:grid;grid-template-columns:36% 1fr;overflow:hidden;background:#fff;border:1px solid #e5dfd7;border-radius:15px;color:#2c2823;text-decoration:none}
+.yad-gift-catalog-image{display:block;min-height:170px;overflow:hidden;background:#efe9e1}
+.yad-gift-catalog-image img{width:100%;height:100%;display:block;object-fit:cover;object-position:center 46%}
+.yad-gift-catalog-copy{display:flex;flex-direction:column;justify-content:center;gap:9px;min-width:0;padding:20px 24px}
+.yad-gift-catalog-copy>strong{font:400 clamp(19px,2.5vw,28px)/1.18 Georgia,"Times New Roman",serif;color:#2c2823}
+.yad-gift-catalog-copy>small{font-size:12px;line-height:1.5;color:#766c63}
+.yad-gift-catalog-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:4px}
+.yad-gift-catalog-bottom b{font-size:20px;color:#282520}
+.yad-gift-catalog-bottom em{font-size:11px;min-height:42px;padding:9px 12px}
+.yad-gift-detail{background:#faf9f6;min-height:100dvh;color:#292621;padding:30px clamp(14px,5vw,68px) 125px}
+.yad-gift-detail[hidden]{display:none!important}
+.yad-gift-breadcrumb{max-width:1300px;margin:0 auto 22px;display:flex;justify-content:space-between;gap:16px}
+.yad-gift-breadcrumb a{font-size:13px;text-decoration:none;color:#756b60}
+.yad-gift-breadcrumb span{font-size:10px;letter-spacing:.15em;color:#938675}
+.yad-gift-layout{max-width:1300px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:clamp(22px,5vw,70px);align-items:start}
+.yad-gift-stage{position:sticky;top:90px;border-radius:16px;overflow:hidden;background:#ede7df}
+.yad-gift-stage img{width:100%;height:auto;max-height:760px;object-fit:contain;display:block}
+.yad-gift-info h1{font:400 clamp(35px,4vw,56px)/1.12 Georgia,"Times New Roman",serif;color:#292621;letter-spacing:-.03em;margin:14px 0 18px}
+.yad-gift-info h1 em{color:#85715a;font-weight:400}
+.yad-gift-lead{font-size:14px;color:#756c62;line-height:1.75}
+.yad-gift-includes{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0 23px}
+.yad-gift-includes span{padding:7px 11px;font-size:11px;background:#fff;border:1px solid #e5dfd6;border-radius:999px;color:#665b4e}
+.yad-gift-picker{background:#fff;border:1px solid #e7e0d7;border-radius:15px;padding:19px 20px 20px;min-width:0;margin:0 0 22px}
+.yad-gift-picker legend{font:500 18px Georgia,"Times New Roman",serif;padding:0 7px;color:#2c2823}
+.yad-gift-picker>p{font-size:12px;line-height:1.5;color:#7e756a;margin:0 0 15px}
+.yad-gift-picker label{display:block;margin-top:13px;font-size:12px;font-weight:600;color:#4f473b}
+.yad-gift-picker select{box-sizing:border-box;display:block;width:100%;min-height:51px;margin-top:7px;padding:11px 13px;background:#faf9f6;border:1px solid #dcd4c9;border-radius:11px;color:#292621;font:400 16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+.yad-gift-picker select:focus-visible,.yad-gift-purchase button:focus-visible{outline:2px solid #78654f;outline-offset:3px}
+.yad-gift-selection-status{padding:10px 12px;background:#f3eee7;border-radius:9px;color:#736454;font-size:12px;overflow-wrap:anywhere;margin:15px 0 0!important}
+.yad-gift-selection-status.error{background:#fff0f0;color:#a53836}
+.yad-gift-purchase{display:flex;align-items:center;justify-content:space-between;gap:17px}
+.yad-gift-purchase>div{display:flex;flex-direction:column;gap:3px}
+.yad-gift-purchase small{color:#81766a;font-size:11px}
+.yad-gift-purchase strong{font-size:27px;color:#272521}
+.yad-gift-purchase button{min-height:52px;padding:11px 18px;border:0;border-radius:11px;color:#fff;background:#292622;font-size:13px;font-weight:650;cursor:pointer}
+.yad-gift-delivery{font-size:12px;color:#81776c;line-height:1.6;margin-top:16px}
+@media(max-width:760px){
+ .yad-home-gift{grid-template-columns:1fr;padding:0 14px;margin:0 auto 55px;gap:16px}
+ .yad-home-gift-photo{aspect-ratio:16/11;border-radius:14px}
+ .yad-home-gift-body h2{font-size:30px;margin:11px 0}
+ .yad-home-gift-body p{font-size:13px}
+ #catalog .yad-gift-catalog-card{grid-template-columns:43% 1fr;border-radius:13px}
+ #catalog .yad-gift-catalog-image{min-height:152px}
+ #catalog .yad-gift-catalog-copy{gap:6px;padding:12px}
+ #catalog .yad-gift-catalog-copy>strong{font-size:18px}
+ #catalog .yad-gift-catalog-copy>small{font-size:11px}
+ #catalog .yad-gift-catalog-bottom{flex-wrap:wrap;gap:6px}
+ #catalog .yad-gift-catalog-bottom b{font-size:17px}
+ #catalog .yad-gift-catalog-bottom em{font-size:11px;min-height:38px;padding:7px 10px}
+ .yad-gift-detail{padding:18px 14px calc(110px + env(safe-area-inset-bottom,0px))}
+ .yad-gift-layout{grid-template-columns:1fr;gap:20px}
+ .yad-gift-stage{position:static;border-radius:13px}
+ .yad-gift-stage img{width:100%;height:auto;max-height:430px;object-fit:cover}
+ .yad-gift-info h1{font-size:37px;margin:11px 0}
+ .yad-gift-lead{font-size:13px}
+ .yad-gift-picker{padding:16px}
+ .yad-gift-purchase strong{font-size:23px}
+ .yad-gift-purchase button{font-size:12px}
+}
+@media(max-width:360px){
+ #catalog .yad-gift-catalog-card{grid-template-columns:1fr}
+ #catalog .yad-gift-catalog-image{height:185px}
+ .yad-gift-purchase{flex-direction:column;align-items:stretch}
+ .yad-gift-purchase button{width:100%}
+}
+
+.yad-gift-photo-note{display:block;padding:10px 13px;background:#fff;font-size:11px;line-height:1.5;color:#857a6d;text-align:center}
