@@ -340,13 +340,86 @@ document.addEventListener('keydown',event=>{
  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
 });
+
+/* Catalog filters use the same real product state as the grid.
+   The sheet never duplicates product lists, requests or filter values. */
+let focusBeforeCatalogFilter=null;
+function closeCatalogFilters(restoreFocus=true){
+ const layer=$('catalogFilterLayer');
+ if(layer.hidden)return;
+ layer.hidden=true;document.body.classList.remove('catalog-filter-open');
+ $('catalogFilterOpen').setAttribute('aria-expanded','false');
+ if(restoreFocus&&focusBeforeCatalogFilter?.isConnected)focusBeforeCatalogFilter.focus();
+ focusBeforeCatalogFilter=null;
+}
+function openCatalogFilters(){
+ const layer=$('catalogFilterLayer');if(!layer.hidden)return;
+ focusBeforeCatalogFilter=document.activeElement;
+ layer.hidden=false;document.body.classList.add('catalog-filter-open');
+ $('catalogFilterOpen').setAttribute('aria-expanded','true');
+ $('catalogFilterSheet').focus();
+}
+$('catalogFilterOpen').addEventListener('click',openCatalogFilters);
+$('catalogFilterClose').addEventListener('click',()=>closeCatalogFilters());
+$('catalogFilterBackdrop').addEventListener('click',()=>closeCatalogFilters());
+$('catalogFilterApply').addEventListener('click',()=>{
+ closeCatalogFilters(false);
+ $('catalogFilterOpen').focus();
+ requestAnimationFrame(()=>$('products').scrollIntoView({
+  block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'
+ }));
+});
+$('catalogFilterLayer').addEventListener('keydown',event=>{
+ if(event.key==='Escape'){event.preventDefault();closeCatalogFilters();return}
+ if(event.key!=='Tab')return;
+ const nodes=[...$('catalogFilterSheet').querySelectorAll('button:not([disabled]),select:not([disabled]),input:not([disabled])')]
+  .filter(el=>!el.closest('[hidden]')&&el.getClientRects().length>0);
+ if(!nodes.length){event.preventDefault();return}
+ const first=nodes[0],last=nodes[nodes.length-1];
+ if(event.shiftKey&&(document.activeElement===first||document.activeElement===$('catalogFilterSheet'))){event.preventDefault();last.focus()}
+ else if(!event.shiftKey&&(document.activeElement===last||document.activeElement===$('catalogFilterSheet'))){event.preventDefault();first.focus()}
+});
+const catalogFilterAudienceLabels={men:'Мужские',women:'Женские',unisex:'Унисекс'};
+const catalogFilterMoodLabels={fresh:'Свежесть и свобода',woody:'Спокойная уверенность',floral:'Мягкость и нежность',intense:'Яркое впечатление'};
+function syncCatalogFilterUI(matchCount){
+ const selected=[];
+ const audience=$('audience').value,family=$('family').value;
+ if(audience!=='all')selected.push(['audience',catalogFilterAudienceLabels[audience]||audience]);
+ if(family!=='all')selected.push(['family',catalogFilterMoodLabels[family]||family]);
+ if(activeScentNote){
+  const note=scentNoteFilters.find(([key])=>key===activeScentNote);
+  if(note)selected.push(['note',note[1]]);
+ }
+ if(favoritesOnly&&currentPage()!=='favorites')selected.push(['favorites','Избранное']);
+ const sort=$('sort').value;
+ if(sort!=='default')selected.push(['sort',sort==='name'?'А–Я':'Я–А']);
+ const badge=$('catalogFilterBadge');
+ badge.hidden=selected.length===0;
+ badge.textContent=String(selected.length);
+ const bar=$('catalogActiveFilters');
+ bar.hidden=selected.length===0;
+ bar.innerHTML=selected.map(([key,label])=>'<button type="button" data-filter-clear="'+key+'" aria-label="Убрать фильтр '+safe(label)+'">'+safe(label)+' <span aria-hidden="true">×</span></button>').join('');
+ $('catalogFilterApply').textContent=matchCount===0?'Показать результаты':'Показать '+matchCount+' '+(matchCount%10===1&&matchCount%100!==11?'аромат':matchCount%10>=2&&matchCount%10<=4&&(matchCount%100<12||matchCount%100>14)?'аромата':'ароматов');
+}
+$('catalogActiveFilters').addEventListener('click',event=>{
+ const b=event.target.closest('[data-filter-clear]');if(!b)return;
+ switch(b.dataset.filterClear){
+  case 'audience':$('audience').value='all';syncAudienceButtons();break;
+  case 'family':$('family').value='all';syncMood();break;
+  case 'note':activeScentNote='';break;
+  case 'favorites':favoritesOnly=false;updateFavoritesUI();break;
+  case 'sort':$('sort').value='default';break;
+ }
+ renderProducts();
+});
+
 const catalogPageSize=12;
 let catalogVisibleLimit=catalogPageSize,catalogViewKey='',renderedCatalogIds=[];
 function renderProducts(){const query=foldScent($('search').value);const terms=query?query.split(/\s+/).filter(Boolean):[];const family=$('family').value,audience=$('audience').value;let items=fragrances.filter(f=>(!favoritesOnly||favorites.includes(f.id))&&(family==='all'||f.family===family)&&(audience==='all'||f.audience===audience)&&scentMatches(f,terms)&&matchesCatalogNote(f,activeScentNote));const sort=$('sort').value;if(sort==='name')items.sort((a,b)=>a.name.localeCompare(b.name,'ru'));if(sort==='name-desc')items.sort((a,b)=>b.name.localeCompare(a.name,'ru'));const key=JSON.stringify([query,family,audience,sort,favoritesOnly,activeScentNote]);if(catalogViewKey!==key){catalogViewKey=key;catalogVisibleLimit=catalogPageSize;renderedCatalogIds=[]}
 const shown=items.slice(0,catalogVisibleLimit),shownIds=shown.map(f=>f.id);
 const append=renderedCatalogIds.length>0&&shownIds.length>renderedCatalogIds.length&&renderedCatalogIds.every((id,index)=>id===shownIds[index]);
 const toRender=append?shown.slice(renderedCatalogIds.length):shown;
-$('catalogCount').textContent=items.length===0?'Ничего не найдено':`Показано ${shown.length} из ${items.length} ароматов`;syncNoteOptions(items.length);
+$('catalogCount').textContent=items.length===0?'Ничего не найдено':`Показано ${shown.length} из ${items.length} ароматов`;syncNoteOptions(items.length);syncCatalogFilterUI(items.length);
 const markup=toRender.map((f,index)=>`<article class="product" data-card-detail="${f.id}"><div class="product-art scene-${f.family} " style="--glow:${f.glow}"><div class="scene-backdrop" aria-hidden="true"><i class="scene-light"></i><i class="scene-ridge ridge-one"></i><i class="scene-ridge ridge-two"></i><i class="scene-branch"></i><i class="scene-stone"></i><i class="scene-foreground"></i></div><span class="atelier-card-stamp" aria-hidden="true">YAD / ATELIER</span>${photoMarkup(20,f.id,!append&&index<2)}<span class="atelier-card-volume" aria-label="Показанный объём">20 мл</span><span class="atelier-card-media-label" aria-label="Тип изображения">${yadMediaLabel(yadProductImage(f.id,20))}</span><div class="yad-product-bottle volume-20" aria-hidden="true"><div class="yad-cap"></div><div class="yad-collar"></div><div class="yad-glass"><div class="yad-tube"></div><div class="yad-label"><span>YAD PERFUME</span><strong>${safe(f.name)}</strong><small>EXTRAIT DE PARFUM<br><span class="bottle-volume">20 мл</span></small></div></div></div><button type="button" class="favorite-toggle" data-favorite="${f.id}" aria-pressed="${favorites.includes(f.id)}" aria-label="${favorites.includes(f.id)?'Убрать из избранного':'В избранное'}: ${safe(f.name)}">${favorites.includes(f.id)?'♥':'♡'}</button></div><div class="product-info"><a class="product-image-link" href="/fragrance/${f.id}" data-detail="${f.id}" aria-label="Подробнее об аромате ${safe(f.name)}">Подробнее об аромате ↗</a><div class="product-meta"><span class="product-audience" data-audience="${f.audience}">${audienceLabels[f.audience]}</span><span class="product-family">${fragranceFamilyLabels[f.family]||'Ароматический'}</span><span class="product-number">№ ${String(fragrances.indexOf(f)+1).padStart(2,"0")}</span></div><h3><a class="product-detail-link" href="/fragrance/${f.id}" data-detail="${f.id}">${safe(f.name)}</a></h3><p class="product-aroma-description">${safe(aromaDescription(f))}</p><div class="product-aroma-notes" aria-label="Ноты аромата: ${safe(f.notes)}"><span class="product-notes-kicker">НОТЫ КОМПОЗИЦИИ</span><div class="product-note-tags">${f.notes.split(' · ').map(note=>`<span>${safe(note)}</span>`).join('')}</div></div><button type="button" class="product-compare" data-compare="${f.id}" aria-pressed="${comparedScents.includes(f.id)}">${comparedScents.includes(f.id)?"✓ В сравнении":"+ Сравнить"}</button><p class="product-price">${rub(prices[20])}</p><div class="product-volume-choice"><label for="size-${f.id}">Выберите объём</label><select aria-label="Объём ${safe(f.name)}" id="size-${f.id}">${Object.entries(prices).map(([ml,p])=>`<option value="${ml}" ${ml==='20'?'selected':''}>${ml} мл — ${rub(p)}</option>`).join('')}</select></div><button data-add="${f.id}">Добавить в корзину ↗</button></div></article>`).join('');
 const holder=$('products');if(append){holder.insertAdjacentHTML('beforeend',markup)}else{holder.innerHTML=markup||'<p>Ароматы не найдены. Попробуйте другую ноту, направление или сбросьте фильтры.</p>'}
 renderedCatalogIds=shownIds;
@@ -614,7 +687,7 @@ function syncAudienceButtons(){const current=$('audience').value;document.queryS
 function selectAudience(value){if(!['all','men','women','unisex'].includes(value))return;$('audience').value=value;syncAudienceButtons();renderProducts()}
 $('catalogAudiences').addEventListener('click',e=>{const b=e.target.closest('[data-audience]');if(b)selectAudience(b.dataset.audience)});
 $('audience').addEventListener('change',()=>selectAudience($('audience').value));
-$('search').addEventListener('input',renderProducts);$('family').addEventListener('change',renderProducts);$('sort').addEventListener('change',renderProducts);$('resetFilters').addEventListener('click',()=>{$('search').value='';$('family').value='all';$('audience').value='all';syncAudienceButtons();$('sort').value='default';activeScentNote='';favoritesOnly=false;updateFavoritesUI();renderProducts()});$('products').addEventListener('click',e=>{const favorite=e.target.closest('[data-favorite]');if(favorite){toggleFavorite(favorite.dataset.favorite);return}const compare=e.target.closest('[data-compare]');if(compare){toggleCompareScent(compare.dataset.compare);return}let b=e.target.closest('[data-add]');if(b){add(b.dataset.add,Number($('size-'+b.dataset.add).value));return}const detail=e.target.closest('[data-detail]');if(detail){e.preventDefault();navigate('fragrance/'+detail.dataset.detail);return}const share=e.target.closest('[data-share]');if(share){shareFragrance(share.dataset.share);return}const card=e.target.closest('.product[data-card-detail]');if(card&&!e.target.closest('button,select,option,input,textarea,label,a,[contenteditable]')){navigate('fragrance/'+card.dataset.cardDetail)}});$('favoritesFilter').addEventListener('click',()=>{favoritesOnly=!favoritesOnly;updateFavoritesUI();renderProducts()});updateFavoritesUI();$('addDiscovery').addEventListener('click',()=>add('discovery',0));$('cartButton').addEventListener('click',openCart);$('mobileCartBar').addEventListener('click',openCart);
+$('search').addEventListener('input',renderProducts);$('family').addEventListener('change',renderProducts);$('sort').addEventListener('change',renderProducts);$('resetFilters').addEventListener('click',()=>{$('search').value='';$('family').value='all';$('audience').value='all';syncAudienceButtons();$('sort').value='default';activeScentNote='';favoritesOnly=currentPage()==='favorites';updateFavoritesUI();renderProducts()});$('products').addEventListener('click',e=>{const favorite=e.target.closest('[data-favorite]');if(favorite){toggleFavorite(favorite.dataset.favorite);return}const compare=e.target.closest('[data-compare]');if(compare){toggleCompareScent(compare.dataset.compare);return}let b=e.target.closest('[data-add]');if(b){add(b.dataset.add,Number($('size-'+b.dataset.add).value));return}const detail=e.target.closest('[data-detail]');if(detail){e.preventDefault();navigate('fragrance/'+detail.dataset.detail);return}const share=e.target.closest('[data-share]');if(share){shareFragrance(share.dataset.share);return}const card=e.target.closest('.product[data-card-detail]');if(card&&!e.target.closest('button,select,option,input,textarea,label,a,[contenteditable]')){navigate('fragrance/'+card.dataset.cardDetail)}});$('favoritesFilter').addEventListener('click',()=>{favoritesOnly=!favoritesOnly;updateFavoritesUI();renderProducts()});updateFavoritesUI();$('addDiscovery').addEventListener('click',()=>add('discovery',0));$('cartButton').addEventListener('click',openCart);$('mobileCartBar').addEventListener('click',openCart);
 const bottomNav=document.querySelector('.yad-bottom-nav');
 const pages=['home','catalog','favorites','cart'];
 // Keep a short-lived return point when shoppers open a fragrance from a list.
@@ -719,6 +792,7 @@ renderMarketHome();
 
 function renderPage(){
  if(!$('compareOverlay').hidden)closeCompareDialog(false);
+ closeCatalogFilters(false);
  const page=currentPage();
  const returnToList=lastRenderedPage.startsWith('fragrance/')&&fragranceReturnContext?.page===page;
  const returnScrollY=returnToList?fragranceReturnContext.scrollY:0;
@@ -898,7 +972,7 @@ document.addEventListener('click',event=>{
   renderProducts();
  }
 });
-const moodLabels={fresh:'Свежесть и свобода',woody:'Спокойная уверенность',floral:'Мягкость и нежность',intense:'Яркое впечатление'};function syncMood(){const selected=$('family').value;document.querySelectorAll('[data-mood]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mood===selected)));$('moodHint').textContent=moodLabels[selected]?'Подобраны ароматы направления «'+moodLabels[selected]+'». Это ориентир по нотам, а не индивидуальная рекомендация.':'Выберите настроение — покажем подходящее направление коллекции.'}document.querySelectorAll('[data-mood]').forEach(button=>button.addEventListener('click',()=>{$('search').value='';$('family').value=$('family').value===button.dataset.mood?'all':button.dataset.mood;syncMood();renderProducts();$('products').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'})}));$('family').addEventListener('change',syncMood);$('resetFilters').addEventListener('click',syncMood);syncMood();
+const moodLabels={fresh:'Свежесть и свобода',woody:'Спокойная уверенность',floral:'Мягкость и нежность',intense:'Яркое впечатление'};function syncMood(){const selected=$('family').value;document.querySelectorAll('[data-mood]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mood===selected)));$('moodHint').textContent=moodLabels[selected]?'Подобраны ароматы направления «'+moodLabels[selected]+'». Это ориентир по нотам, а не индивидуальная рекомендация.':'Выберите настроение — покажем подходящее направление коллекции.'}document.querySelectorAll('[data-mood]').forEach(button=>button.addEventListener('click',()=>{$('search').value='';$('family').value=$('family').value===button.dataset.mood?'all':button.dataset.mood;syncMood();renderProducts();if($('catalogFilterLayer').hidden)$('products').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})}));$('family').addEventListener('change',syncMood);$('resetFilters').addEventListener('click',syncMood);syncMood();
 $('search').addEventListener('keydown',e=>{if(e.key==='Escape'&&$('search').value){$('search').value='';renderProducts()}});// Personal contact details stay in the current page only, not persistent browser storage.
 try{localStorage.removeItem('yad-customer-v1')}catch{};
 syncAudienceButtons();renderProducts();renderCart();renderPage();openLinkedFragrance();
