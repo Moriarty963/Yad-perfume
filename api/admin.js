@@ -66,12 +66,13 @@ module.exports=async(req,res)=>{
   // Review moderation shares the existing HttpOnly administrator session.
   if(req.method==='GET'&&req.query.action==='reviews'){
    const state=String(req.query.status||'pending');
-   if(!['pending','approved','rejected'].includes(state))return res.status(400).json({error:'Неверный фильтр.'});
+   const page=Number(req.query.page||0),reviewPageSize=6;
+   if(!['pending','approved','rejected'].includes(state)||!Number.isInteger(page)||page<0||page>1000)return res.status(400).json({error:'Неверный фильтр.'});
    const rows=await sql`SELECT r.id,r.fragrance_id,r.author_name,r.rating,r.body,r.photos,r.status,r.created_at,
      left(o.public_id::text,8) AS order_number FROM yad_fragrance_reviews r
      JOIN yad_orders o ON o.public_id=r.order_id WHERE r.status=${state}
-     ORDER BY r.created_at DESC LIMIT 40`;
-   return res.status(200).json({reviews:rows});
+     ORDER BY r.created_at DESC LIMIT ${reviewPageSize+1} OFFSET ${page*reviewPageSize}`;
+   return res.status(200).json({reviews:rows.slice(0,reviewPageSize),has_more:rows.length>reviewPageSize,page});
   }
   if(req.method==='PATCH'&&req.query.action==='review'){
    const body=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
