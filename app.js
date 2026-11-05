@@ -771,7 +771,7 @@ window.YadMiniApp?.setBackHandler(()=>{
 document.addEventListener('click',e=>{const link=e.target.closest('a[href^="#"]');if(!link)return;const href=link.getAttribute('href');if(href==='#catalog'||href==='#discovery'||href==='#philosophy'||href==='#questions'||href==='#top'){e.preventDefault();const page=href==='#catalog'?'catalog':'home';navigate(page);if(page==='home'&&href!=='#top')requestAnimationFrame(()=>document.querySelector(href)?.scrollIntoView({behavior:'smooth'}))}});
 $('continueShopping').addEventListener('click',()=>navigate('catalog'));$('clearCart').addEventListener('click',()=>{if(!cart.length)return;if(!window.confirm('Удалить все товары из корзины?'))return;cart=[];persist();$('status').textContent='Корзина очищена.';notify('Корзина очищена')});$('closeCart').addEventListener('click',closeCart);$('overlay').addEventListener('click',closeCart);document.addEventListener('keydown',e=>{if(!$('drawer').classList.contains('open')||currentPage()==='cart')return;if(e.key==='Escape'){e.preventDefault();closeCart();return}if(e.key==='Tab'){const nodes=[...$('drawer').querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),a[href]')].filter(el=>el.getClientRects().length);if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});$('cartItems').addEventListener('click',e=>{let b=e.target.closest('[data-remove],[data-increase]');if(!b)return;let i=Number(b.dataset.remove??b.dataset.increase);if(!cart[i])return;if(b.hasAttribute('data-increase')){if(cart[i].qty>=30){notify('Для одного товара максимум 30 штук.');return}cart[i].qty+=1}else{cart[i].qty--;if(!cart[i].qty)cart.splice(i,1)}persist()});
 // Checkout feedback appears next to the field requiring attention.
-const checkoutFieldIds=['customerName','customerPhone','customerAddress','customerComment'];
+const checkoutFieldIds=['customerName','customerPhone','customerAddress','customerComment','customerTelegramContact'];
 function clearCheckoutFieldIssue(){
  const note=$('checkoutFieldError');if(note)note.remove();
  checkoutFieldIds.forEach(id=>{const field=$(id);field?.removeAttribute('aria-invalid');if(id==='customerAddress')field?.setAttribute('aria-describedby','pickupServiceHint');else field?.removeAttribute('aria-describedby')});
@@ -812,6 +812,13 @@ function buildOrder(){
  if(!address)return checkoutProblem('Укажите город и адрес пункта выдачи.','customerAddress');
  if(address.length>350)return checkoutProblem('Адрес слишком длинный — не более 350 символов.','customerAddress');
  if(comment.length>500)return checkoutProblem('Сократите комментарий до 500 символов.','customerComment');
+ if(method==='telegram'){
+  const tg=$('customerTelegramContact').value.trim();
+  const tgDigits=tg.replace(/\D/g,'');
+  const tgPhone=/^\+?[\d\s()\-]{10,25}$/.test(tg)&&tgDigits.length>=10&&tgDigits.length<=15;
+  if(tg&&!/^@[A-Za-z0-9_]{5,32}$/.test(tg)&&!tgPhone)
+   return checkoutProblem('Введите Telegram @username или телефон от 10 до 15 цифр.','customerTelegramContact');
+ }
  if(!['whatsapp','telegram'].includes(method))
   return checkoutProblem('Выберите, где удобнее подтвердить заказ.');
  return true;
@@ -836,7 +843,7 @@ document.querySelectorAll('input[name="deliveryService"]').forEach(input=>
 );
 syncPickupService();
 const contactMethods=[...document.querySelectorAll('input[name="contactMethod"]')];
-function updatePreferredContact(){const method=document.querySelector('input[name="contactMethod"]:checked')?.value;const hint=$('telegramCheckoutHint');if(hint)hint.hidden=method!=='telegram';}
+function updatePreferredContact(){const method=document.querySelector('input[name="contactMethod"]:checked')?.value;const fields=$('telegramContactFields');if(fields)fields.hidden=method!=='telegram';}
 contactMethods.forEach(input=>input.addEventListener('change',updatePreferredContact));updatePreferredContact();
 // Keep the order overview available, but avoid pushing contact fields below the fold
 // on phones. Desktop retains the expanded review.
@@ -846,9 +853,10 @@ $('submitSiteOrder').addEventListener('click',async()=>{
  clearCheckoutFieldIssue();
  if(!buildOrder())return;
  const method=document.querySelector('input[name="contactMethod"]:checked')?.value;
- const contact=$('customerPhone').value.trim();
+ const phone=$('customerPhone').value.trim();
+ const contact=method==='telegram'?($('customerTelegramContact').value.trim()||phone):phone;
 
- const body={name:$('customerName').value.trim(),contact,method,address:$('customerAddress').value.trim(),delivery:document.querySelector('input[name="deliveryService"]:checked')?.value,comment:$('customerComment').value.trim(),items:cart.map(x=>({id:x.id,ml:x.ml,qty:x.qty,variant:x.variant||'glass',color:x.variant==='travel'?x.color:undefined}))};
+ const body={name:$('customerName').value.trim(),phone,contact,method,address:$('customerAddress').value.trim(),delivery:document.querySelector('input[name="deliveryService"]:checked')?.value,comment:$('customerComment').value.trim(),items:cart.map(x=>({id:x.id,ml:x.ml,qty:x.qty,variant:x.variant||'glass',color:x.variant==='travel'?x.color:undefined}))};
  button.disabled=true;button.textContent='Оформляем заказ…';status.textContent='Сохраняем заявку…';
  try{
   const response=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
