@@ -21,7 +21,7 @@ test('signed promotional opt-out link requires the exact member and untampered s
   const token=issueUnsubscribeToken(memberId);
   assert.equal(verifyUnsubscribeToken(token),memberId);
   assert.equal(verifyUnsubscribeToken(token.replace(memberId,'12345678-1234-4234-8234-123456789abd')),null);
-  assert.equal(verifyUnsubscribeToken(token.slice(0,-2)+'00'),null);
+  assert.equal(verifyUnsubscribeToken(token.slice(0,-1)+(token.endsWith('0')?'1':'0')),null);
   assert.equal(verifyUnsubscribeToken('bad'),null);
  }finally{if(old===undefined)delete process.env.YAD_CLUB_SESSION_SECRET;else process.env.YAD_CLUB_SESSION_SECRET=old}
 });
