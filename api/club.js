@@ -61,7 +61,7 @@ module.exports=async(req,res)=>{
    const b=await safeBody(req);
    const email=formatEmail(b.email);
    const name=String(b.name||'').trim();
-   if(!emailValid(email)||!nameValid(name)||typeof b.promotions!=='boolean')return res.status(400).json({error:'Укажите корректные имя и адрес почты.'});
+   if(!emailValid(email)||!nameValid(name)||typeof b.promotions!=='boolean'||b.terms!==true)return res.status(400).json({error:'Укажите корректные имя и адрес почты.'});
    // Rate limiting by privacy-preserving daily IP fingerprint. Never persist the raw IP.
    const ip=String(req.headers['x-forwarded-for']||'').split(',')[0].trim().slice(0,120);
    const daily=new Date().toISOString().slice(0,10);
