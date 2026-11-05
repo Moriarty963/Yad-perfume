@@ -2587,3 +2587,50 @@ body.compare-dialog-open .compare-tray{visibility:hidden}
 .yad-legacy-telegram-links a:hover{background:#f1eee9;border-color:#cfc3b4}
 .yad-legacy-telegram-links{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
 .yad-legacy-telegram-links a:focus-visible{outline:2px solid #80725d;outline-offset:2px}
+
+
+/* YAD checkout: touch-friendly choice layout with phone-first Telegram flow. */
+.drawer-bottom .delivery-choice{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:10px;margin:16px 0 12px;padding:12px;
+ border:1px solid #dfd9d0;border-radius:14px;
+ min-width:0;
+}
+.drawer-bottom .delivery-choice legend{
+ padding:0 5px;font-size:13px;font-weight:650;color:#4b443b;
+}
+.drawer-bottom .delivery-choice label,
+body[data-page="cart"] .drawer-bottom .delivery-choice label{
+ box-sizing:border-box;min-width:0;margin:0;padding:13px 11px;
+ min-height:50px;display:flex;align-items:center;gap:9px;
+ line-height:1.35;cursor:pointer;overflow-wrap:anywhere;
+ font-size:13px;font-weight:550;
+}
+.drawer-bottom .delivery-choice input[type="radio"]{
+ box-sizing:border-box;display:block;margin:0;
+ width:19px;height:19px;min-width:19px;flex:0 0 19px;
+}
+.drawer-bottom .contact-choice{grid-template-columns:1fr}
+.drawer-bottom .contact-choice label,
+body[data-page="cart"] .drawer-bottom .contact-choice label{
+ min-height:54px;padding:14px 15px;font-size:14px;
+}
+.drawer-bottom .delivery-choice label:focus-within{
+ outline:2px solid #75624c;outline-offset:2px;
+}
+.checkout-contact-hint{
+ display:block;max-width:100%;margin:0 0 12px;
+ padding:11px 13px;background:#f6f2ec;color:#665e53;
+ border:1px solid #e7dfd4;border-radius:10px;
+ font-size:12px;line-height:1.55;
+}
+.checkout-contact-hint[hidden]{display:none!important}
+.drawer-bottom .checkout-submit{
+ width:100%;min-height:54px;
+ border-radius:12px;margin-top:14px;
+ font-size:15px;font-weight:650;letter-spacing:.015em;
+}
+@media(max-width:420px){
+ .drawer-bottom .delivery-choice{grid-template-columns:1fr}
+ .drawer-bottom .delivery-choice label{min-height:48px}
+}
