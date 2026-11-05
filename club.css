@@ -1,0 +1,48 @@
+/* YAD Club / editorial member experience; only scoped rules */
+#clubPage.yad-club-page{display:block;background:#faf9f6;color:#332f2a;min-height:85vh;padding:40px clamp(18px,4vw,56px) 90px}
+#clubPage.yad-club-page[hidden]{display:none!important}
+#clubPage .club-hero{text-align:center;margin:clamp(16px,3vw,48px) auto 34px;max-width:700px}
+#clubPage .club-kicker{display:block;font-size:10px;letter-spacing:.24em;font-weight:700;color:#8f8173}
+#clubPage .club-hero h1{font:400 clamp(54px,8vw,96px)/.98 Georgia,"Times New Roman",serif;letter-spacing:-.055em;margin:18px 0;color:#2b2723}
+#clubPage .club-hero h1 em{font-weight:400;color:#a68b70}
+#clubPage .club-hero p{font-size:14px;color:#7f756e}
+#clubPage .club-benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:0;max-width:1000px;margin:25px auto 58px;border-top:1px solid #dfd8cf;border-bottom:1px solid #dfd8cf}
+#clubPage .club-benefits>div{padding:27px clamp(14px,3vw,28px);border-right:1px solid #dfd8cf}
+#clubPage .club-benefits>div:last-child{border:0}
+#clubPage .club-benefits span{color:#a3907e;font-size:10px;letter-spacing:.18em}
+#clubPage .club-benefits strong{display:block;font:400 19px Georgia,serif;margin:11px 0;color:#38322c}
+#clubPage .club-benefits p{font-size:12px;line-height:1.65;color:#897b70;margin:0}
+#clubPage .club-form-wrap{max-width:540px;margin:0 auto;background:#fff;border:1px solid #e5dfd8;padding:clamp(22px,5vw,44px);box-shadow:0 16px 45px #35271b0a}
+#clubPage .club-form-header h2{font:400 31px/1.17 Georgia,"Times New Roman",serif;letter-spacing:-.03em;margin:9px 0 11px;color:#302a24}
+#clubPage .club-form-header p{font-size:13px;color:#766c64;line-height:1.7;margin:0 0 22px}
+#clubPage .club-form{display:flex;flex-direction:column;gap:19px}
+#clubPage .club-form>label:not(.club-check){display:flex;flex-direction:column;gap:8px;font-size:12px;color:#63594f;font-weight:600}
+#clubPage .club-form input:not([type="checkbox"]){width:100%;background:#fff;color:#2c2824;border:1px solid #d9d0c6;padding:14px 13px;border-radius:3px;font-size:14px;min-height:49px}
+#clubPage .club-form input:focus-visible{outline:2px solid #97816e;outline-offset:2px}
+#clubPage .club-check{display:flex;align-items:flex-start;gap:12px;line-height:1.5;font-size:12px;color:#554b42;font-weight:400;cursor:pointer}
+#clubPage .club-check input{accent-color:#806e5a;width:17px;height:17px;min-width:17px;margin-top:3px}
+#clubPage .club-check strong{font-weight:600;display:block;color:#443b33}
+#clubPage .club-check small{display:block;color:#8e8175;font-size:11px;margin-top:4px}
+#clubPage .club-terms{border-top:1px solid #eee9e2;padding-top:18px}
+#clubPage .club-terms a{color:#5e4b38;text-decoration:underline;text-underline-offset:3px}
+#clubPage .club-primary{border:1px solid #302b25;border-radius:2px;background:#302b25;color:#fdfaf5;font:600 12px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.05em;padding:15px 20px;min-height:49px;cursor:pointer}
+#clubPage .club-primary:hover{background:#514637}
+#clubPage .club-primary:disabled{opacity:.45;cursor:not-allowed}
+#clubPage .club-status{font-size:12px;color:#406d50;line-height:1.7;min-height:0;margin:13px 0}
+#clubPage .club-status.error{color:#a54640}
+#clubPage .club-legal{font-size:11px;line-height:1.7;color:#8b7f74;margin:19px 0 0}
+#clubPage .club-quiet-link{padding:8px 0;border:0;background:transparent;color:#685747;text-decoration:underline;text-underline-offset:4px;cursor:pointer;font-size:12px}
+#clubPage .club-account-actions{display:flex;gap:20px;flex-wrap:wrap;margin-top:24px;padding-top:18px;border-top:1px solid #eee9e2}
+#clubPage .club-account-actions button{font-size:11px;color:#797067;background:none;border:0;text-decoration:underline;cursor:pointer;padding:6px 0}
+#clubPage .club-foot{text-align:center;color:#9c8d7c;font-size:10px;letter-spacing:.17em;padding-top:60px}
+@media(max-width:650px){
+ #clubPage.yad-club-page{padding:22px 17px 80px}
+ #clubPage .club-hero h1{font-size:62px}
+ #clubPage .club-benefits{grid-template-columns:1fr;margin-bottom:31px}
+ #clubPage .club-benefits>div{padding:14px 0;border-right:0;border-bottom:1px solid #dfd8cf}
+ #clubPage .club-benefits>div:last-child{border-bottom:0}
+ #clubPage .club-benefits strong{font-size:17px;margin:4px 0}
+ #clubPage .club-benefits p{font-size:11px}
+ #clubPage .club-form-wrap{padding:22px 18px}
+ #clubPage .club-form-header h2{font-size:28px}
+}
