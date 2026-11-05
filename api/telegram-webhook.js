@@ -3,6 +3,7 @@ const {neon}=require('@neondatabase/serverless');
 const {ready,validWebhookSecret,hashCode,sendText,shopKeyboard,setShopMenu,statusLabels}=require('../lib/yad-telegram');
 const {ensureTelegramTables}=require('../lib/yad-telegram-schema');
 const {handleMessage:handleAdminMessage,handleCallback:handleAdminCallback}=require('../lib/yad-telegram-admin');
+const {handleChannelAdminMessage}=require('../lib/yad-telegram-channel');
 const {YAD_CATALOG_ROWS}=require('../catalog-data');
 const fragranceNames=new Map(YAD_CATALOG_ROWS.map(([id,name])=>[id,name]));
 fragranceNames.set('discovery','Discovery Set');
@@ -29,6 +30,7 @@ module.exports=async(req,res)=>{
   const text=String(message.text||'').trim();
   if(text.length>100)return res.status(200).json({ok:true});
   if(await handleAdminMessage(message))return res.status(200).json({ok:true});
+  if(await handleChannelAdminMessage(message))return res.status(200).json({ok:true});
   const sql=neon(process.env.DATABASE_URL);
   await ensureTelegramTables(sql);
   if(/^\/start(?:@\w+)?(?:\s+.*)?$/i.test(text)){
