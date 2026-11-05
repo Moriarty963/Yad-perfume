@@ -63,6 +63,27 @@ module.exports=async(req,res)=>{
     return res.status(503).json({error:'Telegram не принял сообщение. Повторите попытку позже.',notification_status:outcome});
    return res.status(200).json({notification_status:outcome,status:order.status});
   }
+  // Review moderation shares the existing HttpOnly administrator session.
+  if(req.method==='GET'&&req.query.action==='reviews'){
+   const state=String(req.query.status||'pending');
+   const page=Number(req.query.page||0),reviewPageSize=6;
+   if(!['pending','approved','rejected'].includes(state)||!Number.isInteger(page)||page<0||page>1000)return res.status(400).json({error:'Неверный фильтр.'});
+   const rows=await sql`SELECT r.id,r.fragrance_id,r.author_name,r.rating,r.body,r.photos,r.status,r.created_at,
+     left(o.public_id::text,8) AS order_number FROM yad_fragrance_reviews r
+     JOIN yad_orders o ON o.public_id=r.order_id WHERE r.status=${state}
+     ORDER BY r.created_at DESC LIMIT ${reviewPageSize+1} OFFSET ${page*reviewPageSize}`;
+   return res.status(200).json({reviews:rows.slice(0,reviewPageSize),has_more:rows.length>reviewPageSize,page});
+  }
+  if(req.method==='PATCH'&&req.query.action==='review'){
+   const body=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
+   const rid=String(body.id||''),state=String(body.status||'');
+   if(!/^\d{1,18}$/.test(rid)||!['approved','rejected'].includes(state))
+    return res.status(400).json({error:'Неверное действие.'});
+   const result=await sql`UPDATE yad_fragrance_reviews SET status=${state},moderated_at=now()
+    WHERE id=${rid}::bigint AND status IS DISTINCT FROM ${state} RETURNING id,status`;
+   if(!result.length)return res.status(409).json({error:'Отзыв уже имеет выбранный статус.'});
+   return res.status(200).json({review:result[0]});
+  }
   if(req.method==='GET'){
    // Admin authenticated: repair only missing Telegram tables in the live database.
    await ensureTelegramTables(sql);
