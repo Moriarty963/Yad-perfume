@@ -1,6 +1,6 @@
 'use strict';
 const {neon}=require('@neondatabase/serverless');
-const {ready,validWebhookSecret,hashCode,sendText,statusLabels}=require('../lib/yad-telegram');
+const {ready,validWebhookSecret,hashCode,sendText,shopKeyboard,setShopMenu,statusLabels}=require('../lib/yad-telegram');
 const {ensureTelegramTables}=require('../lib/yad-telegram-schema');
 const {handleMessage:handleAdminMessage,handleCallback:handleAdminCallback}=require('../lib/yad-telegram-admin');
 const {YAD_CATALOG_ROWS}=require('../catalog-data');
@@ -32,9 +32,10 @@ module.exports=async(req,res)=>{
   const sql=neon(process.env.DATABASE_URL);
   await ensureTelegramTables(sql);
   if(/^\/start(?:@\w+)?(?:\s+.*)?$/i.test(text)){
+   await setShopMenu(chatId);
    const m=/^\/start(?:@\w+)?\s+(yad_[A-Za-z0-9_-]{32})$/i.exec(text);
    if(!m){
-    await sendText(chatId,'Добро пожаловать в YAD! 🌿\n\nПодключите заказ с сайта YAD после оформления. Только вы решаете, получать ли уведомления.\n\n/orders — ваши заявки\n/stop — отключить уведомления');
+    await sendText(chatId,'Добро пожаловать в YAD! 🌿\n\nОткройте магазин кнопкой ниже — каталог, корзина и оформление работают прямо в Telegram.\n\n/orders — ваши заявки\n/stop — отключить уведомления',shopKeyboard());
     return res.status(200).json({ok:true});
    }
    const hash=hashCode(m[1]);
@@ -53,7 +54,7 @@ module.exports=async(req,res)=>{
     await sendText(chatId,'Этот заказ уже привязан к другому Telegram. Для защиты данных изменить привязку можно только после отключения прежней подписки.');
     return res.status(200).json({ok:true});
    }
-   await sendText(chatId,'✅ Заказ YAD №'+String(id).slice(0,8).toUpperCase()+' подключён!\n\nВы дали согласие на уведомления об изменениях статуса этого заказа.\n\n/orders — посмотреть связанные заказы\n/stop — отключить уведомления');
+   await sendText(chatId,'✅ Заказ YAD №'+String(id).slice(0,8).toUpperCase()+' подключён!\n\nВы дали согласие на уведомления об изменениях статуса этого заказа.\n\n/orders — посмотреть связанные заказы\n/stop — отключить уведомления',shopKeyboard());
    return res.status(200).json({ok:true});
   }
   if(/^\/stop(?:@\w+)?$/i.test(text)){
@@ -83,11 +84,16 @@ module.exports=async(req,res)=>{
    await sendText(chatId,'✅ YAD Telegram работает. Связь с ботом установлена.\n\nДля уведомлений о заказе подключите заявку на сайте YAD.\n/orders — связанные заказы\n/stop — отключить уведомления');
    return res.status(200).json({ok:true});
   }
-  if(/^\/help(?:@\w+)?$/i.test(text)){
-   await sendText(chatId,'YAD · Помощь\n/ping — проверить работу бота\n/orders — ваши заказы\n/stop — отключить уведомления\n\nДля подключения нового заказа откройте его на сайте YAD.');
+  if(/^\/(?:shop|catalog)(?:@\w+)?$/i.test(text)){
+   await setShopMenu(chatId);
+   await sendText(chatId,'🛍 YAD · Парфюмерия\n\nНажмите кнопку, чтобы открыть каталог внутри Telegram. Выберите аромат и объём, затем оформите заказ.',shopKeyboard());
    return res.status(200).json({ok:true});
   }
-  if(text.startsWith('/'))await sendText(chatId,'Доступные команды: /ping, /orders, /stop, /help.');
+  if(/^\/help(?:@\w+)?$/i.test(text)){
+   await sendText(chatId,'YAD · Помощь\n/shop — открыть магазин в Telegram\n/ping — проверить работу бота\n/orders — ваши заказы\n/stop — отключить уведомления\n\nДля подключения нового заказа откройте его подтверждение в YAD.',shopKeyboard());
+   return res.status(200).json({ok:true});
+  }
+  if(text.startsWith('/'))await sendText(chatId,'Доступные команды: /shop, /ping, /orders, /stop, /help.',shopKeyboard());
   return res.status(200).json({ok:true});
  }catch(e){
   console.error('YAD bot webhook failed',e?.message);
