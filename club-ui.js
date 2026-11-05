@@ -45,7 +45,7 @@
   try{
    if(e.target.id==='clubStart'){
     pendingName=$('clubName').value.trim();email=$('clubEmail').value.trim().toLowerCase();pendingPromos=$('clubPromos').checked;
-    await request('/api/club?action=start',{method:'POST',body:JSON.stringify({name:pendingName,email,promotions:pendingPromos})});
+    await request('/api/club?action=start',{method:'POST',body:JSON.stringify({name:pendingName,email,promotions:pendingPromos,terms:$('clubTerms').checked})});
     step='verify';draw();$('clubCode')?.focus();
    }else if(e.target.id==='clubVerify'){
     const data=await request('/api/club?action=verify',{method:'POST',body:JSON.stringify({email,code:$('clubCode').value.trim()})});
