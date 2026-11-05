@@ -70,7 +70,7 @@ function renderGiftSetDetail(){
  const root=$('giftSetDetail');if(root.dataset.ready==='true')return;
  const options='<option value="">Выберите аромат</option>'+fragrances.map(f=>'<option value="'+safe(f.id)+'">'+safe(f.name)+'</option>').join('');
  root.innerHTML='<div class="yad-gift-breadcrumb"><a href="/catalog" data-gift-back>← К ароматам</a><span>YAD / GIFT COLLECTION</span></div>'+
-  '<div class="yad-gift-layout"><div class="yad-gift-stage"><img src="'+giftSetPhoto+'" alt="Подарочный набор из трёх флаконов YAD по 20 мл в чёрной коробке" width="1122" height="1402" decoding="async" fetchpriority="high"></div>'+
+  '<div class="yad-gift-layout"><div class="yad-gift-stage"><img src="'+giftSetPhoto+'" alt="Подарочный набор из трёх флаконов YAD по 20 мл в чёрной коробке" width="1122" height="1402" decoding="async" fetchpriority="high"><small class="yad-gift-photo-note">Фото — пример оформления. Ароматы в наборе выбираете вы.</small></div>'+
   '<div class="yad-gift-info"><span class="editorial-kicker">YAD / GIFT SET</span><h1>Подарочный набор<br><em>3 × 20 мл</em></h1>'+
   '<p class="yad-gift-lead">Три любимых аромата в элегантной подарочной коробке с фактурой кожи. Соберите свой набор для близкого человека или для себя.</p>'+
   '<div class="yad-gift-includes"><span>Три флакона по 20 мл</span><span>Подарочная коробка</span><span>Выбор из всей коллекции</span></div>'+
