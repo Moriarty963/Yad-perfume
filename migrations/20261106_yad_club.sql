@@ -9,7 +9,9 @@ CREATE TABLE IF NOT EXISTS yad_club_members (
  promotions_opt_in BOOLEAN NOT NULL DEFAULT false,
  promotions_consented_at TIMESTAMPTZ,
  promotions_revoked_at TIMESTAMPTZ,
- consent_version VARCHAR(40)
+ consent_version VARCHAR(40),
+ privacy_accepted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+ privacy_version VARCHAR(40) NOT NULL DEFAULT '2026-11-v1'
 );
 CREATE TABLE IF NOT EXISTS yad_club_challenges (
  email TEXT PRIMARY KEY,
