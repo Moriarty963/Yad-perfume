@@ -34,7 +34,7 @@ async function notifyTelegram(order,b,items){
   '',
   '👤 <b>ПОКУПАТЕЛЬ</b>',
   telegramEscape(b.name.trim()),
-  'Связь: '+(b.method==='whatsapp'?'WhatsApp':'Telegram (бот после подключения)'),
+  'Связь: '+(b.method==='whatsapp'?'WhatsApp':'Telegram'),
   '<code>'+telegramEscape(b.contact.trim())+'</code>',
   ...(b.method==='telegram'&&validPhone(b.phone)&&b.phone.trim()!==b.contact.trim()?['Телефон для связи: <code>'+telegramEscape(b.phone.trim())+'</code>']:[]),
   '',
