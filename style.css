@@ -2900,6 +2900,7 @@ body[data-page="cart"][data-checkout-step="details"] .drawer-bottom{
 }
 
 /* Optional checkout shortcut after a successful add-to-cart action. */
+.toast.toast-with-cart-link[hidden]{display:none!important}
 .toast.toast-with-cart-link{
  display:flex;align-items:center;justify-content:space-between;gap:14px;
  padding:10px 12px 10px 16px;
