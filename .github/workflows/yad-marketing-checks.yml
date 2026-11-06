@@ -7,6 +7,11 @@ on:
       - 'campaigns-admin.js'
       - 'migrations/20261106_yad_campaign_drafts.sql'
       - 'tests/campaign.test.js'
+      - 'tests/campaign-publish.test.js'
+      - 'api/campaign.js'
+      - 'campaigns-public.js'
+      - 'campaigns.css'
+      - 'migrations/20261106_yad_campaign_publication.sql'
       - '.github/workflows/yad-marketing-checks.yml'
   workflow_dispatch:
 
@@ -27,4 +32,4 @@ jobs:
       - name: Install dependencies without lifecycle scripts
         run: npm install --ignore-scripts --no-audit --no-fund
       - name: Verify campaign authorization and concurrency
-        run: node --test tests/campaign.test.js
+        run: node --test tests/campaign.test.js tests/campaign-publish.test.js
