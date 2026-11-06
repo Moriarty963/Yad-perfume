@@ -13,7 +13,7 @@ test('campaign drafts: admin auth, validation, create, revision conflict, delete
  const uuid='12345678-1234-4234-8234-123456789abc';
  async function sql(strings,...args){
   const query=strings.join('?').replace(/\s+/g,' ').trim();
-  if(query.startsWith('SELECT id,title,body,target_url,revision,created_at,updated_at FROM yad_campaign_drafts'))return saved.slice();
+  if(query.startsWith('SELECT d.id,d.title,d.body,d.target_url,d.revision,d.created_at,d.updated_at,'))return saved.slice();
   if(query.startsWith('INSERT INTO yad_campaign_drafts (title,body,target_url)')){
    const row={id:uuid,title:args[0],body:args[1],target_url:args[2],revision:1,created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
    saved.push(row);return [row];
