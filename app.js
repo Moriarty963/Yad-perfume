@@ -604,13 +604,14 @@ function persist(){try{localStorage.setItem(key,JSON.stringify(cart))}catch{}ren
 // The two checkout steps are presentation-only: they never change cart items,
 // server-side price checks or the information actually sent to YAD.
 let checkoutStep='review';
+let checkoutFreshReceipt=false;
 function setCheckoutStep(next,{scroll=true}={}){
  const receipt=$('orderReceipt'),hasCart=cart.length>0;
  const step=hasCart?(next==='details'?'details':'review'):(receipt&&!receipt.hidden?'receipt':'review');
  checkoutStep=step;
  document.body.dataset.checkoutStep=step;
  const review=step==='review',details=step==='details';
- $('cartStepTitle').textContent=details?'Оформление заказа':step==='receipt'?'Заказ оформлен':'Ваша корзина';
+ $('cartStepTitle').textContent=details?'Оформление заказа':step==='receipt'?(checkoutFreshReceipt?'Заказ оформлен':'Последняя заявка'):'Ваша корзина';
  $('cartItems').hidden=!review;
  // Previous orders must not push the next-action button or the checkout form below the fold.
  const historyPanel=$('orderHistory');if(historyPanel&&hasCart)historyPanel.hidden=true;
@@ -626,7 +627,7 @@ function setCheckoutStep(next,{scroll=true}={}){
  if(details&&window.matchMedia('(max-width:760px)').matches)$('checkoutReview').open=false;
  if(scroll&&currentPage()==='cart')window.scrollTo({top:0,behavior:'instant'});
 }
-function renderCart(){const quantity=cart.reduce((s,x)=>s+x.qty,0);const sum=cart.reduce((s,x)=>s+x.qty*x.price,0);const shipping=cartDeliveryFee(cart);$('count').textContent=quantity;$('subtotal').textContent=rub(sum);$('deliveryPrice').textContent=quantity&&shipping===0?'Бесплатно':rub(shipping);$('deliveryChoiceLegend').textContent=shipping===0?'Куда доставить заказ · Бесплатно':'Куда доставить заказ · 250 ₽';$('total').textContent=rub(sum+shipping);$('mobileCartCount').textContent=quantity;$('mobileCartTotal').textContent=rub(sum+shipping);$('mobileCartBar').hidden=true;$('navCartCount').textContent=quantity>99?'99+':quantity;$('navCartCount').hidden=quantity===0;$('clearCart').hidden=quantity===0;$('cartItems').innerHTML=cart.length?cart.map((x,i)=>`<div class="cart-row"><div class="cart-product"><img class="cart-bottle-photo" alt="" loading="lazy" decoding="async" src="${cartProductPhoto(x)}" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div class="cart-product-copy">${safe(x.title)}<small>${safe(orderProductLine(x))} · ${x.qty} шт. · ${rub(x.price*x.qty)}</small></div></div><div class="cart-qty"><button data-remove="${i}" aria-label="Уменьшить количество ${safe(x.title)}">−</button><span aria-label="Количество">${x.qty}</span><button data-increase="${i}" aria-label="Увеличить количество ${safe(x.title)}">+</button></div></div>`).join(''):'<p class="cart-empty-state">Пока пусто. Выберите аромат из коллекции.</p>';
+function renderCart(){const quantity=cart.reduce((s,x)=>s+x.qty,0);if(quantity>0)checkoutFreshReceipt=false;const sum=cart.reduce((s,x)=>s+x.qty*x.price,0);const shipping=cartDeliveryFee(cart);$('count').textContent=quantity;$('subtotal').textContent=rub(sum);$('deliveryPrice').textContent=quantity&&shipping===0?'Бесплатно':rub(shipping);$('deliveryChoiceLegend').textContent=shipping===0?'Куда доставить заказ · Бесплатно':'Куда доставить заказ · 250 ₽';$('total').textContent=rub(sum+shipping);$('mobileCartCount').textContent=quantity;$('mobileCartTotal').textContent=rub(sum+shipping);$('mobileCartBar').hidden=true;$('navCartCount').textContent=quantity>99?'99+':quantity;$('navCartCount').hidden=quantity===0;$('clearCart').hidden=quantity===0;$('cartItems').innerHTML=cart.length?cart.map((x,i)=>`<div class="cart-row"><div class="cart-product"><img class="cart-bottle-photo" alt="" loading="lazy" decoding="async" src="${cartProductPhoto(x)}" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div class="cart-product-copy">${safe(x.title)}<small>${safe(orderProductLine(x))} · ${x.qty} шт. · ${rub(x.price*x.qty)}</small></div></div><div class="cart-qty"><button data-remove="${i}" aria-label="Уменьшить количество ${safe(x.title)}">−</button><span aria-label="Количество">${x.qty}</span><button data-increase="${i}" aria-label="Увеличить количество ${safe(x.title)}">+</button></div></div>`).join(''):'<p class="cart-empty-state">Пока пусто. Выберите аромат из коллекции.</p>';
  renderCheckoutReview();
  renderOrderReceipt();
  renderOrderHistory();
@@ -1104,6 +1105,7 @@ $('submitSiteOrder').addEventListener('click',async()=>{
   saveLastOrder();
   status.classList.add('success');
   status.textContent='Заявка №'+publicNumber+' отправлена.';
+  checkoutFreshReceipt=true;
   cart=[];persist();setCheckoutStep('receipt',{scroll:false});notify('Заказ оформлен');
   $('orderReceipt')?.scrollIntoView({block:'start',behavior:'smooth'});
  }catch(error){status.classList.add('error');status.textContent=(error.message||'Не удалось оформить заказ.')+' Попробуйте ещё раз чуть позже.'}
