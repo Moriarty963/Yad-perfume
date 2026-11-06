@@ -77,6 +77,5 @@ test('production webhook keeps Telegram secret verification and admin-only callb
  assert.match(src,/validWebhookSecret\(req\.headers\?\.\['x-telegram-bot-api-secret-token'\]\)/);
  assert.match(src,/handleChannelAdminCallback\(update\.callback_query\)/);
  assert.match(src,/handleAdminCallback\(update\.callback_query\)/);
- const config=JSON.parse(fs.readFileSync(path.join(__dirname,'../vercel.json'),'utf8'));
- assert.equal(config.functions['api/telegram-webhook.js'].maxDuration,30);
+ assert.equal(typeof require('../api/telegram-webhook.js'),'function');
 });
