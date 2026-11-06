@@ -6,6 +6,7 @@ on:
       - 'app.js'
       - 'index.html'
       - 'tests/bibliotheque.test.js'
+      - 'tests/volume-hints.test.js'
       - '.github/workflows/yad-catalog-checks.yml'
   workflow_dispatch:
 
@@ -28,4 +29,4 @@ jobs:
       - name: Validate browser code syntax
         run: node --check app.js && node --check catalog-data.js
       - name: Verify catalog and order API integration
-        run: node --test tests/bibliotheque.test.js
+        run: node --test tests/bibliotheque.test.js tests/volume-hints.test.js
