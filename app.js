@@ -57,7 +57,7 @@ function addGiftSet(scents){
  if(item){if(item.qty>=30){notify('Для одной позиции максимум 30 наборов.');return false}item.qty+=1}
  else{if(cart.length>=30){notify('В корзине максимум 30 разных позиций.');return false}
   cart.push({id:'gift-set',ml:0,title:giftSetTitle,variant:'gift',scents:chosen,price:giftSetPrice,qty:1})}
- persist();notify('Подарочный набор добавлен в корзину');return true;
+ persist();notify('Подарочный набор добавлен в корзину',true);return true;
 }
 function giftSetCardMarkup(){
  return '<a href="/gift-set" data-gift-detail class="yad-gift-catalog-card">'+
@@ -585,7 +585,21 @@ function syncCheckoutAction(){
  const sum=cart.reduce((total,item)=>total+item.qty*item.price,0);
  button.innerHTML='Отправить заявку · '+rub(sum+cartDeliveryFee(cart))+' <span aria-hidden="true">↗</span>';
 }
-function notify(message){const el=$('toast');if(!el)return;el.textContent=message;el.hidden=false;clearTimeout(notify.timer);notify.timer=setTimeout(()=>{el.hidden=true},3500)}function add(id,ml,variant='glass',color='Чёрный'){let title=id==='discovery'?'Discovery Set · 3 × 6 мл':fragrances.find(f=>f.id===id)?.name;if(!title)return;if(![6,10].includes(ml))variant='glass';if(variant!=='travel')variant='glass';if(!travelColors.includes(color))color='Чёрный';let price=id==='discovery'?990:itemPrice(ml,variant);if(!Number.isFinite(price))return;let found=cart.find(x=>x.id===id&&x.ml===ml&&(x.variant||'glass')===variant&&(variant!=='travel'||x.color===color));if(found){if(found.qty>=30){notify('Для одного товара максимум 30 штук.');return}found.qty+=1}else{if(cart.length>=30){notify('В корзине максимум 30 разных позиций.');return}cart.push({id,ml,title,variant,color,price,qty:1})}persist();notify('Добавлено в корзину · '+cart.reduce((sum,x)=>sum+x.qty,0)+' шт.')}
+function notify(message,cartAction=false){
+ const el=$('toast');if(!el)return;
+ const label=document.createElement('span');label.textContent=message;
+ el.replaceChildren(label);
+ el.classList.toggle('toast-with-cart-link',Boolean(cartAction));
+ if(cartAction){
+  const button=document.createElement('button');
+  button.type='button';button.textContent='В корзину →';
+  button.setAttribute('aria-label','Перейти к корзине YAD');
+  button.addEventListener('click',()=>{clearTimeout(notify.timer);el.hidden=true;navigate('cart')});
+  el.append(button);
+ }
+ el.hidden=false;clearTimeout(notify.timer);
+ notify.timer=setTimeout(()=>{el.hidden=true},cartAction?5200:3500);
+}function add(id,ml,variant='glass',color='Чёрный'){let title=id==='discovery'?'Discovery Set · 3 × 6 мл':fragrances.find(f=>f.id===id)?.name;if(!title)return;if(![6,10].includes(ml))variant='glass';if(variant!=='travel')variant='glass';if(!travelColors.includes(color))color='Чёрный';let price=id==='discovery'?990:itemPrice(ml,variant);if(!Number.isFinite(price))return;let found=cart.find(x=>x.id===id&&x.ml===ml&&(x.variant||'glass')===variant&&(variant!=='travel'||x.color===color));if(found){if(found.qty>=30){notify('Для одного товара максимум 30 штук.');return}found.qty+=1}else{if(cart.length>=30){notify('В корзине максимум 30 разных позиций.');return}cart.push({id,ml,title,variant,color,price,qty:1})}persist();notify('Добавлено в корзину · '+cart.reduce((sum,x)=>sum+x.qty,0)+' шт.',true)}
 function persist(){try{localStorage.setItem(key,JSON.stringify(cart))}catch{}renderCart()}
 // The two checkout steps are presentation-only: they never change cart items,
 // server-side price checks or the information actually sent to YAD.
