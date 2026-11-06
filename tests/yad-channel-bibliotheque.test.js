@@ -54,6 +54,17 @@ test('owner sees a preview, and approval publishes original video with product b
  assert.equal(calls.filter(x=>x.method==='sendVideo').length,1,'a repeat click cannot republish');
 });
 
+test('deep link opens the same owner-only review preview, without posting',async()=>{
+ const {channel,calls}=createChannel();
+ const start={text:'/start bibliotheque',from:{id:42},chat:{id:42,type:'private'}};
+ assert.equal(await channel.handleChannelAdminMessage(start),true);
+ assert.equal(calls.filter(x=>x.method==='sendMessage').length,1);
+ assert.equal(calls.filter(x=>x.method==='sendVideo').length,0);
+ assert.equal(await channel.handleChannelAdminMessage({...start,from:{id:99},chat:{id:99,type:'private'}}),true);
+ assert.equal(calls.filter(x=>x.method==='sendMessage').length,1,'not available to other accounts');
+ assert.equal(await channel.handleChannelAdminMessage({...start,text:'/start unrelated'}),false,'regular shop start commands remain untouched');
+});
+
 test('unauthorized owners and channels cannot publish',async()=>{
  const {channel,calls}=createChannel();
  await channel.handleChannelAdminMessage(message(99));
