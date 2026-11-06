@@ -66,9 +66,36 @@ module.exports=async(req,res)=>{
   if(req.query.action==='campaigns'&&req.method==='GET'){
    const page=Number(req.query.page||0),limit=20;
    if(!Number.isInteger(page)||page<0||page>100)return res.status(400).json({error:'Неверная страница.'});
-   const rows=await sql`SELECT id,title,body,target_url,revision,created_at,updated_at
-      FROM yad_campaign_drafts ORDER BY updated_at DESC,id DESC LIMIT ${limit+1} OFFSET ${page*limit}`;
+   const rows=await sql`SELECT d.id,d.title,d.body,d.target_url,d.revision,d.created_at,d.updated_at,
+      (p.campaign_id IS NOT NULL) AS published
+      FROM yad_campaign_drafts d LEFT JOIN yad_campaign_publication p ON p.campaign_id=d.id
+      ORDER BY d.updated_at DESC,d.id DESC LIMIT ${limit+1} OFFSET ${page*limit}`;
    return res.status(200).json({drafts:rows.slice(0,limit),has_more:rows.length>limit,page});
+  }
+  if(req.query.action==='campaign-publication'&&req.method==='POST'){
+   // Admin session is checked above. Publishing is never automated.
+   let validOrigin=false;
+   try{const origin=new URL(String(req.headers.origin||''));validOrigin=origin.protocol==='https:'&&origin.host===req.headers.host}
+   catch{}
+   if(!validOrigin)return res.status(403).json({error:'Недопустимый источник публикации.'});
+   let b;
+   try{b=typeof req.body==='string'?JSON.parse(req.body):req.body||{}}
+   catch{return res.status(400).json({error:'Некорректные данные.'})}
+   const id=String(b?.id||'');
+   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+       ||typeof b.publish!=='boolean')return res.status(400).json({error:'Некорректное действие.'});
+   if(b.publish){
+    // An atomic upsert ensures exactly one published campaign on the entire storefront.
+    const rows=await sql`INSERT INTO yad_campaign_publication(slot,campaign_id,published_at)
+      SELECT 1,id,now() FROM yad_campaign_drafts
+      WHERE id=${id}::uuid AND target_url<>''
+      ON CONFLICT(slot) DO UPDATE SET campaign_id=EXCLUDED.campaign_id,published_at=now()
+      RETURNING campaign_id,published_at`;
+    if(!rows.length)return res.status(400).json({error:'Сохраните действительную ссылку на предложение перед публикацией.'});
+    return res.status(200).json({published:true,id:rows[0].campaign_id});
+   }
+   const rows=await sql`DELETE FROM yad_campaign_publication WHERE campaign_id=${id}::uuid RETURNING campaign_id`;
+   return res.status(200).json({published:false,changed:rows.length>0});
   }
   if(req.query.action==='campaign'&&['POST','PATCH','DELETE'].includes(req.method)){
    // Only same-site browser interactions may change privately stored campaigns.
