@@ -2898,3 +2898,25 @@ body[data-page="cart"][data-checkout-step="details"] .drawer-bottom{
 @media(prefers-reduced-motion:no-preference){
  .cart-review-continue{transition:background .15s ease}
 }
+
+/* Optional checkout shortcut after a successful add-to-cart action. */
+.toast.toast-with-cart-link{
+ display:flex;align-items:center;justify-content:space-between;gap:14px;
+ padding:10px 12px 10px 16px;
+ min-width:min(340px,calc(100vw - 24px));max-width:calc(100vw - 24px);
+ border:1px solid #e4d7c4;border-radius:12px;
+ box-shadow:0 11px 36px rgba(20,20,17,.16);
+ color:#302a22;
+}
+.toast.toast-with-cart-link>span{line-height:1.35;overflow-wrap:anywhere}
+.toast.toast-with-cart-link button{
+ flex-shrink:0;min-height:42px;
+ border:0;border-radius:9px;background:#302b24;color:#fff;
+ font-size:12px;font-weight:650;padding:9px 12px;
+ cursor:pointer;
+}
+.toast.toast-with-cart-link button:focus-visible{outline:3px solid #a88e6f;outline-offset:3px}
+@media(max-width:760px){
+ body:not([data-page="cart"]) .toast{bottom:calc(86px + env(safe-area-inset-bottom))}
+ .toast.toast-with-cart-link{gap:9px;font-size:12px}
+}
