@@ -2794,3 +2794,23 @@ body[data-page="favorites"] #catalog .catalog-filter-last .favorites-filter{disp
 }
 
 .yad-gift-photo-note{display:block;padding:10px 13px;background:#fff;font-size:11px;line-height:1.5;color:#857a6d;text-align:center}
+
+/* Bibliothèque / New arrival: a restrained editorial cue, not a limited-time offer. */
+.product-art .yad-new-fragrance-badge{
+ position:absolute;top:15px;right:14px;z-index:5;
+ display:inline-flex;align-items:center;justify-content:center;
+ padding:7px 10px;background:#3a3430;color:#f7f2e9;
+ border:1px solid rgba(240,231,212,.32);border-radius:2px;
+ font-size:9px;font-weight:700;letter-spacing:.15em;line-height:1.2;
+ pointer-events:none;
+}
+.yad-new-detail-tag{
+ display:inline-flex;max-width:100%;margin:12px 0 9px;
+ border:1px solid #c7b8a5;color:#76624c;
+ padding:7px 10px;font:600 10px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ letter-spacing:.12em;overflow-wrap:anywhere;
+}
+@media(max-width:480px){
+ .product-art .yad-new-fragrance-badge{top:10px;right:10px;font-size:8px;padding:6px 8px}
+ .yad-new-detail-tag{font-size:9px;letter-spacing:.08em}
+}
