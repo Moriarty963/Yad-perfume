@@ -2826,3 +2826,75 @@ body[data-page^="fragrance/"] .atelier-format-caption #detailSizeHint{
 body[data-page^="fragrance/"] .atelier-format-caption small{
  color:#90867a;font-size:11px;font-weight:400;line-height:1.45;
 }
+
+/* YAD Checkout v4 — two calm, touch-friendly steps without duplicate CTAs. */
+#cartReviewBar[hidden],#cartActions[hidden],#cartItems[hidden],#checkoutPanel[hidden]{display:none!important}
+body[data-page="cart"] .cart-review-bar{
+ box-sizing:border-box;
+ display:grid;gap:15px;
+ margin:22px 16px 26px;padding:22px 25px;
+ background:#faf8f4;color:#292621;
+ border:1px solid #e2dbd0;border-radius:15px;
+ box-shadow:0 9px 38px rgba(25,22,18,.06);
+}
+.cart-review-eyebrow{
+ font-size:10px;font-weight:650;line-height:1.4;
+ letter-spacing:.13em;color:#857562;
+}
+.cart-review-totals{
+ display:flex;justify-content:space-between;align-items:center;gap:16px;
+}
+.cart-review-totals>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+#cartReviewCount{font-size:13px;font-weight:600;color:#49443d}
+#cartReviewShipping{font-size:12px;line-height:1.4;color:#746c61}
+#cartReviewTotal{
+ font:400 clamp(23px,3vw,30px)/1.1 Georgia,"Times New Roman",serif;
+ color:#24211e;white-space:nowrap;
+}
+.cart-review-continue{
+ box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;
+ gap:16px;width:100%;min-height:55px;padding:13px 20px;
+ border:0;border-radius:11px;
+ background:#25231f;color:#f9f6f0;
+ font:600 14px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ cursor:pointer;
+}
+.cart-review-continue:hover{background:#40392f}
+.cart-review-continue:focus-visible,.checkout-step-nav button:focus-visible{
+ outline:3px solid #9f8669;outline-offset:3px;
+}
+body[data-page="cart"] .cart-review-bar>p{
+ margin:0;text-align:center;font-size:11px;line-height:1.5;color:#8a8074;
+}
+body[data-page="cart"] .checkout-step-nav{
+ display:flex;align-items:center;justify-content:space-between;
+ flex-wrap:wrap;gap:9px;
+ padding:0 0 20px;margin:0 0 12px;
+ border-bottom:1px solid #e9e3da;
+}
+body[data-page="cart"] .checkout-step-nav button{
+ background:transparent;border:0;padding:9px 0;min-height:42px;
+ font:600 12px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ color:#655747;cursor:pointer;
+}
+body[data-page="cart"] .checkout-step-nav>span{
+ color:#9a8c7b;font-size:9px;letter-spacing:.13em;font-weight:600;
+}
+body[data-page="cart"][data-checkout-step="details"] .drawer-bottom{
+ margin-top:12px;
+}
+@media(max-width:760px){
+ body[data-page="cart"] .cart-review-bar{
+  position:sticky;
+  bottom:calc(81px + env(safe-area-inset-bottom));
+  z-index:8;
+  margin:14px 12px 14px;padding:19px 18px;
+  border-radius:15px;
+  box-shadow:0 5px 26px rgba(20,20,20,.12);
+ }
+ .cart-review-continue{min-height:56px;font-size:15px}
+ body[data-page="cart"][data-checkout-step="details"] .drawer-top{padding-bottom:8px}
+}
+@media(prefers-reduced-motion:no-preference){
+ .cart-review-continue{transition:background .15s ease}
+}
