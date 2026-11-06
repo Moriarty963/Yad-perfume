@@ -57,7 +57,7 @@ function addGiftSet(scents){
  if(item){if(item.qty>=30){notify('Для одной позиции максимум 30 наборов.');return false}item.qty+=1}
  else{if(cart.length>=30){notify('В корзине максимум 30 разных позиций.');return false}
   cart.push({id:'gift-set',ml:0,title:giftSetTitle,variant:'gift',scents:chosen,price:giftSetPrice,qty:1})}
- persist();notify('Подарочный набор добавлен в корзину');return true;
+ persist();notify('Подарочный набор добавлен в корзину',true);return true;
 }
 function giftSetCardMarkup(){
  return '<a href="/gift-set" data-gift-detail class="yad-gift-catalog-card">'+
@@ -585,14 +585,51 @@ function syncCheckoutAction(){
  const sum=cart.reduce((total,item)=>total+item.qty*item.price,0);
  button.innerHTML='Отправить заявку · '+rub(sum+cartDeliveryFee(cart))+' <span aria-hidden="true">↗</span>';
 }
-function notify(message){const el=$('toast');if(!el)return;el.textContent=message;el.hidden=false;clearTimeout(notify.timer);notify.timer=setTimeout(()=>{el.hidden=true},3500)}function add(id,ml,variant='glass',color='Чёрный'){let title=id==='discovery'?'Discovery Set · 3 × 6 мл':fragrances.find(f=>f.id===id)?.name;if(!title)return;if(![6,10].includes(ml))variant='glass';if(variant!=='travel')variant='glass';if(!travelColors.includes(color))color='Чёрный';let price=id==='discovery'?990:itemPrice(ml,variant);if(!Number.isFinite(price))return;let found=cart.find(x=>x.id===id&&x.ml===ml&&(x.variant||'glass')===variant&&(variant!=='travel'||x.color===color));if(found){if(found.qty>=30){notify('Для одного товара максимум 30 штук.');return}found.qty+=1}else{if(cart.length>=30){notify('В корзине максимум 30 разных позиций.');return}cart.push({id,ml,title,variant,color,price,qty:1})}persist();notify('Добавлено в корзину · '+cart.reduce((sum,x)=>sum+x.qty,0)+' шт.')}
+function notify(message,cartAction=false){
+ const el=$('toast');if(!el)return;
+ const label=document.createElement('span');label.textContent=message;
+ el.replaceChildren(label);
+ el.classList.toggle('toast-with-cart-link',Boolean(cartAction));
+ if(cartAction){
+  const button=document.createElement('button');
+  button.type='button';button.textContent='В корзину →';
+  button.setAttribute('aria-label','Перейти к корзине YAD');
+  button.addEventListener('click',()=>{clearTimeout(notify.timer);el.hidden=true;navigate('cart')});
+  el.append(button);
+ }
+ el.hidden=false;clearTimeout(notify.timer);
+ notify.timer=setTimeout(()=>{el.hidden=true},cartAction?5200:3500);
+}function add(id,ml,variant='glass',color='Чёрный'){let title=id==='discovery'?'Discovery Set · 3 × 6 мл':fragrances.find(f=>f.id===id)?.name;if(!title)return;if(![6,10].includes(ml))variant='glass';if(variant!=='travel')variant='glass';if(!travelColors.includes(color))color='Чёрный';let price=id==='discovery'?990:itemPrice(ml,variant);if(!Number.isFinite(price))return;let found=cart.find(x=>x.id===id&&x.ml===ml&&(x.variant||'glass')===variant&&(variant!=='travel'||x.color===color));if(found){if(found.qty>=30){notify('Для одного товара максимум 30 штук.');return}found.qty+=1}else{if(cart.length>=30){notify('В корзине максимум 30 разных позиций.');return}cart.push({id,ml,title,variant,color,price,qty:1})}persist();notify('Добавлено в корзину · '+cart.reduce((sum,x)=>sum+x.qty,0)+' шт.',true)}
 function persist(){try{localStorage.setItem(key,JSON.stringify(cart))}catch{}renderCart()}
+// The two checkout steps are presentation-only: they never change cart items,
+// server-side price checks or the information actually sent to YAD.
+let checkoutStep='review';
+function setCheckoutStep(next,{scroll=true}={}){
+ const receipt=$('orderReceipt'),hasCart=cart.length>0;
+ const step=hasCart?(next==='details'?'details':'review'):(receipt&&!receipt.hidden?'receipt':'review');
+ checkoutStep=step;
+ document.body.dataset.checkoutStep=step;
+ const review=step==='review',details=step==='details';
+ $('cartStepTitle').textContent=details?'Оформление заказа':step==='receipt'?'Заказ оформлен':'Ваша корзина';
+ $('cartItems').hidden=!review;
+ $('cartActions').hidden=details;
+ $('cartReviewBar').hidden=!review||!hasCart;
+ $('checkoutPanel').hidden=!details||!hasCart;
+ const qty=cart.reduce((sum,x)=>sum+x.qty,0);
+ const subtotal=cart.reduce((sum,x)=>sum+x.qty*x.price,0);
+ const shipping=cartDeliveryFee(cart);
+ $('cartReviewCount').textContent='В корзине '+qty+' шт.';
+ $('cartReviewShipping').textContent=shipping===0?'Бесплатная доставка':'Доставка · '+rub(shipping);
+ $('cartReviewTotal').textContent=rub(subtotal+shipping);
+ if(details&&window.matchMedia('(max-width:760px)').matches)$('checkoutReview').open=false;
+ if(scroll&&currentPage()==='cart')window.scrollTo({top:0,behavior:'instant'});
+}
 function renderCart(){const quantity=cart.reduce((s,x)=>s+x.qty,0);const sum=cart.reduce((s,x)=>s+x.qty*x.price,0);const shipping=cartDeliveryFee(cart);$('count').textContent=quantity;$('subtotal').textContent=rub(sum);$('deliveryPrice').textContent=quantity&&shipping===0?'Бесплатно':rub(shipping);$('deliveryChoiceLegend').textContent=shipping===0?'Куда доставить заказ · Бесплатно':'Куда доставить заказ · 250 ₽';$('total').textContent=rub(sum+shipping);$('mobileCartCount').textContent=quantity;$('mobileCartTotal').textContent=rub(sum+shipping);$('mobileCartBar').hidden=true;$('navCartCount').textContent=quantity>99?'99+':quantity;$('navCartCount').hidden=quantity===0;$('clearCart').hidden=quantity===0;$('cartItems').innerHTML=cart.length?cart.map((x,i)=>`<div class="cart-row"><div class="cart-product"><img class="cart-bottle-photo" alt="" loading="lazy" decoding="async" src="${cartProductPhoto(x)}" onerror="this.onerror=null;this.src='/assets/yad-20ml.webp'"><div class="cart-product-copy">${safe(x.title)}<small>${safe(orderProductLine(x))} · ${x.qty} шт. · ${rub(x.price*x.qty)}</small></div></div><div class="cart-qty"><button data-remove="${i}" aria-label="Уменьшить количество ${safe(x.title)}">−</button><span aria-label="Количество">${x.qty}</span><button data-increase="${i}" aria-label="Увеличить количество ${safe(x.title)}">+</button></div></div>`).join(''):'<p class="cart-empty-state">Пока пусто. Выберите аромат из коллекции.</p>';
- $('checkoutPanel').hidden=cart.length===0;
  renderCheckoutReview();
  renderOrderReceipt();
  renderOrderHistory();
  syncCheckoutAction();
+ setCheckoutStep(checkoutStep,{scroll:false});
 }
 function orderProductLine(x){
  return x.id==='gift-set'?'3 × 20 мл · '+giftSetNames(x.scents):x.id==='discovery'?'Набор 3 × 6 мл':x.ml+' мл · '+packagingName(x);
@@ -906,6 +943,7 @@ function renderPage(){
  else if(page==='catalog'){favoritesOnly=false}
  updateFavoritesUI();renderProducts();
  const isCart=page==='cart';
+ if(isCart)setCheckoutStep(cart.length?'review':'receipt',{scroll:false});
  $('overlay').hidden=true;$('drawer').classList.toggle('open',isCart);$('drawer').setAttribute('aria-hidden',String(!isCart));
  document.body.classList.toggle('cart-open',isCart);
  setBottomActive(isGift||isDetail?'catalog':page);
@@ -948,6 +986,15 @@ window.YadMiniApp?.setBackHandler(()=>{
 });
 
 document.addEventListener('click',e=>{const link=e.target.closest('a[href^="#"]');if(!link)return;const href=link.getAttribute('href');if(href==='#catalog'||href==='#discovery'||href==='#philosophy'||href==='#questions'||href==='#top'){e.preventDefault();const page=href==='#catalog'?'catalog':'home';navigate(page);if(page==='home'&&href!=='#top')requestAnimationFrame(()=>document.querySelector(href)?.scrollIntoView({behavior:'smooth'}))}});
+$('cartContinueCheckout').addEventListener('click',()=>{
+ if(!cart.length)return;
+ setCheckoutStep('details');
+ $('cartBackToReview').focus({preventScroll:true});
+});
+$('cartBackToReview').addEventListener('click',()=>{
+ setCheckoutStep('review');
+ $('cartContinueCheckout').focus({preventScroll:true});
+});
 $('continueShopping').addEventListener('click',()=>navigate('catalog'));$('clearCart').addEventListener('click',()=>{if(!cart.length)return;if(!window.confirm('Удалить все товары из корзины?'))return;cart=[];persist();$('status').textContent='Корзина очищена.';notify('Корзина очищена')});$('closeCart').addEventListener('click',closeCart);$('overlay').addEventListener('click',closeCart);document.addEventListener('keydown',e=>{if(!$('drawer').classList.contains('open')||currentPage()==='cart')return;if(e.key==='Escape'){e.preventDefault();closeCart();return}if(e.key==='Tab'){const nodes=[...$('drawer').querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),a[href]')].filter(el=>el.getClientRects().length);if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});$('cartItems').addEventListener('click',e=>{let b=e.target.closest('[data-remove],[data-increase]');if(!b)return;let i=Number(b.dataset.remove??b.dataset.increase);if(!cart[i])return;if(b.hasAttribute('data-increase')){if(cart[i].qty>=30){notify('Для одного товара максимум 30 штук.');return}cart[i].qty+=1}else{cart[i].qty--;if(!cart[i].qty)cart.splice(i,1)}persist()});
 // Checkout feedback appears next to the field requiring attention.
 const checkoutFieldIds=['customerName','customerPhone','customerAddress','customerComment','customerTelegramContact'];
@@ -1052,7 +1099,7 @@ $('submitSiteOrder').addEventListener('click',async()=>{
   saveLastOrder();
   status.classList.add('success');
   status.textContent='Заявка №'+publicNumber+' отправлена.';
-  cart=[];persist();notify('Заказ оформлен');
+  cart=[];persist();setCheckoutStep('receipt',{scroll:false});notify('Заказ оформлен');
   $('orderReceipt')?.scrollIntoView({block:'start',behavior:'smooth'});
  }catch(error){status.classList.add('error');status.textContent=(error.message||'Не удалось оформить заказ.')+' Попробуйте ещё раз чуть позже.'}
  finally{button.disabled=false;syncCheckoutAction()}
