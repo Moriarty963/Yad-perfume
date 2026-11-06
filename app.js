@@ -612,6 +612,8 @@ function setCheckoutStep(next,{scroll=true}={}){
  const review=step==='review',details=step==='details';
  $('cartStepTitle').textContent=details?'Оформление заказа':step==='receipt'?'Заказ оформлен':'Ваша корзина';
  $('cartItems').hidden=!review;
+ // Previous orders must not push the next-action button or the checkout form below the fold.
+ const historyPanel=$('orderHistory');if(historyPanel&&hasCart)historyPanel.hidden=true;
  $('cartActions').hidden=details;
  $('cartReviewBar').hidden=!review||!hasCart;
  $('checkoutPanel').hidden=!details||!hasCart;
@@ -981,7 +983,10 @@ window.YadMiniApp?.setBackHandler(()=>{
  const page=currentPage();
  if(page==='gift-set')navigate(giftSetReturnPage);
  else if(page.startsWith('fragrance/'))navigate(fragranceReturnContext?.page||'catalog');
- else if(page==='cart')navigate('catalog');
+ else if(page==='cart'){
+  if(checkoutStep==='details'){setCheckoutStep('review');$('cartContinueCheckout').focus({preventScroll:true});}
+  else navigate('catalog');
+ }
  else navigate('home');
 });
 
