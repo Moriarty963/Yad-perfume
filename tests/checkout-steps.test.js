@@ -69,3 +69,32 @@ test('checkout remains submitted only via the existing /api/orders validation pa
  assert.match(markup,/id="cartBackToReview"/);
  assert.match(markup,/id="checkoutPanel" hidden/);
 });
+
+test('add-to-cart toast offers an optional button without forcing navigation',()=>{
+ const app=fs.readFileSync(path.join(__dirname,'../app.js'),'utf8');
+ const start=app.indexOf('function notify(message,cartAction=false){');
+ const end=app.indexOf('function add(',start);
+ assert.ok(start>=0&&end>start);
+ const element={hidden:true,children:[],classList:{styles:new Set(),toggle(name,on){if(on)this.styles.add(name);else this.styles.delete(name)}},replaceChildren(...items){this.children=[...items]},append(child){this.children.push(child)}};
+ const visited=[];
+ const sandbox={
+  $:id=>id==='toast'?element:null,
+  document:{createElement:tag=>({tag,textContent:'',attrs:{},handlers:{},setAttribute(k,v){this.attrs[k]=v},addEventListener(k,fn){this.handlers[k]=fn}})},
+  clearTimeout:()=>{},setTimeout:()=>101,
+  navigate:page=>visited.push(page)
+ };
+ const {notify}=vm.runInNewContext(app.slice(start,end)+'\n({notify})',sandbox);
+ notify('Добавлено в корзину · 1 шт.',true);
+ assert.equal(element.hidden,false);
+ assert.equal(element.children.length,2);
+ assert.equal(element.children[1].textContent,'В корзину →');
+ assert.equal(visited.length,0,'adding does not force navigation');
+ element.children[1].handlers.click();
+ assert.equal(element.hidden,true);
+ assert.equal(visited[0],'cart');
+ notify('Аромат сохранён в избранном');
+ assert.equal(element.children.length,1);
+ assert.equal(element.classList.styles.has('toast-with-cart-link'),false);
+ const styles=fs.readFileSync(path.join(__dirname,'../style.css'),'utf8');
+ assert.match(styles,/\.toast\.toast-with-cart-link\[hidden\]\{display:none!important\}/);
+});
