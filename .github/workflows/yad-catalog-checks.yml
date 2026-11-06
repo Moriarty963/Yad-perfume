@@ -1,0 +1,31 @@
+name: YAD catalog checks
+on:
+  pull_request:
+    paths:
+      - 'catalog-data.js'
+      - 'app.js'
+      - 'index.html'
+      - 'tests/bibliotheque.test.js'
+      - '.github/workflows/yad-catalog-checks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  catalog-and-checkout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install runtime libraries
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Validate browser code syntax
+        run: node --check app.js && node --check catalog-data.js
+      - name: Verify catalog and order API integration
+        run: node --test tests/bibliotheque.test.js
