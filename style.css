@@ -2814,3 +2814,15 @@ body[data-page="favorites"] #catalog .catalog-filter-last .favorites-filter{disp
  .product-art .yad-new-fragrance-badge{top:10px;right:10px;font-size:8px;padding:6px 8px}
  .yad-new-detail-tag{font-size:9px;letter-spacing:.08em}
 }
+
+/* Size guidance: conversational buyer language, not technical ingredient data. */
+body[data-page^="fragrance/"] .atelier-format-caption{
+ display:flex;flex-direction:column;gap:5px;
+ margin:13px 0 9px;line-height:1.5;letter-spacing:0;
+}
+body[data-page^="fragrance/"] .atelier-format-caption #detailSizeHint{
+ color:#554a3d;font-size:12px;font-weight:600;
+}
+body[data-page^="fragrance/"] .atelier-format-caption small{
+ color:#90867a;font-size:11px;font-weight:400;line-height:1.45;
+}
