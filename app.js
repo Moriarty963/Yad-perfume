@@ -213,9 +213,14 @@ function yadDigitalBottle(id,ml){
  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
 }
 function yadProductImage(id,ml){
- // New fragrance: until photos of the real YAD bottle arrive, use an honest branded visualization.
- // Avoid broken studio image requests and do not show Byredo's original bottle as YAD merchandise.
- if(id==='bibliotheque')return {src:yadDigitalBottle(id,ml),isPhoto:false,isComposite:false,isMockup:false};
+ // Every NEW fragrance after the original 69 automatically inherits the real YAD
+ // studio bottle for the selected millilitres, with only its label name replaced.
+ // This is the standard catalog workflow; no special case for Bibliothèque.
+ const studioIndex=YAD_CATALOG_ROWS.findIndex(row=>row[0]===id);
+ if(studioIndex>=YAD_BASE_STUDIO_COUNT&&Object.prototype.hasOwnProperty.call(prices,ml)){
+  const url='/api/yad-flacon?id='+encodeURIComponent(id)+'&ml='+ml;
+  return {src:url,isPhoto:false,isComposite:true,isMockup:false};
+ }
  const f=fragrances.find(x=>x.id===id);
  const slug=YAD_PHOTO_SLUGS[id]||id;
  const studio=f&&Object.prototype.hasOwnProperty.call(prices,ml)?'/assets/studio/'+slug+'-'+ml+'ml.webp?v=20261104-2':null;
