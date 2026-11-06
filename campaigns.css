@@ -1,0 +1,63 @@
+/* YAD: discreet editorial promotion — visible only for an admin-published offer. */
+.yad-store-campaign[hidden]{display:none!important}
+.yad-store-campaign{
+ --campaign-ink:#2e2923;
+ color:var(--campaign-ink);
+ position:relative;
+ display:grid;
+ grid-template-columns:minmax(0,1fr) auto;
+ column-gap:clamp(16px,4vw,56px);
+ row-gap:11px;
+ align-items:center;
+ background:#eae5dc;
+ border:1px solid #ded7cb;
+ padding:clamp(21px,3.5vw,38px) clamp(21px,4vw,48px);
+ margin:24px auto 29px;
+ width:100%;
+ min-width:0;
+}
+.yad-store-campaign::after{
+ content:"";position:absolute;top:0;bottom:0;left:0;width:3px;background:#97826a
+}
+.yad-campaign-overline{display:block;grid-column:1/-1;color:#867765;letter-spacing:.22em;font-size:10px;font-weight:650}
+.yad-campaign-copy{min-width:0}
+.yad-store-campaign h2,.yad-store-campaign h3{
+ font:400 clamp(23px,2.8vw,37px)/1.16 Georgia,"Times New Roman",serif;
+ letter-spacing:-.035em;
+ margin:4px 0 11px;
+ color:#29251f;
+ overflow-wrap:break-word;
+}
+.yad-store-campaign p{
+ font:400 13px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ color:#6e6256;
+ white-space:pre-line;
+ margin:0;
+ overflow:hidden;
+ display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+}
+.yad-campaign-cta{
+ display:inline-flex;align-items:center;justify-content:space-between;gap:25px;
+ padding:13px 18px;min-height:48px;
+ background:#322e29;color:#f7f5ef;text-decoration:none;
+ border:1px solid #322e29;border-radius:2px;
+ font-size:12px;font-weight:600;white-space:nowrap;
+}
+.yad-campaign-cta:hover{background:#4b4339;color:#fff}
+.yad-campaign-cta:focus-visible{outline:3px solid #b69e7a;outline-offset:3px}
+.yad-store-campaign-catalog{
+ background:#faf8f4;
+ margin:8px 0 26px;
+ padding:20px clamp(19px,3vw,28px);
+ border-color:#e5dfd4;
+}
+.yad-store-campaign-catalog h3{font-size:clamp(21px,2.2vw,29px)}
+.yad-store-campaign-catalog p{font-size:12px}
+@media(max-width:660px){
+ .yad-store-campaign{grid-template-columns:1fr;gap:10px;padding:22px 19px;margin:18px 0 24px}
+ .yad-campaign-overline{grid-column:1}
+ .yad-campaign-copy h2,.yad-campaign-copy h3{font-size:27px;margin-bottom:8px}
+ .yad-campaign-cta{margin-top:8px;max-width:100%;justify-content:space-between}
+ .yad-store-campaign-catalog{padding:19px}
+}
+@media(prefers-reduced-motion:no-preference){.yad-campaign-cta{transition:background .15s ease}}
