@@ -839,8 +839,8 @@ $('fragranceDetail').addEventListener('click',e=>{
 
 
 function renderMarketHome(){
- const featured=['imagination','tygar','kirke','aventus'].map(id=>fragrances.find(f=>f.id===id));
- $('marketFeatured').innerHTML=featured.map(f=>`<article class="market-card"><a href="/fragrance/${f.id}" data-market-detail="${f.id}" class="market-card-photo scene-${f.family}" style="--glow:${f.glow}" aria-label="Открыть ${safe(f.name)}">${photoMarkup(100,f.id)}<div class="market-mini-bottle"><span>YAD</span><small>${safe(f.name)}</small></div></a><div class="market-card-copy"><span>${audienceLabels[f.audience]} · ${safe(f.notes)}</span><a href="/fragrance/${f.id}" data-market-detail="${f.id}">${safe(f.name)}</a><div class="market-card-bottom"><strong>от ${rub(prices[6])}</strong><button type="button" data-market-add="${f.id}" aria-label="Выбрать объём ${safe(f.name)}">→</button></div></div></article>`).join('');
+ const featured=['bibliotheque','imagination','tygar','kirke'].map(id=>fragrances.find(f=>f.id===id));
+ $('marketFeatured').innerHTML=featured.map(f=>`<article class="market-card"><a href="/fragrance/${f.id}" data-market-detail="${f.id}" class="market-card-photo scene-${f.family}" style="--glow:${f.glow}" aria-label="Открыть ${safe(f.name)}">${photoMarkup(100,f.id)}<div class="market-mini-bottle"><span>YAD</span><small>${safe(f.name)}</small></div></a><div class="market-card-copy"><span>${f.id==='bibliotheque'?'НОВИНКА · ':''}${audienceLabels[f.audience]} · ${safe(f.notes)}</span><a href="/fragrance/${f.id}" data-market-detail="${f.id}">${safe(f.name)}</a><div class="market-card-bottom"><strong>от ${rub(prices[6])}</strong><button type="button" data-market-add="${f.id}" aria-label="Выбрать объём ${safe(f.name)}">→</button></div></div></article>`).join('');
 }
 function marketCatalog(family='all',focus=false,audience='all'){
  activeScentNote='';navigate('catalog');$('family').value=family;$('audience').value=audience;syncAudienceButtons();syncMood();$('search').value='';renderProducts();
