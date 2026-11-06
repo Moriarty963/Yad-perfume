@@ -947,7 +947,11 @@ function renderPage(){
  else if(page==='catalog'){favoritesOnly=false}
  updateFavoritesUI();renderProducts();
  const isCart=page==='cart';
- if(isCart)setCheckoutStep(cart.length?'review':'receipt',{scroll:false});
+ // A return visit to the cart must never look like a newly placed order.
+ if(isCart){
+  if(lastRenderedPage!=='cart')checkoutFreshReceipt=false;
+  setCheckoutStep(cart.length?'review':'receipt',{scroll:false});
+ }
  $('overlay').hidden=true;$('drawer').classList.toggle('open',isCart);$('drawer').setAttribute('aria-hidden',String(!isCart));
  document.body.classList.toggle('cart-open',isCart);
  setBottomActive(isGift||isDetail?'catalog':page);
