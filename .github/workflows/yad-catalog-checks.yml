@@ -5,6 +5,7 @@ on:
       - 'catalog-data.js'
       - 'app.js'
       - 'index.html'
+      - 'style.css'
       - 'tests/bibliotheque.test.js'
       - 'tests/volume-hints.test.js'
       - 'tests/checkout-steps.test.js'
