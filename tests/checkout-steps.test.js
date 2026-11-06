@@ -58,7 +58,7 @@ test('two-step checkout keeps cart and customer fields intact and updates delive
  assert.equal(elements.cartItems.hidden,true);
  assert.equal(elements.cartReviewBar.hidden,true);
  assert.equal(elements.checkoutPanel.hidden,true);
- assert.equal(elements.cartStepTitle.textContent,'Заказ оформлен');
+ assert.equal(elements.cartStepTitle.textContent,'Последняя заявка','old stored receipt must not be misrepresented as a new order');
 });
 test('checkout remains submitted only via the existing /api/orders validation path',()=>{
  const app=fs.readFileSync(path.join(__dirname,'../app.js'),'utf8');
@@ -66,6 +66,7 @@ test('checkout remains submitted only via the existing /api/orders validation pa
  assert.match(app,/if\(!buildOrder\(\)\)return/);
  assert.match(app,/fetch\('\/api\/orders'/);
  assert.match(app,/setCheckoutStep\('receipt',\{scroll:false\}\)/);
+ assert.match(app,/checkoutFreshReceipt=true;/,'fresh receipt is shown only after a successful server response');
  assert.match(markup,/id="cartContinueCheckout"/);
  assert.match(markup,/id="cartBackToReview"/);
  assert.match(markup,/id="checkoutPanel" hidden/);
