@@ -67,6 +67,7 @@ test('checkout remains submitted only via the existing /api/orders validation pa
  assert.match(app,/fetch\('\/api\/orders'/);
  assert.match(app,/setCheckoutStep\('receipt',\{scroll:false\}\)/);
  assert.match(app,/checkoutFreshReceipt=true;/,'fresh receipt appears only after successful submission');
+ assert.match(app,/if\(lastRenderedPage!=='cart'\)checkoutFreshReceipt=false;/,'returning to cart must not present an old receipt as a new order');
  assert.match(markup,/id="cartContinueCheckout"/);
  assert.match(markup,/id="cartBackToReview"/);
  assert.match(markup,/id="checkoutPanel" hidden/);
