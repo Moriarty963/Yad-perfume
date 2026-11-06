@@ -13,7 +13,7 @@ test('two-step checkout keeps cart and customer fields intact and updates delive
  const elements=Object.fromEntries([
   'orderReceipt','cartStepTitle','cartItems','cartActions','cartReviewBar',
   'checkoutPanel','cartReviewCount','cartReviewShipping','cartReviewTotal',
-  'checkoutReview','customerName'
+  'checkoutReview','customerName','orderHistory'
  ].map(id=>[id,{hidden:false,textContent:'',open:true,value:''}]));
  elements.orderReceipt.hidden=true;
  elements.customerName.value='Покупатель';
@@ -30,6 +30,7 @@ test('two-step checkout keeps cart and customer fields intact and updates delive
  ui.setCheckoutStep('review',{scroll:false});
  assert.equal(elements.cartReviewBar.hidden,false);
  assert.equal(elements.checkoutPanel.hidden,true);
+ assert.equal(elements.orderHistory.hidden,true,'previous orders stay below the active checkout flow');
  assert.equal(elements.cartReviewTotal.textContent,'1550 ₽');
  assert.equal(elements.cartReviewShipping.textContent,'Доставка · 250 ₽');
  assert.equal(ui.getStep(),'review');
