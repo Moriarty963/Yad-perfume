@@ -9,6 +9,11 @@ on:
       - 'tests/bibliotheque.test.js'
       - 'tests/volume-hints.test.js'
       - 'tests/checkout-steps.test.js'
+      - 'tests/yad-channel-bibliotheque.test.js'
+      - 'lib/yad-telegram-channel.js'
+      - 'lib/yad-telegram.js'
+      - 'api/telegram-webhook.js'
+      - 'vercel.json'
       - '.github/workflows/yad-catalog-checks.yml'
   workflow_dispatch:
 
@@ -31,4 +36,4 @@ jobs:
       - name: Validate browser code syntax
         run: node --check app.js && node --check catalog-data.js
       - name: Verify catalog and order API integration
-        run: node --test tests/bibliotheque.test.js tests/volume-hints.test.js tests/checkout-steps.test.js
+        run: node --test tests/bibliotheque.test.js tests/volume-hints.test.js tests/checkout-steps.test.js tests/yad-channel-bibliotheque.test.js
