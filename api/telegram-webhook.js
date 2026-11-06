@@ -3,7 +3,7 @@ const {neon}=require('@neondatabase/serverless');
 const {ready,validWebhookSecret,hashCode,sendText,shopKeyboard,setShopMenu,statusLabels}=require('../lib/yad-telegram');
 const {ensureTelegramTables}=require('../lib/yad-telegram-schema');
 const {handleMessage:handleAdminMessage,handleCallback:handleAdminCallback}=require('../lib/yad-telegram-admin');
-const {handleChannelAdminMessage}=require('../lib/yad-telegram-channel');
+const {handleChannelAdminMessage,handleChannelAdminCallback}=require('../lib/yad-telegram-channel');
 const {YAD_CATALOG_ROWS}=require('../catalog-data');
 const fragranceNames=new Map(YAD_CATALOG_ROWS.map(([id,name])=>[id,name]));
 fragranceNames.set('discovery','Discovery Set');
@@ -18,7 +18,11 @@ module.exports=async(req,res)=>{
   if(update.callback_query){
    // Telegram only delivers callbacks from the existing authenticated webhook.
    // Private-chat and exact Telegram user-ID verification happen inside handler.
-   await handleAdminCallback(update.callback_query);
+   // Channel-preview confirmation is owner-only and is processed before
+   // the general order management callback handler.
+   if(!await handleChannelAdminCallback(update.callback_query)){
+    await handleAdminCallback(update.callback_query);
+   }
    return res.status(200).json({ok:true});
   }
   const message=update.message;
