@@ -19,6 +19,17 @@ test('checkout offers local courier delivery and describes a street address',()=
  assert.match(api,/const destination=b\.delivery==='Курьер по Хасавюрту'/);
  assert.match(js,/delivery:\['Wildberries','Ozon','Курьер по Хасавюрту'\]\.includes\(value\.delivery\)/);
 });
+test('courier order address includes Khasavyurt exactly once',()=>{
+ const api=file('api/orders.js');
+ const start=api.indexOf('function courierAddress(address){');
+ const end=api.indexOf('async function notifyTelegram(',start);
+ assert.ok(start>=0&&end>start);
+ const fn=vm.runInNewContext(api.slice(start,end)+'\ncourierAddress', {});
+ assert.equal(fn('улица Датуева, дом 12'),'г. Хасавюрт, улица Датуева, дом 12');
+ assert.equal(fn('г. Хасавюрт, улица Датуева, дом 12'),'г. Хасавюрт, улица Датуева, дом 12');
+ assert.equal(fn('Хасавюрт, улица Датуева, дом 12'),'Хасавюрт, улица Датуева, дом 12');
+});
+
 test('switching from pickup to courier updates form labels and clears the old address',()=>{
  const source=file('app.js');
  const begin=source.indexOf('// Marketplace choices are pickup locations, not stores.');
