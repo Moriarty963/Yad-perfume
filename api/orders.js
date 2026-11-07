@@ -12,6 +12,7 @@ perfumeNames.discovery='Discovery Set';
 perfumeNames['gift-set']='YAD Gift Set · 3 × 20 мл';
 function telegramEscape(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function rub(n){return new Intl.NumberFormat('ru-RU').format(n)+' ₽'}
+function courierAddress(address){const value=address.trim();return /^\s*(г\.?\s*)?хасавюрт\b/i.test(value)?value:'г. Хасавюрт, '+value}
 async function notifyTelegram(order,b,items){
  const token=process.env.YAD_TELEGRAM_BOT_TOKEN,chat=process.env.YAD_TELEGRAM_CHAT_ID;
  if(!token||!chat)return;
@@ -42,7 +43,7 @@ async function notifyTelegram(order,b,items){
   '',
   '📦 <b>ДОСТАВКА</b>',
   telegramEscape(b.delivery),
-  telegramEscape(b.delivery==='Курьер по Хасавюрту'?'г. Хасавюрт, '+b.address.trim():b.address.trim())
+  telegramEscape(b.delivery==='Курьер по Хасавюрту'?courierAddress(b.address):b.address.trim())
  );
  if(b.comment.trim())lines.push('','💬 <b>КОММЕНТАРИЙ</b>',telegramEscape(b.comment.trim()));
  // Telegram actions are restricted to a private administrator, never a group.
@@ -90,9 +91,7 @@ module.exports=async(req,res)=>{
   if(subtotal>1000000)return res.status(400).json({error:'Слишком большая сумма заказа.'});
   const orderDeliveryFee=items.some(item=>item.ml===100)?0:fee;
   // City courier deliveries use the address field; store the city explicitly.
-  const destination=b.delivery==='Курьер по Хасавюрту'
-   ?(/^\s*(г\.?\s*)?хасавюрт\b/i.test(b.address.trim())?b.address.trim():'г. Хасавюрт, '+b.address.trim())
-   :b.address.trim();
+  const destination=b.delivery==='Курьер по Хасавюрту'?courierAddress(b.address):b.address.trim();
   const sql=neon(process.env.DATABASE_URL);
   const rows=await sql`INSERT INTO yad_orders (customer_name,customer_phone,contact_method,contact_value,delivery_service,pickup_address,comment,items,subtotal_rub,delivery_rub,total_rub) VALUES (${b.name.trim()},${validPhone(b.phone)?b.phone.trim():(validPhone(b.contact)?b.contact.trim():null)},${b.method},${b.contact.trim()},${b.delivery},${destination},${b.comment.trim()},${JSON.stringify(items)}::jsonb,${subtotal},${orderDeliveryFee},${subtotal+orderDeliveryFee}) RETURNING public_id,created_at,subtotal_rub,delivery_rub,total_rub`;
   await notifyTelegram(rows[0],b,items);return res.status(201).json({order_id:rows[0].public_id,total:rows[0].total_rub,status_token:issueToken(rows[0].public_id)});
