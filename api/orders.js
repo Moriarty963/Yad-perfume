@@ -12,7 +12,7 @@ perfumeNames.discovery='Discovery Set';
 perfumeNames['gift-set']='YAD Gift Set · 3 × 20 мл';
 function telegramEscape(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function rub(n){return new Intl.NumberFormat('ru-RU').format(n)+' ₽'}
-function courierAddress(address){const value=address.trim();return /^\s*(г\.?\s*)?хасавюрт\b/i.test(value)?value:'г. Хасавюрт, '+value}
+function courierAddress(address){const value=address.trim();return /^\s*(?:г\.?\s*)?хасавюрт(?:\s|,|$)/i.test(value)?value:'г. Хасавюрт, '+value}
 async function notifyTelegram(order,b,items){
  const token=process.env.YAD_TELEGRAM_BOT_TOKEN,chat=process.env.YAD_TELEGRAM_CHAT_ID;
  if(!token||!chat)return;
