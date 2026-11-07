@@ -82,7 +82,7 @@ function renderGiftSetDetail(){
   '<p id="giftSelectionStatus" class="yad-gift-selection-status" aria-live="polite" role="status">Выберите 3 аромата.</p></fieldset>'+
   '<div class="yad-gift-purchase"><div><small>Стоимость набора</small><strong>'+rub(giftSetPrice)+'</strong></div>'+
   '<button type="button" id="giftAddToCart">Добавить набор в корзину ↗</button></div>'+
-  '<p class="yad-gift-delivery">Доставка до ПВЗ Wildberries или Ozon — 250 ₽. При наличии в заказе флакона 100 мл доставка бесплатна. Оплата после согласования.</p></div></div>';
+  '<p class="yad-gift-delivery">Доставка до ПВЗ Wildberries или Ozon либо курьером по Хасавюрту — 250 ₽. При наличии в заказе флакона 100 мл доставка бесплатна. Оплата после согласования.</p></div></div>';
  root.dataset.ready='true';
 }
 $('giftSetDetail').addEventListener('change',e=>{
@@ -142,7 +142,7 @@ function normalizeLocalOrder(value){
  });
  const token=typeof value.statusToken==='string'&&/^v1\.[0-9a-f-]{36}\.[0-9]{10}\.[a-f0-9]{64}$/.test(value.statusToken)?value.statusToken:null;
  return {number:value.number,method:value.method==='whatsapp'?'whatsapp':'telegram',
- delivery:value.delivery==='Wildberries'?'Wildberries':'Ozon',
+ delivery:['Wildberries','Ozon','Курьер по Хасавюрту'].includes(value.delivery)?value.delivery:'Ozon',
  total:Math.max(0,Math.min(1000000,Number(value.total)||0)),items,
  statusToken:token,status:['new','confirmed','paid','shipped','completed','cancelled'].includes(value.status)?value.status:'new',
  checkedAt:typeof value.checkedAt==='string'?value.checkedAt:null,savedAt};
@@ -1044,9 +1044,9 @@ function buildOrder(){
  const digits=phone.replace(/\D/g,'');
  if(digits.length<10||digits.length>15||!/^\+?[\d\s()\-]{10,25}$/.test(phone))
   return checkoutProblem('Проверьте номер: от 10 до 15 цифр, можно использовать +, пробелы и скобки.','customerPhone');
- if(!['Wildberries','Ozon'].includes(delivery))
-  return checkoutProblem('Выберите службу доставки: Wildberries или Ozon.');
- if(!address)return checkoutProblem('Укажите город и адрес пункта выдачи.','customerAddress');
+ if(!['Wildberries','Ozon','Курьер по Хасавюрту'].includes(delivery))
+  return checkoutProblem('Выберите способ доставки: ПВЗ Wildberries, ПВЗ Ozon или курьером по Хасавюрту.');
+ if(!address)return checkoutProblem(delivery==='Курьер по Хасавюрту'?'Укажите улицу, дом и при необходимости квартиру.':'Укажите город и адрес пункта выдачи.','customerAddress');
  if(address.length>350)return checkoutProblem('Адрес слишком длинный — не более 350 символов.','customerAddress');
  if(comment.length>500)return checkoutProblem('Сократите комментарий до 500 символов.','customerComment');
  if(method==='telegram'){
@@ -1066,14 +1066,23 @@ checkoutFieldIds.forEach(id=>$(id)?.addEventListener('input',event=>{
  const status=$('siteOrderStatus');
  if(status.classList.contains('error')){status.textContent='';status.className='checkout-status'}
 }));
-// Wildberries and Ozon designate pickup destinations only, never storefront links.
+// Marketplace choices are pickup locations, not stores. Khasavyurt is local courier delivery.
 function syncPickupService(changed=false){
  const service=document.querySelector('input[name="deliveryService"]:checked')?.value;
  const field=$('customerAddress'),hint=$('pickupServiceHint');
- if(!['Wildberries','Ozon'].includes(service)||!field||!hint)return;
- hint.textContent=changed&&field.value.trim()
-  ?'Вы выбрали ПВЗ '+service+'. Проверьте, что указанный адрес относится именно к этой службе.'
-  :'Укажите адрес ПВЗ '+service+', куда доставить ваш заказ YAD.';
+ if(!field||!hint)return;
+ const local=service==='Курьер по Хасавюрту';
+ const label=$('deliveryAddressLabel'),explanation=$('deliveryExplainer');
+ if(changed){field.value='';clearCheckoutFieldIssue()}
+ if(label)label.textContent=local?'Адрес доставки по Хасавюрту':'Город и адрес пункта выдачи';
+ field.placeholder=local?'Улица, дом, квартира, подъезд':'Город, улица, дом или название ПВЗ';
+ field.setAttribute('autocomplete',local?'street-address':'off');
+ if(explanation)explanation.textContent=local
+  ?'Курьерская доставка действует в пределах города Хасавюрт. Мы свяжемся с вами, чтобы согласовать время и детали. Оплата после подтверждения заказа.'
+  :'Заказ оформляется напрямую в YAD. Мы отправим его в выбранный пункт выдачи. Wildberries и Ozon используются только для получения посылки.';
+ hint.textContent=local
+  ?'Укажите адрес в Хасавюрте: улицу, дом, квартиру и подъезд (при необходимости). Время доставки согласуем перед отправкой.'
+  :'Укажите адрес ПВЗ '+(service==='Ozon'?'Ozon':'Wildberries')+', куда доставить ваш заказ YAD.';
 }
 document.querySelectorAll('input[name="deliveryService"]').forEach(input=>
  input.addEventListener('change',()=>syncPickupService(true))

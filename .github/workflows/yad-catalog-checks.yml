@@ -9,6 +9,9 @@ on:
       - 'tests/bibliotheque.test.js'
       - 'tests/volume-hints.test.js'
       - 'tests/checkout-steps.test.js'
+      - 'tests/local-delivery.test.js'
+      - 'api/orders.js'
+      - 'migrations/20261107_khasavyurt_local_delivery.sql'
       - 'tests/yad-channel-bibliotheque.test.js'
       - 'lib/yad-telegram-channel.js'
       - 'lib/yad-telegram.js'
@@ -34,6 +37,6 @@ jobs:
       - name: Install runtime libraries
         run: npm install --ignore-scripts --no-audit --no-fund
       - name: Validate browser code syntax
-        run: node --check app.js && node --check catalog-data.js
+        run: node --check app.js && node --check catalog-data.js && node --check api/orders.js
       - name: Verify catalog and order API integration
-        run: node --test tests/bibliotheque.test.js tests/volume-hints.test.js tests/checkout-steps.test.js tests/yad-channel-bibliotheque.test.js
+        run: node --test tests/bibliotheque.test.js tests/volume-hints.test.js tests/checkout-steps.test.js tests/local-delivery.test.js tests/yad-channel-bibliotheque.test.js
